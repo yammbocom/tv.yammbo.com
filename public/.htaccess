@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Yammbo Tv SPA gate: /app and /app/ (bare) go through Laravel (auth middleware),
+    # deeper asset paths (/app/<hash>/scripts/main.js etc.) serve directly via Apache.
+    RewriteRule ^app/?$ index.php [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

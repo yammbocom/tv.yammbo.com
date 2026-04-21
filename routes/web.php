@@ -22,5 +22,11 @@ Route::get('/catalog/{type}/{id}/{extra}.json', [StremioAddonController::class, 
 Route::get('/meta/{type}/{id}.json', [StremioAddonController::class, 'meta']);
 Route::get('/stream/{type}/{id}.json', [StremioAddonController::class, 'stream']);
 
+// Stremio SPA gated behind Wave auth — .htaccess rewrites /app and /app/ here.
+// Deeper asset paths (/app/<hash>/...) are served directly by Apache.
+Route::get('/app', function () {
+    return response()->file(public_path('app/index.html'), ['Content-Type' => 'text/html']);
+})->middleware('auth');
+
 // Wave routes
 Wave::routes();

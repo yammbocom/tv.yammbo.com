@@ -1,6 +1,13 @@
 <?php
-    use function Laravel\Folio\{name};
+    use function Laravel\Folio\{name, render};
     name('home');
+
+    render(function (\Illuminate\View\View $view) {
+        if (auth()->check()) {
+            return redirect('/app');
+        }
+        return $view;
+    });
 ?>
 
 <x-layouts.marketing

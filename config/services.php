@@ -13,4 +13,8 @@ return [
         'secret' => env('SPARKPOST_SECRET'),
     ],
 
+    'tmdb' => [
+        'key' => env('TMDB_API_KEY'),
+    ],
+
 ];

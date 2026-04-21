@@ -1,7 +1,11 @@
 <?php
-    use function Laravel\Folio\{middleware, name};
+    use function Laravel\Folio\{middleware, name, render};
 	middleware('auth');
     name('dashboard');
+
+    render(function (\Illuminate\View\View $view) {
+        return redirect('/app');
+    });
 ?>
 
 <x-layouts.app>

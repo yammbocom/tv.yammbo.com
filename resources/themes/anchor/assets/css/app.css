@@ -140,3 +140,54 @@ https://github.com/filamentphp/filament/blob/4.x/docs/01-introduction/02-install
 
 /* Required by widgets */
 @import '../../../../../vendor/filament/widgets/resources/css/index.css';
+
+/* ═══════════════════════════════════════════════════════════════════
+   Yammbo Tv — dark + red theme override
+   (per-site exception, other Yammbo sites stay B&W — see memory)
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+    --yammbo-red: #dc2626;
+    --yammbo-red-dark: #b91c1c;
+}
+
+body {
+    background-color: #000 !important;
+    color: #e4e4e7 !important;
+}
+
+/* Backgrounds: white/light surfaces → black/near-black */
+.bg-white                          { background-color: #000 !important; }
+.bg-zinc-50, .bg-gray-50           { background-color: #0a0a0a !important; }
+.bg-zinc-100, .bg-gray-100,
+.bg-neutral-100                    { background-color: #111 !important; }
+
+/* Dark accents (buttons, badges) in the light theme → red */
+.bg-zinc-900, .bg-zinc-800, .bg-black { background-color: var(--yammbo-red) !important; }
+.hover\:bg-zinc-900:hover,
+.hover\:bg-zinc-800:hover          { background-color: var(--yammbo-red-dark) !important; }
+
+/* Text: dark → light */
+.text-zinc-900, .text-gray-900,
+.text-slate-900, .text-black       { color: #fafafa !important; }
+.text-zinc-700, .text-gray-700,
+.text-slate-800, .text-slate-700   { color: #d4d4d8 !important; }
+.text-zinc-500, .text-gray-500,
+.text-slate-500                    { color: #a1a1aa !important; }
+
+/* Text on dark (inverted) buttons stays white */
+.text-white                        { color: #fff !important; }
+
+/* Borders */
+.border-zinc-100, .border-zinc-200,
+.border-gray-100, .border-gray-200 { border-color: #27272a !important; }
+.border-zinc-900, .border-black    { border-color: var(--yammbo-red) !important; }
+
+/* Primary link/button accent → red */
+a[data-primary], [data-primary="indigo-700"],
+.fi-color-primary                  { background-color: var(--yammbo-red) !important; color: #fff !important; }
+
+/* SVG "wave" hero animation: was blue, now red */
+.wave { fill: var(--yammbo-red) !important; }
+
+/* Filament admin dark mode preference */
+html[data-theme] { color-scheme: dark; }

@@ -1,60 +1,165 @@
-<p align="center"><a href="https://devdojo.com/wave" target="_blank"><img src="https://cdn.devdojo.com/images/october2024/wave-logo.png" width="200"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/thedevdojo/wave/actions"><img src="https://github.com/thedevdojo/wave/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
-<a href="https://github.com/thedevdojo/wave"><img src="https://img.shields.io/github/v/release/thedevdojo/wave" alt="Latest Stable Version"></a>
-<a href="https://github.com/thedevdojo/wave"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
-<a href="https://herd.laravel.com/new?starter-kit=devdojo/wave"><img src="https://img.shields.io/badge/Install%20with%20Herd-f55247?logo=laravel&logoColor=white"></a>
-</p>
+<img src=".github/logo.png" alt="Yammbo" width="320">
 
-Wave is a SaaS framework, built with <a href="https://laravel.com">Laravel</a>, that will make building your SaaS application fun and easier than ever before. <a href="https://devdojo.com/wave/docs" target="_blank">View the full docs here</a>.
+# Yammbo Tv
 
-Wave provides you with all the essential features found in many popular SaaS platforms, allowing you to quickly transform your idea into a profitable SaaS product. Here are a handful of features that Wave provides:
+Streaming catalog, metadata and player for the Yammbo TV
+companion — web, mobile and TV app in one.
 
- - <a href="https://devdojo.com/wave/docs/features/auth" target="_blank">Authentication</a>
- - <a href="https://devdojo.com/wave/docs/features/user-profiles" target="_blank">User Profiles</a>
- - <a href="https://devdojo.com/wave/docs/features/user-impersonations" target="_blank">User Impersonations</a>
- - <a href="https://devdojo.com/wave/docs/features/billing" target="_blank">Billing</a>
- - <a href="https://devdojo.com/wave/docs/features/subscription-plans" target="_blank">Subscription Plans</a>
- - <a href="https://devdojo.com/wave/docs/features/roles-permissions" target="_blank">Roles & Permissions</a>
- - <a href="https://devdojo.com/wave/docs/features/notifications" target="_blank">User Notifications</a>
- - <a href="https://devdojo.com/wave/docs/features/changelog" target="_blank">Changelog</a>
- - <a href="https://devdojo.com/wave/docs/features/blog" target="_blank">Blog</a>
- - <a href="https://devdojo.com/wave/docs/features/pages" target="_blank">Pages</a>
- - <a href="https://devdojo.com/wave/docs/features/api" target="_blank">API</a>
- - <a href="https://devdojo.com/wave/docs/features/admin" target="_blank">Admin</a>
- - <a href="https://devdojo.com/wave/docs/features/themes" target="_blank">Themes</a>
- - <a href="https://devdojo.com/wave/docs/features/plugins" target="_blank">Plugins</a>
+</div>
 
-Be sure to view a list of <a href="https://devdojo.com/wave/docs/features/auth" target="_blank">all features here</a>.
+---
 
-## Demo
+## Overview
 
-You can view a <a href="https://devdojo.com/wave/demo" target="_blank">live demo here</a>, which will also allow you to preview all the <a href="https://devdojo.com/wave/themes" target="_blank">available themes</a>.
+Yammbo Tv is the backend and web player for the `tv.yammbo.com` service.
+It unifies three pieces behind a single domain:
 
-<a href="https://devdojo.com/wave/demo" target="_blank"><img src="https://cdn.devdojo.com/images/august2024/wave-anchor-theme.jpeg" alt="Wave Anchor Theme Preview"></a>
+- a **marketing landing**, blog and auth flows,
+- a **Stremio-based** web player for the catalog, meta details, library
+  and in-browser playback,
+- an **admin panel** for content operations and user management,
+- a **mobile / TV APK** companion driven by a dedicated REST API
+  (`/api/app-tv/*`), so a phone can log in, manage the library and
+  pair with a TV set without typing on the set.
 
-## Installation
+## Features
 
-There are two ways to install Wave, you can install it via the automated installer or manually.
+- **Unified app**: landing, admin, player SPA and APK endpoints on a
+  single domain, a single session and a single user database.
+- **Yammbo Library**: user-owned "My List" that survives beyond
+  third-party catalog availability. Soft-delete, per-episode progress,
+  Cinemeta auto-sync for series.
+- **Calendar**: upcoming and recent episodes for everything in the
+  library, with day-by-day grouping.
+- **Premium addon policy**: active subscribers automatically get the
+  premium streams addon installed and the free-only YouTube / public-domain
+  addons removed; downgrading reverses the change on next login.
+- **Pricing and checkout**: three-tier plans with direct Stripe Checkout
+  (no trial).
+- **i18n with auto-detect**: interface and subtitle languages are seeded
+  from the user's locale on first load, with EN / ES / PT / FR support.
+- **TV APK pairing** (via `/api/app-tv/*`): JWT-based auth, subscription
+  status polling, remote library sync and progress reporting.
+- **Service-worker invalidation**: every build carries a hash; clients
+  with stale service workers auto-unregister and reload on the next hit.
 
-Click here to <a href="https://devdojo.com/wave/docs/install" target="_blank">view the full installation instructions</a>.
+## Tech stack
 
-## Support the Project
+| Layer              | Choice                                        |
+| ------------------ | --------------------------------------------- |
+| Backend            | PHP 8.2, Laravel 12, Wave (SaaS framework)    |
+| Admin              | Filament 4                                    |
+| Auth               | devdojo/auth + custom JWT for APK             |
+| Player front-end   | Stremio Web SPA fork (React)                  |
+| Build tool         | Webpack (Stremio Web), Vite (Wave)            |
+| Database           | MariaDB 10                                    |
+| HTTP               | Apache 2.4 + PHP-FPM                          |
+| Billing            | Stripe (checkout + webhook)                   |
 
-The best way to support this project is to support us by subscribing to a <a href="https://devdojo.com/pro">DevDojo Pro</a> account. This will give you access to <a href="https://devdojo.com/wave/pro">premium content</a> to help you build your SaaS even quicker. Also, make sure to tell your friends and <a href="https://github.com/thedevdojo/wave/compare" target="_blank">submit a PR</a> if you want to contribute.
+## Route surface
 
-We've also got a full video series on how you can setup, build, and configure Wave. 🍿 You can watch first few videos for free, and additional videos will require a [DevDojo Pro](https://devdojo.com/wave/pro) subscription. By subscribing to a [DevDojo Pro](https://devdojo.com/pro) subscription you will also be supporting the ongoing development of this project. It's a win win! 🙌
+| Path                                           | Serves                                                     |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| `/`                                            | Marketing landing (redirects to `/app` if signed in)       |
+| `/app`, `/app/`                                | Stremio player SPA                                         |
+| `/app/{path}`                                  | 301 to `/app/#/{path}` (Stremio uses HashRouter)           |
+| `/admin`                                       | Filament admin panel                                       |
+| `/auth/login`, `/auth/register`                | devdojo/auth views                                         |
+| `/pricing`, `/pricing/checkout`                | Plans and direct Stripe checkout                           |
+| `/api/app-tv/whoami`                           | Session identity + subscription status                     |
+| `/api/app-tv/login`, `/register`               | JWT auth for the APK                                       |
+| `/api/app-tv/library[...]`                     | User library read / toggle / progress / episodes           |
+| `/api/app-tv/calendar`                         | Upcoming and recent episodes for the library               |
+| `/manifest.json`, `/catalog/*`, `/meta/*`      | Stremio addon (catalog + metadata)                         |
+| `/webhook/stripe`                              | Stripe billing webhook                                     |
 
-[Click here to watch the Wave Video Course](https://devdojo.com/wave/videos).
+## Data model (Yammbo tables)
 
+- **`yambo_library`** — `(user_id, meta_id, meta_type)` unique. Stores the
+  poster, title, genres, rating and runtime at add-time so the "My List"
+  row survives catalog changes upstream. `removed_at` implements soft
+  delete; `watched_at` and `watch_progress` track playback state.
+- **`yambo_library_episodes`** — `(user_id, meta_id, season, episode)`
+  unique. Stores per-episode air date, watched timestamp and watch
+  progress. Indexed on `air_date` for the calendar view.
 
-## Documentation
+## Addon policy
 
-Checkout the [official documentation here](https://devdojo.com/wave/docs).
+Applied on every login and on subscription-state changes:
 
-## Sponsors
+| State         | Installed                 | Uninstalled                                          |
+| ------------- | ------------------------- | ---------------------------------------------------- |
+| All users     | Cinemeta, Local Files, OpenSubtitles (never removed) | YouTube (`com.linvo.stremiochannels`), Public Domain Movies (`org.stremio.pubdomainmovies`) |
+| Premium       | + Premium streams addon   | + WatchHub (`org.stremio.watchhub`)                  |
+| Downgrade     | — (premium addon is removed next login) | —                                        |
 
-Wave is proudly supported by our amazing sponsors. A big thank you to:
+## Project layout
 
-[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%203.svg)](https://www.digitalocean.com/?refcode=dc19b9819d06&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+```
+app/
+  Http/Controllers/AppTv/          # API for the mobile / TV app
+  Http/Controllers/                # Pricing, billing, webhook, auth
+  Models/                          # Yambo library + episode models
+database/migrations/               # yambo_library, yambo_library_episodes
+resources/
+  themes/anchor/                   # Wave marketing theme overrides
+  views/                           # Pricing, auth, TV-pairing blades
+routes/
+  web.php                          # Landing, /app, /admin, /pricing
+  api.php                          # /api/app-tv/*
+public/app/                        # Built Stremio SPA (immutable per-build)
+```
+
+The Stremio front-end source lives in a separate working tree under
+`stremio-web-src/` on the deploy host and is built independently; the
+compiled bundle is copied into `public/app/`.
+
+## Local development
+
+> The app requires Wave's own environment: DB, mailer and Stripe test
+> keys. Copy `.env.example` and fill it in before running migrations.
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan jwt:secret           # for the APK auth layer
+npm ci
+npm run dev                       # Vite for Wave theme assets
+php artisan serve
+```
+
+Run the scheduler (queues + cron) in a separate terminal if needed:
+
+```bash
+php artisan schedule:work
+php artisan queue:work
+```
+
+## Production build
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+php artisan optimize
+php artisan storage:link
+```
+
+## Status
+
+Production. HTTPS with Let's Encrypt. Nightly offsite backups.
+
+## Contact
+
+For bug reports, partnerships or support: **support@yammbo.com**
+
+## License
+
+Proprietary. Not for redistribution. Built on open-source and commercial
+upstream components (Wave, Stremio Web, devdojo/auth, Filament); their
+respective licenses apply to the upstream portions of the codebase.
+
+© Yammbo. All rights reserved.

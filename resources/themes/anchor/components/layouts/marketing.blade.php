@@ -16,5 +16,8 @@
     @include('theme::partials.footer-scripts')
     {{ $javascript ?? '' }}
 
+    {{-- Yammbo chat widget (chat.yammbo.com) — marketing pages only, not /app SPA nor /admin --}}
+    <script src="https://chat.yammbo.com/widget.js" defer></script>
+
 </body>
 </html>

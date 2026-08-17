@@ -1,97 +1,128 @@
-<section>
-    <x-marketing.elements.heading
-        level="h2"
-        title="Chart Your Course"
-        description="Set sail and discover the riches of our value-packed plans, meticulously designed to offer you the very best features for less on your SaaS expedition. " 
-    />
+@php
+    use Wave\Plan;
+    use Wave\Subscription as WaveSub;
+    use Carbon\Carbon;
 
-    <div x-data="{ on: false, billing: '{{ get_default_billing_cycle() }}',
-            toggleRepositionMarker(toggleButton){
-                if(this.$refs.marker && toggleButton){
-                    this.$refs.marker.style.width=toggleButton.offsetWidth + 'px';
-                    this.$refs.marker.style.height=toggleButton.offsetHeight + 'px';
-                    this.$refs.marker.style.left=toggleButton.offsetLeft + 'px';
-                }
-            }
-         }" 
-        x-init="
-                setTimeout(function(){ 
-                    toggleRepositionMarker($refs.monthly); 
-                    if($refs.marker){
-                        $refs.marker.classList.remove('opacity-0');
-                        setTimeout(function(){ 
-                            $refs.marker.classList.add('duration-300', 'ease-out');
-                        }, 10); 
-                    }
-                }, 1);
-        "
-        class="mx-auto mt-12 mb-2 w-full max-w-6xl md:my-12" x-cloak>
+    $plans = Plan::where('active', true)
+        ->where(function ($q) {
+            $q->whereNotNull('monthly_price_id')->orWhereNotNull('yearly_price_id');
+        })
+        ->orderBy('sort_order')
+        ->get();
 
-        @if(has_monthly_yearly_toggle())
-            <div class="flex relative justify-start items-center pb-5 -translate-y-2 md:justify-center">
-                <div class="inline-flex relative justify-center items-center p-1 w-auto text-center rounded-full border-2 -translate-y-3 md:mx-auto border-zinc-900">
-                    <div x-ref="monthly" x-on:click="billing='Monthly'; toggleRepositionMarker($el)" :class="{ 'text-white': billing == 'Monthly', 'text-zinc-900' : billing != 'Monthly' }" class="relative z-20 px-3.5 py-1 text-sm font-medium leading-6 rounded-full duration-300 ease-out cursor-pointer">
-                        Monthly
-                    </div>
-                    <div x-ref="yearly" x-on:click="billing='Yearly'; toggleRepositionMarker($el)" :class="{ 'text-white': billing == 'Yearly', 'text-zinc-900' : billing != 'Yearly' }" class="relative z-20 px-3.5 py-1 text-sm font-medium leading-6 rounded-full duration-300 ease-out cursor-pointer">
-                        Yearly
-                    </div>
-                    <div x-ref="marker" class="absolute left-0 z-10 w-1/2 h-full opacity-0" x-cloak>
-                        <div class="w-full h-full rounded-full shadow-sm bg-zinc-900"></div>
-                    </div>
-                </div>  
+    $authUser = auth()->user();
+    $activeSub = null;
+    if ($authUser) {
+        $now = Carbon::now();
+        $activeSub = WaveSub::where('billable_type', 'user')
+            ->where('billable_id', $authUser->id)
+            ->whereIn('status', ['active', 'trialing'])
+            ->where(function ($q) use ($now) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
+            })
+            ->orderByDesc('id')
+            ->first();
+    }
+    $activePlanId = $activeSub?->plan_id;
+@endphp
+
+<section id="pricing">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+            {{ __('landing.pricing.heading') }}
+        </h2>
+        <p class="text-lg text-zinc-400">
+            {{ __('landing.pricing.subheading') }}
+        </p>
+    </div>
+
+    <div x-data="{ billing: 'monthly' }" class="max-w-6xl mx-auto">
+        {{-- Billing toggle --}}
+        <div class="flex justify-center mb-12">
+            <div class="inline-flex p-1 rounded-full bg-white/5 border border-white/10">
+                <button
+                    x-on:click="billing = 'monthly'"
+                    x-bind:class="billing === 'monthly' ? 'bg-[#E50914] text-white' : 'text-zinc-400 hover:text-white'"
+                    class="px-6 py-2 rounded-full text-sm font-semibold transition-colors">
+                    {{ __('landing.pricing.monthly') }}
+                </button>
+                <button
+                    x-on:click="billing = 'yearly'"
+                    x-bind:class="billing === 'yearly' ? 'bg-[#E50914] text-white' : 'text-zinc-400 hover:text-white'"
+                    class="px-6 py-2 rounded-full text-sm font-semibold transition-colors">
+                    {{ __('landing.pricing.yearly') }}
+                    <span class="ml-1 text-xs opacity-80">{{ __('landing.pricing.save') }}</span>
+                </button>
             </div>
-        @endif
+        </div>
 
-        <div class="flex flex-col flex-wrap gap-x-5 lg:flex-row lg:space-x-5">
-
-            @foreach(Wave\Plan::getActivePlans() as $plan)
-                @php $features = explode(',', $plan->features); @endphp
-                <div
-                    {{--  Say that you have a monthly plan that doesn't have a yearly plan, in that case we will hide the place that doesn't have a price_id --}}
-                    x-show="(billing == 'Monthly' && '{{ $plan->monthly_price_id }}' != '') || (billing == 'Yearly' && '{{ $plan->yearly_price_id }}' != '')" 
-                    class="flex-1 px-0 mx-auto mb-6 w-full md:max-w-lg lg:mb-0" x-cloak>
-                    <div class="flex flex-col lg:mb-10 h-full bg-white rounded-xl border-2  @if($plan->default){{ 'border-zinc-900 lg:scale-105' }}@else{{ 'border-zinc-200' }}@endif shadow-sm sm:mb-0">
-                        <div class="px-8 pt-8">
-                            <span class="px-4 py-1 text-base font-medium text-white rounded-full bg-zinc-900 text-uppercase" data-primary="indigo-700">
-                                {{ $plan->name }}
-                            </span>
+        {{-- Plans grid --}}
+        <div class="grid md:grid-cols-3 gap-6">
+            @foreach($plans as $plan)
+                @php
+                    $isDefault = (int) ($plan->default ?? 0) === 1;
+                    $isCurrent = $activePlanId === $plan->id;
+                    $features = array_filter(array_map('trim', explode(',', (string) $plan->features)));
+                @endphp
+                <div class="relative p-8 rounded-2xl bg-white/[0.03] border {{ $isDefault ? 'border-[#E50914]' : 'border-white/10' }} flex flex-col">
+                    @if($isDefault)
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#E50914] text-white text-xs font-bold uppercase tracking-wide">
+                            {{ __('landing.pricing.recommended') }}
                         </div>
+                    @endif
 
-                        <div class="px-8 mt-5">
-                            <span class="text-5xl font-bold">{{ $plan->currency }}<span x-text="billing == 'Monthly' ? '{{ $plan->monthly_price }}' : '{{ $plan->yearly_price }}'"></span></span>
-                            <span class="text-xl font-bold text-zinc-500"><span x-text="billing == 'Monthly' ? '/mo' : '/yr'"></span></span>
+                    @php
+                        // La descripción traducida manda; si el plan no tiene
+                        // entrada en lang/, cae a la de la tabla `plans`.
+                        $planKey = 'landing.plans.'.\Illuminate\Support\Str::slug($plan->name);
+                    @endphp
+                    <h3 class="text-2xl font-bold text-white mb-2">{{ $plan->name }}</h3>
+                    <p class="text-sm text-zinc-400 mb-6 min-h-[40px]">{{ \Illuminate\Support\Facades\Lang::has($planKey) ? __($planKey) : $plan->description }}</p>
+
+                    <div class="mb-6">
+                        <div x-show="billing === 'monthly'" class="flex items-baseline">
+                            <span class="text-5xl font-bold text-white">{{ $plan->currency }}{{ $plan->monthly_price }}</span>
+                            <span class="text-zinc-400 ml-2">{{ __('landing.pricing.per_month') }}</span>
                         </div>
-
-                        <div class="px-8 pb-10 mt-3">
-                            <p class="text-base leading-7 text-zinc-500">{{ $plan->description }}</p>
-                        </div>
-
-                        <div class="p-8 mt-auto rounded-b-lg bg-zinc-50">
-                            <ul class="flex flex-col">
-                                @foreach($features as $feature)
-                                    <li class="mt-1">
-                                        <span class="flex items-center text-green-500">
-                                            <svg class="mr-3 w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"></path></svg>
-                                            <span class="text-zinc-700">
-                                                {{ $feature }}
-                                            </span>
-                                        </span>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <div class="mt-8">
-                                <x-button class="w-full" tag="a" href="/settings/subscription">
-                                    Get Started
-                                </x-button>
-                            </div>
+                        <div x-show="billing === 'yearly'" x-cloak class="flex items-baseline">
+                            <span class="text-5xl font-bold text-white">{{ $plan->currency }}{{ $plan->yearly_price }}</span>
+                            <span class="text-zinc-400 ml-2">{{ __('landing.pricing.per_year') }}</span>
                         </div>
                     </div>
+
+                    <ul class="flex-1 space-y-3 mb-8 text-sm">
+                        @foreach($features as $feat)
+                            <li class="flex items-start text-zinc-300">
+                                <svg class="w-5 h-5 text-[#E50914] mt-0.5 flex-shrink-0 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ $feat }}
+                            </li>
+                        @endforeach
+                    </ul>
+
+                    @if($isCurrent)
+                        <div class="block text-center px-6 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 font-bold">
+                            {{ __('landing.pricing.cta_current') }}
+                        </div>
+                    @elseif($authUser)
+                        <form method="POST" action="{{ url('/pricing/checkout') }}">
+                            @csrf
+                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                            <input type="hidden" name="billing_cycle" x-bind:value="billing">
+                            <button type="submit"
+                                class="w-full text-center px-6 py-3 rounded-lg {{ $isDefault ? 'bg-[#E50914] hover:bg-[#B0070F]' : 'bg-white/5 hover:bg-white/10 border border-white/10' }} text-white font-bold transition-colors">
+                                {{ __('landing.pricing.cta') }}
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ url('/auth/login') }}?redirect={{ urlencode('/pricing') }}"
+                           class="block text-center px-6 py-3 rounded-lg {{ $isDefault ? 'bg-[#E50914] hover:bg-[#B0070F]' : 'bg-white/5 hover:bg-white/10 border border-white/10' }} text-white font-bold transition-colors">
+                            {{ __('landing.pricing.cta_login') }}
+                        </a>
+                    @endif
                 </div>
             @endforeach
         </div>
     </div>
-
-    <p class="mt-0 mb-8 w-full text-center text-zinc-500 sm:my-10">All plans are fully configurable in the Admin Area.</p>
 </section>

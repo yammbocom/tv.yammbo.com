@@ -1,9 +1,24 @@
+# Cabeceras de seguridad. Sin CSP todavía: el SPA de Stremio y Filament usan
+# scripts inline, así que una política estricta hay que construirla aparte.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), payment=()"
+    Header always set Strict-Transport-Security "max-age=15552000"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
+
+    # Los .map exponen el código fuente completo del SPA. Se bloquean por
+    # rewrite y no con "Require all denied": esa directiva se ignora aquí
+    # (probado sirviendo un .map de prueba, devolvía 200 con su contenido).
+    RewriteRule \.map$ - [F,L]
 
     # Yammbo Tv SPA gate: /app and /app/ (bare) go through Laravel (auth middleware),
     # deeper asset paths (/app/<hash>/scripts/main.js etc.) serve directly via Apache.

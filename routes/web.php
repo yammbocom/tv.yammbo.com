@@ -136,12 +136,17 @@ Route::get('/app/{path}', function ($path) {
 | (session + CSRF) para que el botón de checkout pueda usar X-CSRF-TOKEN.
 */
 
-Route::get('/app-tv/subscription', [AppTvSubscriptionController::class, 'show'])->name('app-tv.subscription');
-Route::get('/app-tv/payment-success', [AppTvPaymentController::class, 'success'])->name('app-tv.payment-success');
+// Estas tres tomaban user_id del request igual que las de routes/api.php, así
+// que quedaban fuera del cierre del IDOR: /app-tv/subscription?user_id=N
+// renderizaba el plan y la fecha de renovación de cualquier cuenta.
+Route::middleware(\App\Http\Middleware\ResolveAppTvUser::class)->group(function () {
+    Route::get('/app-tv/subscription', [AppTvSubscriptionController::class, 'show'])->name('app-tv.subscription');
+    Route::get('/app-tv/payment-success', [AppTvPaymentController::class, 'success'])->name('app-tv.payment-success');
 
-// Checkout vive en /api/app-tv/checkout pero usa web middleware (session+CSRF) porque
-// lo dispara un fetch desde el blade subscription.
-Route::post('/api/app-tv/checkout', [AppTvSubscriptionController::class, 'checkout'])->name('app-tv.checkout');
+    // Checkout vive en /api/app-tv/checkout pero usa web middleware (session+CSRF) porque
+    // lo dispara un fetch desde el blade subscription.
+    Route::post('/api/app-tv/checkout', [AppTvSubscriptionController::class, 'checkout'])->name('app-tv.checkout');
+});
 
 // Páginas estáticas del WebView APK (Centro de Ayuda, Compartir, VPN info, Descarga)
 // Servidas como vistas directas — sin lógica. download recibe la URL del APK.

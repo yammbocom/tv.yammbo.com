@@ -22,10 +22,18 @@ class AppTvLibraryController extends Controller
 {
     /**
      * Dueño autenticado de la petición, puesto por ResolveAppTvUser.
+     *
+     * Aborta si falta: este proyecto registra rutas app-tv en dos ficheros
+     * distintos y así fue como el checkout se quedó sin proteger. Sin esta
+     * guarda, una ruta registrada sin el middleware escribiría con user_id=0.
      */
     private function userId(Request $request): int
     {
-        return (int) $request->attributes->get('yambo_user_id');
+        $id = (int) $request->attributes->get('yambo_user_id');
+
+        abort_if($id <= 0, 401, 'unauthenticated');
+
+        return $id;
     }
 
     /**

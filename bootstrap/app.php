@@ -24,8 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // (distinta en cada petición) y ningún throttle por IP llega a saltar.
         $middleware->trustProxies(
             at: require __DIR__.'/../config/cloudflare-proxies.php',
+            // Sin X_FORWARDED_HOST a propósito: Cloudflare reenvía la cabecera
+            // tal cual la manda el cliente, así que confiar en ella deja que
+            // cualquiera fije el host de la petición. Con eso, un POST a
+            // /forgot-password genera el enlace de reseteo apuntando al dominio
+            // del atacante y el correo sale legítimo desde aquí.
             headers: Illuminate\Http\Request::HEADER_X_FORWARDED_FOR
-                | Illuminate\Http\Request::HEADER_X_FORWARDED_HOST
                 | Illuminate\Http\Request::HEADER_X_FORWARDED_PORT
                 | Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
         );

@@ -20,12 +20,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Cloudflare va por delante: sin esto la IP del cliente es la del edge
+        // (distinta en cada petición) y ningún throttle por IP llega a saltar.
+        $middleware->trustProxies(
+            at: require __DIR__.'/../config/cloudflare-proxies.php',
+            headers: Illuminate\Http\Request::HEADER_X_FORWARDED_FOR
+                | Illuminate\Http\Request::HEADER_X_FORWARDED_HOST
+                | Illuminate\Http\Request::HEADER_X_FORWARDED_PORT
+                | Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
+        );
+
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(AppServiceProvider::HOME);
 
         $middleware->encryptCookies(except: [
             'theme',
         ]);
+
+        // Yammbo Tv: detect user locale from ?lang, cookie, Accept-Language
+        $middleware->web(append: [
+            \App\Http\Middleware\DetectLocale::class,
+        ]);
+
         $middleware->validateCsrfTokens(except: [
             '/webhook/paddle',
             '/webhook/stripe',

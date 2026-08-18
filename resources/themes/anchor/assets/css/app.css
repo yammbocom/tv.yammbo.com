@@ -142,12 +142,18 @@ https://github.com/filamentphp/filament/blob/4.x/docs/01-introduction/02-install
 @import '../../../../../vendor/filament/widgets/resources/css/index.css';
 
 /* ═══════════════════════════════════════════════════════════════════
-   Yammbo Tv — dark + red theme override
-   (per-site exception, other Yammbo sites stay B&W — see memory)
+
+/* ═══════════════════════════════════════════════════════════════════
+   Yammbo Tv — dark + red theme override v3 (2026-04-21 late)
+   Replaces v1 + v2. Key fixes:
+   - .bg-black NO tocar (rompe body Yambo)
+   - Auth widget: selectores más específicos con [data-auth]
+   - Contrast: text dark → light sin romper bg nativo
    ═══════════════════════════════════════════════════════════════════ */
+
 :root {
-    --yammbo-red: #dc2626;
-    --yammbo-red-dark: #b91c1c;
+    --yammbo-red: #E50914;
+    --yammbo-red-dark: #B0070F;
 }
 
 body {
@@ -155,39 +161,135 @@ body {
     color: #e4e4e7 !important;
 }
 
-/* Backgrounds: white/light surfaces → black/near-black */
-.bg-white                          { background-color: #000 !important; }
-.bg-zinc-50, .bg-gray-50           { background-color: #0a0a0a !important; }
-.bg-zinc-100, .bg-gray-100,
-.bg-neutral-100                    { background-color: #111 !important; }
+/* --- Backgrounds WHITE → BLACK (pero NO bg-black nativo, ese es Yambo ya) --- */
+.bg-white:not(body):not(.yambo-keep-bg) { background-color: #000 !important; }
+.bg-zinc-50:not(body), .bg-gray-50:not(body) { background-color: #0a0a0a !important; }
+.bg-zinc-100:not(body), .bg-gray-100:not(body), .bg-neutral-100:not(body) { background-color: #111 !important; }
+.bg-slate-50:not(body), .bg-slate-100:not(body) { background-color: #0a0a0a !important; }
+.bg-white\/50 { background-color: rgba(0,0,0,0.5) !important; }
+.bg-white\/90 { background-color: rgba(0,0,0,0.9) !important; }
+.dark\:bg-zinc-800, .dark\:bg-zinc-900 { background-color: #0a0a0a !important; }
 
-/* Dark accents (buttons, badges) in the light theme → red */
-.bg-zinc-900, .bg-zinc-800, .bg-black { background-color: var(--yammbo-red) !important; }
-.hover\:bg-zinc-900:hover,
-.hover\:bg-zinc-800:hover          { background-color: var(--yammbo-red-dark) !important; }
+/* --- Dark surfaces (zinc-900/800) should stay DARK — do NOT turn into red --- */
+/* Only specific PRIMARY BUTTONS (non-text) turn red via explicit selectors. */
 
-/* Text: dark → light */
-.text-zinc-900, .text-gray-900,
-.text-slate-900, .text-black       { color: #fafafa !important; }
-.text-zinc-700, .text-gray-700,
-.text-slate-800, .text-slate-700   { color: #d4d4d8 !important; }
-.text-zinc-500, .text-gray-500,
-.text-slate-500                    { color: #a1a1aa !important; }
+/* --- Text contrast: dark → light --- */
+.text-black:not(.yambo-keep-color) { color: #fafafa !important; }
+.text-gray-900, .text-zinc-900, .text-slate-900, .text-neutral-900 { color: #fafafa !important; }
+.text-gray-800, .text-zinc-800, .text-slate-800, .text-neutral-800 { color: #ededed !important; }
+.text-gray-700, .text-zinc-700, .text-slate-700, .text-neutral-700 { color: #d4d4d8 !important; }
+.text-gray-600, .text-zinc-600, .text-slate-600, .text-neutral-600 { color: #bdbdbd !important; }
+.text-gray-500, .text-zinc-500, .text-slate-500, .text-neutral-500 { color: #a1a1aa !important; }
+.text-gray-400, .text-zinc-400, .text-slate-400, .text-neutral-400 { color: #8a8a92 !important; }
+.text-white { color: #fff !important; }
 
-/* Text on dark (inverted) buttons stays white */
-.text-white                        { color: #fff !important; }
+.hover\:text-zinc-900:hover, .hover\:text-gray-900:hover,
+.hover\:text-black:hover, .hover\:text-slate-900:hover { color: #fff !important; }
 
-/* Borders */
-.border-zinc-100, .border-zinc-200,
-.border-gray-100, .border-gray-200 { border-color: #27272a !important; }
-.border-zinc-900, .border-black    { border-color: var(--yammbo-red) !important; }
+/* --- Borders oscuros --- */
+.border-zinc-100:not([class*="border-red"]),
+.border-zinc-200:not([class*="border-red"]),
+.border-gray-100:not([class*="border-red"]),
+.border-gray-200:not([class*="border-red"]),
+.border-slate-100, .border-slate-200 { border-color: #27272a !important; }
+.border-zinc-200\/60, .border-zinc-200\/70, .border-gray-200\/60, .border-gray-200\/70 { border-color: rgba(42,42,42,0.7) !important; }
 
-/* Primary link/button accent → red */
+/* --- Primary/accent elements (EXPLICITLY primary) turn red --- */
 a[data-primary], [data-primary="indigo-700"],
-.fi-color-primary                  { background-color: var(--yammbo-red) !important; color: #fff !important; }
+.fi-color-primary, .fi-btn-color-primary,
+button.fi-btn[data-variant="primary"] {
+    background-color: var(--yammbo-red) !important;
+    color: #fff !important;
+}
+.fi-color-primary:hover, .fi-btn-color-primary:hover { background-color: var(--yammbo-red-dark) !important; }
 
-/* SVG "wave" hero animation: was blue, now red */
+/* SVG wave animation on Wave demo header */
 .wave { fill: var(--yammbo-red) !important; }
 
-/* Filament admin dark mode preference */
+/* Filament admin dark mode */
 html[data-theme] { color-scheme: dark; }
+
+/* ═══ Auth widget (devdojo/auth) — ALL WHITE → DARK ═══ */
+
+/* Container parent (the main white card) */
+#auth-body,
+body[id="auth-body"],
+#auth-body[id] { background-color: #000 !important; }
+
+#auth-background-image-overlay { background-color: #000 !important; opacity: 1 !important; }
+#auth-background-image { display: none !important; }
+
+/* The actual form card (white on default devdojo) */
+#auth-container,
+#auth-container[id],
+#auth-container.bg-white,
+[data-auth] #auth-container,
+[data-auth] .bg-white {
+    background-color: #111 !important;
+    border: 1px solid #2A2A2A !important;
+    color: #fff !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+}
+
+/* Primary button */
+.auth-component-button,
+.auth-component-button[class],
+[data-auth] button[type="submit"] {
+    background-color: var(--yammbo-red) !important;
+    color: #fff !important;
+    border: none !important;
+}
+.auth-component-button:hover { background-color: var(--yammbo-red-dark) !important; }
+
+/* Inputs */
+.auth-component-input,
+[data-auth] input[type="text"],
+[data-auth] input[type="email"],
+[data-auth] input[type="password"] {
+    background-color: #1A1A1A !important;
+    border-color: #333 !important;
+    color: #fff !important;
+}
+.auth-component-input::placeholder,
+[data-auth] input::placeholder { color: #666 !important; }
+.auth-component-input:focus,
+[data-auth] input:focus { border-color: var(--yammbo-red) !important; outline: none !important; }
+
+.auth-component-input-label,
+.auth-component-input-label-focused { color: #d4d4d8 !important; }
+
+/* Social auth buttons */
+.auth-component-social-button,
+[data-auth] .bg-zinc-50 {
+    background-color: #1A1A1A !important;
+    border-color: #333 !important;
+    color: #fff !important;
+}
+.auth-component-social-button:hover { background-color: #2A2A2A !important; }
+
+/* Links inside auth */
+[data-auth] a { color: var(--yammbo-red) !important; }
+[data-auth] a:hover { color: #FF3B45 !important; }
+
+/* Hide "powered by devdojo" branding */
+a[href*="devdojo.com"][href*="utm_source=branding"],
+a[href*="devdojo.com/auth"] { display: none !important; }
+
+/* ═══ Form inputs en otros sitios (no auth) ═══ */
+input[type="text"]:not([data-auth] *):not(.auth-component-input),
+input[type="email"]:not([data-auth] *):not(.auth-component-input),
+input[type="password"]:not([data-auth] *):not(.auth-component-input),
+input[type="search"]:not([data-auth] *):not(.auth-component-input),
+input[type="number"]:not([data-auth] *):not(.auth-component-input),
+textarea, select {
+    background-color: #1A1A1A !important;
+    color: #fff !important;
+    border-color: #333 !important;
+}
+input:not([data-auth] *)::placeholder,
+textarea::placeholder { color: #666 !important; }
+input:focus:not([data-auth] *),
+textarea:focus, select:focus {
+    border-color: var(--yammbo-red) !important;
+    outline-color: var(--yammbo-red) !important;
+}

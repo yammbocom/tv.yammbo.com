@@ -1,2 +1,3 @@
-<link rel="icon" href="{{ setting('site.favicon', '/wave/favicon.png') }}" type="image/x-icon">
-<link rel="icon" href="{{ setting('site.favicon_dark', '/wave/favicon-dark.png') }}" type="image/png" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="{{ asset('images/yambo-icon.png') }}" type="image/png">
+<link rel="apple-touch-icon" href="{{ asset('images/yambo-icon.png') }}">
+<meta name="theme-color" content="#E50914">

@@ -12,25 +12,28 @@
 
 <x-layouts.marketing
     :seo="[
-        'title'         => setting('site.title', 'Laravel Wave'),
-        'description'   => setting('site.description', 'Software as a Service Starter Kit'),
-        'image'         => url('/og_image.png'),
+        'title'         => __('landing.seo.title'),
+        'description'   => __('landing.seo.description'),
+        'image'         => asset('/images/yambo-icon.png'),
         'type'          => 'website'
     ]"
+    bodyClass="bg-black text-white"
 >
-        
-        <x-marketing.sections.hero />
-        
-        <x-container class="py-12 border-t sm:py-24 border-zinc-200">
-            <x-marketing.sections.features />
-        </x-container>
+    <x-marketing.sections.hero />
 
-        <x-container class="py-12 border-t sm:py-24 border-zinc-200">
-            <x-marketing.sections.testimonials />
-        </x-container>
-        
-        <x-container class="py-12 border-t sm:py-24 border-zinc-200">
-            <x-marketing.sections.pricing />
-        </x-container>
+    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+        <x-marketing.sections.features />
+    </x-container>
 
+    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+        <x-marketing.sections.pricing />
+    </x-container>
+
+    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+        <x-marketing.sections.faq />
+    </x-container>
+
+    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+        <x-marketing.sections.cta />
+    </x-container>
 </x-layouts.marketing>

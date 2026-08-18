@@ -20,7 +20,8 @@ use Wave\Subscription;
  * POST /mi-suscripcion/cancelar     → cancela la suscripción local (gateway=manual)
  *
  * Si el user no tiene sub activa, redirige a /pricing.
- * Auth requerida (web middleware).
+ * Auth requerida: ResolveAppTvUser (sesión web o Bearer JWT). El `user_id`
+ * que venga en el request se ignora.
  */
 class BillingController extends Controller
 {
@@ -64,19 +65,15 @@ class BillingController extends Controller
      */
     public function portal(Request $request): RedirectResponse
     {
-        // Web: usa session. APK WebView: pasa user_id por query (sin session).
-        $user = auth()->user();
-        $fromApp = false;
-        if (! $user) {
-            $userId = (int) $request->query('user_id');
-            if ($userId > 0) {
-                $user = User::find($userId);
-                $fromApp = (bool) $user;
-            }
-        }
+        // El dueño lo resuelve ResolveAppTvUser (sesión web o Bearer JWT del APK).
+        // Antes se leía `user_id` del request cuando no había sesión: `?user_id=N`
+        // abría el Stripe Customer Portal de un tercero y cancelaba su suscripción.
+        $userId = (int) $request->attributes->get('yambo_user_id');
+        $user = $userId > 0 ? User::find($userId) : null;
         if (! $user) {
             return redirect('/auth/login?redirect='.urlencode('/mi-suscripcion'));
         }
+        $fromApp = ! auth()->check();
 
         $subscription = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
@@ -114,19 +111,15 @@ class BillingController extends Controller
 
     public function cancel(Request $request): RedirectResponse
     {
-        // Web: usa session. APK WebView: pasa user_id por query/body (sin session).
-        $user = auth()->user();
-        $fromApp = false;
-        if (! $user) {
-            $userId = (int) ($request->input('user_id') ?: $request->query('user_id'));
-            if ($userId > 0) {
-                $user = User::find($userId);
-                $fromApp = (bool) $user;
-            }
-        }
+        // El dueño lo resuelve ResolveAppTvUser (sesión web o Bearer JWT del APK).
+        // Antes se leía `user_id` del request cuando no había sesión: `?user_id=N`
+        // abría el Stripe Customer Portal de un tercero y cancelaba su suscripción.
+        $userId = (int) $request->attributes->get('yambo_user_id');
+        $user = $userId > 0 ? User::find($userId) : null;
         if (! $user) {
             return redirect('/auth/login?redirect='.urlencode('/mi-suscripcion'));
         }
+        $fromApp = ! auth()->check();
 
         $subscription = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)

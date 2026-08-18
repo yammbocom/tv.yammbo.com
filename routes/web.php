@@ -202,8 +202,15 @@ Route::post('/tv-link/confirm', [TvLinkController::class, 'confirm'])->name('app
  * usamos `/mi-suscripcion` que es libre y semánticamente claro en español.
  */
 Route::get('/mi-suscripcion', [BillingController::class, 'show'])->name('billing.show');
-Route::get('/mi-suscripcion/portal', [BillingController::class, 'portal'])->name('billing.portal');
-Route::post('/mi-suscripcion/cancelar', [BillingController::class, 'cancel'])->name('billing.cancel');
+
+// portal() y cancel() resolvían `user_id` del request cuando no había sesión, así
+// que sin credencial alguna `?user_id=N` abría el Stripe Customer Portal de otra
+// persona y cancelaba su suscripción. show() no lo hacía y se queda con su
+// redirect a login, que es mejor UX que el 401 del middleware.
+Route::middleware(\App\Http\Middleware\ResolveAppTvUser::class)->group(function () {
+    Route::get('/mi-suscripcion/portal', [BillingController::class, 'portal'])->name('billing.portal');
+    Route::post('/mi-suscripcion/cancelar', [BillingController::class, 'cancel'])->name('billing.cancel');
+});
 
 /*
  * Pricing direct checkout — desde el landing /pricing, los usuarios logged-in

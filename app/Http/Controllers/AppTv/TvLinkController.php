@@ -30,6 +30,14 @@ class TvLinkController extends Controller
 {
     private const CODE_TTL_MINUTES = 15;
 
+    /**
+     * Margen para que la TV recoja la sesión después de que el móvil confirme.
+     * Pasado esto el código muere: antes, un código enlazado se saltaba la
+     * comprobación de caducidad y seguía devolviendo nombre, email y estado de
+     * suscripción indefinidamente.
+     */
+    private const LINKED_GRACE_MINUTES = 5;
+
     public function generate(): JsonResponse
     {
         do {
@@ -64,7 +72,11 @@ class TvLinkController extends Controller
             return response()->json(['status' => 'invalid'], 404);
         }
 
-        if (Carbon::parse($row->expires_at)->isPast() && !$row->linked_at) {
+        $expired = $row->linked_at
+            ? Carbon::parse($row->linked_at)->addMinutes(self::LINKED_GRACE_MINUTES)->isPast()
+            : Carbon::parse($row->expires_at)->isPast();
+
+        if ($expired) {
             return response()->json(['status' => 'expired']);
         }
 

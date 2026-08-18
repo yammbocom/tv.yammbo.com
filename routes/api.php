@@ -37,8 +37,8 @@ Route::prefix('app-tv')->group(function () {
     Route::post('register', [AppTvAuthController::class, 'register'])->middleware('throttle:5,10');
 
     // TV-LINK-QR-API-V54
-    Route::post('tv-link/generate', [\App\Http\Controllers\AppTv\TvLinkController::class, 'generate']);
-    Route::post('tv-link/poll', [\App\Http\Controllers\AppTv\TvLinkController::class, 'poll']);
+    Route::post('tv-link/generate', [\App\Http\Controllers\AppTv\TvLinkController::class, 'generate'])->middleware('throttle:10,1');
+    Route::post('tv-link/poll', [\App\Http\Controllers\AppTv\TvLinkController::class, 'poll'])->middleware('throttle:30,1');
 });
 
 // Privadas: el dueño sale de la sesión web o del JWT, nunca del request.

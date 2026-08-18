@@ -83,7 +83,9 @@ class BillingController extends Controller
             ->orderByDesc('id')
             ->first();
 
-        $backUrl = $fromApp ? '/app-tv/subscription?user_id='.$user->id : '/mi-suscripcion';
+        // Sin `?user_id=`: /app-tv/subscription lo ignora desde que resuelve el
+        // dueño por credencial, y arrastrarlo sugería lo contrario.
+        $backUrl = $fromApp ? '/app-tv/subscription' : '/mi-suscripcion';
 
         if (! $subscription) {
             return redirect($backUrl)->with([
@@ -127,7 +129,9 @@ class BillingController extends Controller
             ->orderByDesc('id')
             ->first();
 
-        $backUrl = $fromApp ? '/app-tv/subscription?user_id='.$user->id : '/mi-suscripcion';
+        // Sin `?user_id=`: /app-tv/subscription lo ignora desde que resuelve el
+        // dueño por credencial, y arrastrarlo sugería lo contrario.
+        $backUrl = $fromApp ? '/app-tv/subscription' : '/mi-suscripcion';
 
         if (! $subscription) {
             return redirect($backUrl)->with([

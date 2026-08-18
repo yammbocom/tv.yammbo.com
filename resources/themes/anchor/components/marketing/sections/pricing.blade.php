@@ -1,6 +1,6 @@
 @php
-    use Wave\Plan;
-    use Wave\Subscription as WaveSub;
+    use App\Models\Plan;
+    use App\Models\Subscription;
     use Carbon\Carbon;
 
     $plans = Plan::where('active', true)
@@ -14,7 +14,7 @@
     $activeSub = null;
     if ($authUser) {
         $now = Carbon::now();
-        $activeSub = WaveSub::where('billable_type', 'user')
+        $activeSub = Subscription::where('billable_type', 'user')
             ->where('billable_id', $authUser->id)
             ->whereIn('status', ['active', 'trialing'])
             ->where(function ($q) use ($now) {

@@ -105,25 +105,17 @@
     @endif
   </div>
 
-  @php
-    $isFromApp = $fromApp ?? false;
-    $userQuery = $isFromApp ? '?user_id='.$user->id : '';
-  @endphp
-
   <div class="actions">
     @if($subscription->status === 'active' || $subscription->status === 'trialing')
       @if($isStripe)
         {{-- Sub Stripe: Customer Portal con cancel/cambiar plan/método pago/invoices --}}
-        <a class="btn" href="/mi-suscripcion/portal{{ $userQuery }}">{{ __('app-tv.billing.manage_subscription') }}</a>
+        <a class="btn" href="/mi-suscripcion/portal">{{ __('app-tv.billing.manage_subscription') }}</a>
         <p class="hint">{{ __('app-tv.billing.manage_subscription_hint') }}</p>
       @else
         {{-- Sub manual/admin: cancel local + cambiar via /pricing --}}
         <a class="btn secondary" href="/pricing">{{ __('app-tv.billing.change_plan') }}</a>
-        <form id="cancel-form" method="POST" action="/mi-suscripcion/cancelar{{ $userQuery }}" style="margin:0">
+        <form id="cancel-form" method="POST" action="/mi-suscripcion/cancelar" style="margin:0">
           @csrf
-          @if($isFromApp)
-            <input type="hidden" name="user_id" value="{{ $user->id }}">
-          @endif
           <button type="button" class="btn danger" onclick="confirmCancel()" style="width:100%">{{ __('app-tv.billing.cancel_subscription') }}</button>
         </form>
         <p class="hint">{{ __('app-tv.billing.manual_note') }}</p>
@@ -136,7 +128,7 @@
     @endif
   </div>
 
-  <a href="{{ $isFromApp ? '/app-tv/subscription'.$userQuery : '/app' }}" class="back">{{ __('app-tv.billing.back_to_app') }}</a>
+  <a href="/app" class="back">{{ __('app-tv.billing.back_to_app') }}</a>
 </div>
 
 <script>

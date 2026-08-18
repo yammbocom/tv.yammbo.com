@@ -45,7 +45,7 @@ if (app()->environment('local')) {
 /***** Billing Routes *****/
 Route::post('webhook/paddle', '\Wave\Http\Controllers\Billing\Webhooks\PaddleWebhook@handler')->middleware('paddle-webhook-signature');
 Route::post('webhook/stripe', '\Wave\Http\Controllers\Billing\Webhooks\StripeWebhook@handler');
-Route::get('stripe/portal', '\Wave\Http\Controllers\Billing\Stripe@redirect_to_customer_portal')->name('stripe.portal');
+Route::get('stripe/portal', '\Wave\Http\Controllers\Billing\Stripe@redirect_to_customer_portal')->middleware('auth')->name('stripe.portal'); // sin auth llamaba latestSubscription() sobre null: 500 publico
 Route::redirect('billing', 'settings/subscription')->name('billing');
 
 try {

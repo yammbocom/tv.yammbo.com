@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\View;
 use Stripe\StripeClient;
-use Wave\Plan;
-use Wave\Subscription;
+use App\Models\Plan;
+use App\Models\Subscription;
 
 /**
  * Pricing + checkout para la APK YamboTV (WebView).
@@ -106,7 +106,7 @@ class AppTvSubscriptionController extends Controller
 
     private function createStripeCheckout(User $user, Plan $plan, string $priceId, string $cycle): JsonResponse
     {
-        $secret = config('wave.stripe.secret_key') ?: (config('services.stripe.secret') ?: env('STRIPE_SECRET_KEY'));
+        $secret = config('yammbo.stripe.secret_key') ?: (config('services.stripe.secret') ?: env('STRIPE_SECRET_KEY'));
         if (empty($secret)) {
             return response()->json(['error' => 'Stripe no configurado'], 500);
         }

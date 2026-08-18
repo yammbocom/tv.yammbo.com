@@ -23,7 +23,7 @@ use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Role;
-use Wave\Plan;
+use App\Models\Plan;
 
 class PlanResource extends Resource
 {

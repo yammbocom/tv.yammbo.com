@@ -7,8 +7,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Wave\Plan;
-use Wave\Subscription;
+use App\Models\Plan;
+use App\Models\Subscription;
 
 /**
  * GET /api/app-tv/status

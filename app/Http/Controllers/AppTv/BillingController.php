@@ -9,8 +9,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\StripeClient;
-use Wave\Plan;
-use Wave\Subscription;
+use App\Models\Plan;
+use App\Models\Subscription;
 
 /**
  * Gestión de suscripción para usuarios web (tv.yammbo.com).
@@ -95,7 +95,7 @@ class BillingController extends Controller
         try {
             // Ver nota en AppTvPaymentController: services.stripe.secret está
             // vacío y env() es null con la config cacheada.
-            $stripe = new StripeClient(config('wave.stripe.secret_key') ?: config('services.stripe.secret'));
+            $stripe = new StripeClient(config('yammbo.stripe.secret_key') ?: config('services.stripe.secret'));
             $session = $stripe->billingPortal->sessions->create([
                 'customer' => $subscription->vendor_customer_id,
                 'return_url' => url($backUrl),

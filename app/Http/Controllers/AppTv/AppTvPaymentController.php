@@ -8,8 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Stripe\StripeClient;
-use Wave\Plan;
-use Wave\Subscription;
+use App\Models\Plan;
+use App\Models\Subscription;
 
 /**
  * GET /app-tv/payment-success?gateway=stripe&user_id=X&session_id=cs_xxx
@@ -48,7 +48,7 @@ class AppTvPaymentController extends Controller
         // wave.stripe.secret_key es la única que resuelve de verdad:
         // services.stripe.secret está vacío y env() devuelve null en cuanto la
         // config está cacheada, así que el fallback dejaba el cliente sin clave.
-        $secret = config('wave.stripe.secret_key') ?: config('services.stripe.secret');
+        $secret = config('yammbo.stripe.secret_key') ?: config('services.stripe.secret');
         if (empty($secret)) {
             return false;
         }

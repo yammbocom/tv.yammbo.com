@@ -40,7 +40,7 @@ $yamboSubscriptionFor = function ($user) {
         return ['active' => false, 'plan' => null];
     }
     $now = \Carbon\Carbon::now();
-    $sub = \Wave\Subscription::where('billable_type', 'user')
+    $sub = \App\Models\Subscription::where('billable_type', 'user')
         ->where('billable_id', $user->id)
         ->whereIn('status', ['active', 'trialing'])
         ->where(function ($q) use ($now) {
@@ -49,7 +49,7 @@ $yamboSubscriptionFor = function ($user) {
         ->orderByDesc('id')
         ->first();
     if ($sub) {
-        $plan = \Wave\Plan::find($sub->plan_id);
+        $plan = \App\Models\Plan::find($sub->plan_id);
 
         return ['active' => true, 'plan' => $plan->name ?? 'Premium'];
     }
@@ -228,7 +228,7 @@ Route::post('/pricing/checkout', function (\Illuminate\Http\Request $request) {
         'billing_cycle' => 'required|in:monthly,yearly',
     ]);
 
-    $plan = \Wave\Plan::where('id', $validated['plan_id'])->where('active', true)->first();
+    $plan = \App\Models\Plan::where('id', $validated['plan_id'])->where('active', true)->first();
     if (! $plan) {
         abort(404, 'Plan no encontrado');
     }
@@ -240,7 +240,7 @@ Route::post('/pricing/checkout', function (\Illuminate\Http\Request $request) {
         abort(422, 'El plan no tiene precio configurado para ese ciclo');
     }
 
-    $secretKey = config('wave.stripe.secret_key');
+    $secretKey = config('yammbo.stripe.secret_key');
     if (! $secretKey) {
         abort(500, 'Stripe no configurado');
     }

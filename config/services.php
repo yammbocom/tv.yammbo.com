@@ -13,6 +13,10 @@ return [
         'secret' => env('SPARKPOST_SECRET'),
     ],
 
+    'firebase' => [
+        'sa_path' => env('FIREBASE_SA_PATH'),
+    ],
+
     'tmdb' => [
         'key' => env('TMDB_API_KEY'),
     ],

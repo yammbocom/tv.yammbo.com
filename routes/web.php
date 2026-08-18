@@ -270,5 +270,14 @@ Route::post('/pricing/checkout', function (\Illuminate\Http\Request $request) {
 // Wave routes (dynamic pages, auth, subscription, etc.)
 Wave::routes();
 
+/*
+ * Webhook propio. Va DESPUÉS de Wave::routes() a propósito: en una colisión de
+ * método+URI gana la última ruta registrada, igual que el override de /install
+ * de más abajo. Así sustituye al webhook de Wave sin tocar la URL registrada en
+ * el dashboard de Stripe. La exclusión de CSRF de bootstrap/app.php es por URI,
+ * así que sigue aplicando igual.
+ */
+Route::post('webhook/stripe', [\App\Http\Controllers\Billing\StripeWebhook::class, 'handler'])->name('webhook.stripe');
+
 // Yambo: /install override (debe ir tras Wave::routes para ganar a wave.install)
 Route::view("/install", "install");

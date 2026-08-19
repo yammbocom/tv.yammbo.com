@@ -211,3 +211,20 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ---- Menú móvil: panel completo, no la píldora deformada ---- */
+.nav-sheet {
+  background-color: var(--color-paper);
+}
+.nav-sheet-link {
+  display: block;
+  padding: var(--space-sm) 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-rule);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.nav-sheet-link:hover,
+.nav-sheet-link:focus-visible { color: var(--color-accent); }

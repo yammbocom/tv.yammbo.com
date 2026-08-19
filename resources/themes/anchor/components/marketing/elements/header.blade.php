@@ -3,7 +3,10 @@
     x-init="$watch('mobileOpen', v => document.body.classList.toggle('overflow-hidden', v))"
     class="sticky top-4 z-50 px-4"
 >
-    <div class="nav-pill mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-2.5 sm:px-5">
+    {{-- `relative z-50` para que la píldora quede por encima del panel móvil:
+         el panel es hijo de este header y va después en el DOM, así que sin
+         esto lo tapaba y el botón de cerrar dejaba de verse. --}}
+    <div class="nav-pill relative z-50 mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-2.5 sm:px-5">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2 font-display text-[color:var(--color-ink)]">
             <img src="/images/yambo-icon.png" alt="Yammbo Tv" class="w-7 h-7" width="28" height="28">
@@ -43,19 +46,26 @@
         </button>
     </div>
 
-    {{-- Mobile menu --}}
+    {{-- Menú móvil a pantalla completa.
+
+         Antes reutilizaba .nav-pill, que lleva border-radius:999px porque está
+         pensada para una barra horizontal: en vertical se deformaba en un óvalo
+         y dejaba ver la página por las esquinas, con el botón saliéndose de la
+         curva. Un panel opaco que cubre la pantalla evita las dos cosas. --}}
     <div x-show="mobileOpen" x-cloak
          x-transition:enter="transition ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-out" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          style="transition-duration: var(--dur-mid)"
-         id="nav-mobile" class="nav-pill mx-auto mt-2 flex max-w-3xl flex-col gap-1 p-3 md:hidden">
-        <a href="/pricing" @click="mobileOpen = false" class="link-quiet whitespace-nowrap rounded-lg px-3 py-2.5">{{ __('landing.nav.pricing') }}</a>
-        <a href="/help" @click="mobileOpen = false" class="link-quiet whitespace-nowrap rounded-lg px-3 py-2.5">{{ __('landing.nav.help') }}</a>
-        @auth
-            <a href="/app" @click="mobileOpen = false" class="btn btn-accent mt-1 justify-center">{{ __('landing.nav.app') }}</a>
-        @else
-            <a href="/auth/login" @click="mobileOpen = false" class="link-quiet whitespace-nowrap rounded-lg px-3 py-2.5">{{ __('landing.nav.login') }}</a>
-            <a href="/pricing" @click="mobileOpen = false" class="btn btn-accent mt-1 justify-center">{{ __('landing.pricing.cta') }}</a>
-        @endauth
+         id="nav-mobile" class="nav-sheet fixed inset-0 z-40 flex flex-col md:hidden">
+        <nav class="flex flex-col gap-1 px-6 pt-28 pb-8">
+            <a href="/pricing" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.pricing') }}</a>
+            <a href="/help" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.help') }}</a>
+            @auth
+                <a href="/app" @click="mobileOpen = false" class="btn btn-accent mt-4 justify-center">{{ __('landing.nav.app') }}</a>
+            @else
+                <a href="/auth/login" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.login') }}</a>
+                <a href="/pricing" @click="mobileOpen = false" class="btn btn-accent mt-4 justify-center">{{ __('landing.pricing.cta') }}</a>
+            @endauth
+        </nav>
     </div>
 </header>

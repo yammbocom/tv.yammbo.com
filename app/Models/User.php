@@ -4,9 +4,6 @@ namespace App\Models;
 
 use Devdojo\Auth\Models\User as AuthUser;
 use Exception;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasAvatar;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,7 +25,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * que los tokens emitidos siguen siendo válidos mientras esta clase implemente
  * JWTSubject.
  */
-class User extends AuthUser implements FilamentUser, HasAvatar, JWTSubject
+class User extends AuthUser implements JWTSubject
 {
     use HasFactory, HasRoles, Notifiable, SoftDeletes;
 
@@ -158,16 +155,6 @@ class User extends AuthUser implements FilamentUser, HasAvatar, JWTSubject
     public function avatar(): string
     {
         return Storage::url($this->avatar);
-    }
-
-    public function getFilamentAvatarUrl(): ?string
-    {
-        return $this->avatar();
-    }
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $panel->getId() === 'admin' && $this->hasRole('admin');
     }
 
     public function getJWTIdentifier(): mixed

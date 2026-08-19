@@ -15,7 +15,6 @@ export default defineConfig({
             input: [
                 `resources/themes/${activeTheme}/assets/css/app.css`,
                 `resources/themes/${activeTheme}/assets/js/app.js`,
-                'resources/css/filament/admin/theme.css',
             ],
             refresh: [
                 `resources/themes/${activeTheme}/**/*`,

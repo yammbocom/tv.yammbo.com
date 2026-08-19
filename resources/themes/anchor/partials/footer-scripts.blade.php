@@ -1,4 +1,3 @@
-@filamentScripts
 @livewireScripts
 
 {{-- @yield('javascript') --}}

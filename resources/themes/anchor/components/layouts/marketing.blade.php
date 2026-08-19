@@ -11,7 +11,7 @@
         {{ $slot }}
     </main>
 
-    @livewire('notifications')
+    {{-- @livewire('notifications') era el toast de Filament; se fue con el paquete --}}
     @include('theme::partials.footer')
     @include('theme::partials.footer-scripts')
     {{ $javascript ?? '' }}

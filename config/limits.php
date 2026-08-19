@@ -19,12 +19,9 @@ return [
     |
     */
 
-    'features' => [
-        'api_keys' => [
-            'model' => \Wave\ApiKey::class,
-            'column' => 'user_id',
-        ],
-    ],
+    // Las API keys eran de Wave y su página se retiró con el paquete; la tabla
+    // `api_keys` estaba vacía. Sin features con límite por ahora.
+    'features' => [],
 
     /*
     |--------------------------------------------------------------------------

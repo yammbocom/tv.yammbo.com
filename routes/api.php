@@ -75,5 +75,3 @@ Route::post('portalCore/v8/active', [PortalCoreController::class, 'active']);
 Route::any('portalCore/{path?}', [PortalCoreController::class, 'fallback'])
     ->where('path', '.*');
 
-// Wave default API (/api/login, /api/register, /api/logout, /api/refresh, /api/token)
-Wave::api();

@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Listeners\LogSuccessfulLogin;
 use App\Listeners\LogSuccessfulLogout;
 use Exception;
+use App\Models\User;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -45,6 +47,15 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->setSchemaDefaultLength();
+
+        // `model_has_roles.model_type` guarda el alias 'users', no la clase, y
+        // quien registraba ese morph map era el service provider de Wave. Sin
+        // esta línea Spatie busca por 'App\Models\User', no encuentra ninguna
+        // fila y TODOS los usuarios se quedan sin roles: el admin pierde el
+        // panel y las suscripciones dejan de conceder su plan.
+        Relation::morphMap([
+            'users' => User::class,
+        ]);
 
         // Register activity log event listeners
         Event::listen(Login::class, LogSuccessfulLogin::class);

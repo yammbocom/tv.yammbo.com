@@ -4,14 +4,11 @@
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
 
-@source '../../../../../app/Filament/**/*.php';
-@source '../../../../../resources/views/filament/**/*.blade.php';
-@source '../../../../../vendor/filament/**/*.blade.php';
 @source '../../../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../../../../resources/views/**/*.blade.php';
+@source '../../../../../vendor/devdojo/auth/resources/**/*.blade.php';
 @source '../../../../../resources/views/components/**/*.blade.php';
 @source '../../../../../resources/views/components/blade.php';
-@source '../../../../../wave/resources/views/**/*.blade.php';
 @source '../../../../../resources/themes/anchor/**/*.blade.php';
 @source '../../../../../resources/plugins/**/*.php';
 @source '../../../../../config/*.php';
@@ -113,33 +110,9 @@
   --primary-950: #111827;
 }
 
-/** The following are CSS files needed by Filament for components, table builder, etc. 
-https://github.com/filamentphp/filament/blob/4.x/docs/01-introduction/02-installation.md#configuring-styles
-**/
+/* Los CSS de Filament se fueron con el paquete: el build fallaba al no
+   resolver vendor/filament/support/resources/css/index.css. */
 
-/* Required by all components */
-@import '../../../../../vendor/filament/support/resources/css/index.css';
-
-/* Required by actions and tables */
-@import '../../../../../vendor/filament/actions/resources/css/index.css';
-
-/* Required by actions, forms and tables */
-@import '../../../../../vendor/filament/forms/resources/css/index.css';
-
-/* Required by actions and infolists */
-@import '../../../../../vendor/filament/infolists/resources/css/index.css';
-
-/* Required by notifications */
-@import '../../../../../vendor/filament/notifications/resources/css/index.css';
-
-/* Required by actions, infolists, forms, schemas and tables */
-@import '../../../../../vendor/filament/schemas/resources/css/index.css';
-
-/* Required by tables */
-@import '../../../../../vendor/filament/tables/resources/css/index.css';
-
-/* Required by widgets */
-@import '../../../../../vendor/filament/widgets/resources/css/index.css';
 
 /* ═══════════════════════════════════════════════════════════════════
 

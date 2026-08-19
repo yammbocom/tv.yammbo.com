@@ -47,8 +47,8 @@
     </div>
 
     <h2 class="text-sm font-semibold text-[#bdbdbd] uppercase tracking-wide mb-3">Últimos 30 envíos</h2>
-    <div class="rounded-lg border border-[#1f1f1f] bg-[#0f0f0f] overflow-hidden">
-        <table class="w-full text-sm">
+    <div class="rounded-lg border border-[#1f1f1f] bg-[#0f0f0f] overflow-x-auto">
+        <table class="w-full min-w-[720px] text-sm">
             <thead>
                 <tr class="border-b border-[#1f1f1f] text-left text-xs uppercase tracking-wide text-[#888]">
                     <th class="px-5 py-3">Enviado</th>

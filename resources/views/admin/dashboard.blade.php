@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="rounded-lg border border-[#1f1f1f] bg-[#0f0f0f] p-5">
             <p class="text-xs uppercase tracking-wide text-[#888] mb-2">Usuarios</p>
             <p class="text-3xl font-bold">{{ number_format($stats['users']) }}</p>

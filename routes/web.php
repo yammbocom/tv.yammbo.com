@@ -17,7 +17,6 @@ use App\Http\Controllers\AppTv\AppTvSubscriptionController;
 use App\Http\Controllers\AppTv\BillingController;
 use App\Http\Controllers\StremioAddonController;
 use Illuminate\Support\Facades\Route;
-use Wave\Facades\Wave;
 
 // Stremio addon endpoints (mounted at root so manifest URL is https://tv.yammbo.com/manifest.json)
 Route::get('/manifest.json', [StremioAddonController::class, 'manifest']);
@@ -267,8 +266,6 @@ Route::post('/pricing/checkout', function (\Illuminate\Http\Request $request) {
     return redirect()->away($session->url);
 })->middleware('web')->name('pricing.checkout');
 
-// Wave routes (dynamic pages, auth, subscription, etc.)
-Wave::routes();
 
 /*
  * Webhook propio. Va DESPUÉS de Wave::routes() a propósito: en una colisión de
@@ -315,3 +312,8 @@ Route::prefix('panel')->middleware(['auth', EnsurePanelAdmin::class])->name('pan
     Route::get('/push', [PushController::class, 'index'])->name('push.index');
     Route::post('/push', [PushController::class, 'store'])->name('push.store');
 });
+
+// /admin era el panel de Filament. Se mantiene la URL viva porque es la que
+// está memorizada y enlazada; ahora lleva al panel propio.
+Route::redirect('/admin', '/panel');
+Route::redirect('/admin/login', '/auth/login');

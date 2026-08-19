@@ -8,8 +8,6 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Lab404\Impersonate\ImpersonateServiceProvider::class,
-        \Wave\WaveServiceProvider::class,
-        \DevDojo\Themes\ThemesServiceProvider::class,
         \DevDojo\Themes\ThemesServiceProvider::class,
     ])
     ->withRouting(
@@ -50,8 +48,6 @@ return Application::configure(basePath: dirname(__DIR__))
             '/webhook/paddle',
             '/webhook/stripe',
         ]);
-
-        $middleware->append(\Filament\Http\Middleware\DisableBladeIconComponents::class);
 
         $middleware->web(\RalphJSmit\Livewire\Urls\Middleware\LivewireUrlsMiddleware::class);
 

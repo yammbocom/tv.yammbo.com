@@ -317,3 +317,23 @@ Route::prefix('panel')->middleware(['auth', EnsurePanelAdmin::class])->name('pan
 // está memorizada y enlazada; ahora lleva al panel propio.
 Route::redirect('/admin', '/panel');
 Route::redirect('/admin/login', '/auth/login');
+
+/*
+ * Cierre de sesión en /logout.
+ *
+ * Lo servía Wave y se fue con el paquete, pero el bundle del SPA lleva
+ * "/logout" compilado dentro: desde que se retiró, "Cerrar sesión" llevaba a
+ * un 404 y dejaba la sesión abierta. Reconstruir el fork solo para cambiar esa
+ * URL es mucho más caro que sostener la ruta aquí.
+ *
+ * Va por GET porque es lo que emite el SPA. Lo peor que consigue un tercero
+ * incrustando la URL es cerrarle la sesión a alguien, y devdojo/auth ya expone
+ * un GET equivalente en /auth/logout.
+ */
+Route::get('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+})->name('logout');

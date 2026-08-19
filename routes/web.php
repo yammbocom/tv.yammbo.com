@@ -336,4 +336,4 @@ Route::get('/logout', function (\Illuminate\Http\Request $request) {
     $request->session()->regenerateToken();
 
     return redirect('/');
-})->name('logout');
+});  // sin ->name(): devdojo/auth ya registra el nombre "logout" para POST /auth/logout, y duplicarlo rompe route:cache

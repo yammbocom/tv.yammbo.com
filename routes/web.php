@@ -281,3 +281,37 @@ Route::post('webhook/stripe', [\App\Http\Controllers\Billing\StripeWebhook::clas
 
 // Yambo: /install override (debe ir tras Wave::routes para ganar a wave.install)
 Route::view("/install", "install");
+
+/*
+|--------------------------------------------------------------------------
+| Panel de administración propio (/panel)
+|--------------------------------------------------------------------------
+| Sustituye a Filament (/admin) poco a poco: convive con el panel viejo
+| hasta que quede verificado, así que nada de esto toca rutas ni vistas
+| de Filament. Blade + controladores normales, sin Livewire/Folio.
+*/
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\PushController;
+use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Middleware\EnsurePanelAdmin;
+
+Route::prefix('panel')->middleware(['auth', EnsurePanelAdmin::class])->name('panel.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+
+    Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
+    Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('/plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
+
+    Route::get('/push', [PushController::class, 'index'])->name('push.index');
+    Route::post('/push', [PushController::class, 'store'])->name('push.store');
+});

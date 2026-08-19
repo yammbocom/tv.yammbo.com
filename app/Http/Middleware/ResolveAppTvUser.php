@@ -50,9 +50,10 @@ class ResolveAppTvUser
             }
 
             // Una navegación de navegador (pulsar "Gestionar suscripción") no debe
-            // acabar viendo un JSON: si la sesión caducó, al login. El 401 se
-            // reserva para quien pide JSON, que es el SPA y el APK.
-            if (! $request->expectsJson()) {
+            // acabar viendo un JSON: si la sesión caducó, al login. Las rutas de
+            // API contestan 401 siempre, aunque el cliente no mande Accept: un
+            // redirect a HTML rompería al APK, que espera un código de estado.
+            if (! $request->expectsJson() && ! $request->is('api/*')) {
                 return redirect('/auth/login?redirect='.urlencode('/'.ltrim($request->path(), '/')));
             }
 

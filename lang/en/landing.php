@@ -16,9 +16,28 @@ return [
         'hint' => 'Cancel anytime · No lock-in',
     ],
 
+    // Caption and alt text for the player screenshots. These used to be locale
+    // ternaries inside index.blade.php: fine in ES and EN, impossible to
+    // translate without editing the template.
+    'shots' => [
+        'discover_alt' => 'Yammbo Tv home screen showing the movie and series catalog',
+        'discover_caption' => 'Catalog — discover what to watch',
+        'detail_alt' => 'Title detail view in Yammbo Tv with synopsis, genres and cast',
+        'detail_caption' => 'Title page — synopsis, genres and cast',
+        'search_alt' => 'Search in Yammbo Tv showing movie and series results',
+        'search_caption' => 'Instant search across the whole catalog',
+        'board_alt' => 'Home screen with continue watching in Yammbo Tv',
+        'board_caption' => 'Home — pick up right where you left off',
+    ],
+
+    'ui' => [
+        'close' => 'Close',
+    ],
+
     'features' => [
         'heading' => 'An experience built to enjoy',
         'subheading' => 'Yammbo Tv brings the best of streaming together in a clean, fast and thoughtful interface.',
+        'group3_heading' => 'Home, with everything where you left it',
 
         'f1_title' => 'Infinite catalog',
         'f1_body' => 'Access hundreds of thousands of movies and series thanks to our expandable catalogs. There is always something new to discover.',

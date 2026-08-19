@@ -35,9 +35,9 @@
         <div class="mt-8 sm:mt-10 px-4 sm:px-6 lg:px-10 xl:px-16">
             <figure class="shot">
                 <img src="/images/app/spa-discover.webp" width="1600" height="1000"
-                     alt="{{ app()->getLocale() === 'es' ? 'Pantalla de inicio de Yammbo Tv con el catálogo de películas y series' : 'Yammbo Tv home screen showing the movie and series catalog' }}"
+                     alt="{{ __('landing.shots.discover_alt') }}"
                      class="w-full h-auto">
-                <figcaption>{{ app()->getLocale() === 'es' ? 'Catálogo — descubre qué ver' : 'Catalog — discover what to watch' }}</figcaption>
+                <figcaption>{{ __('landing.shots.discover_caption') }}</figcaption>
             </figure>
         </div>
     </section>
@@ -58,9 +58,9 @@
                 </div>
                 <figure class="shot min-w-0">
                     <img src="/images/app/spa-detail.webp" width="1600" height="1000" loading="lazy"
-                         alt="{{ app()->getLocale() === 'es' ? 'Ficha de un título en Yammbo Tv con sinopsis, géneros y reparto' : 'Title detail view in Yammbo Tv with synopsis, genres and cast' }}"
+                         alt="{{ __('landing.shots.detail_alt') }}"
                          class="w-full h-auto">
-                    <figcaption>{{ app()->getLocale() === 'es' ? 'Ficha de título — sinopsis, géneros y reparto' : 'Title page — synopsis, genres and cast' }}</figcaption>
+                    <figcaption>{{ __('landing.shots.detail_caption') }}</figcaption>
                 </figure>
             </div>
         </x-container>
@@ -71,9 +71,9 @@
             <div class="grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-center md:gap-12">
                 <figure class="shot min-w-0 md:order-1">
                     <img src="/images/app/spa-search.webp" width="1600" height="1000" loading="lazy"
-                         alt="{{ app()->getLocale() === 'es' ? 'Búsqueda en Yammbo Tv con resultados de películas y series' : 'Search in Yammbo Tv showing movie and series results' }}"
+                         alt="{{ __('landing.shots.search_alt') }}"
                          class="w-full h-auto">
-                    <figcaption>{{ app()->getLocale() === 'es' ? 'Búsqueda instantánea en todo el catálogo' : 'Instant search across the whole catalog' }}</figcaption>
+                    <figcaption>{{ __('landing.shots.search_caption') }}</figcaption>
                 </figure>
                 <div class="min-w-0 md:order-2">
                     <ul class="space-y-5">
@@ -93,25 +93,30 @@
         <x-container>
             <div class="max-w-xl">
                 <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-xl)] font-semibold">
-                    {{ app()->getLocale() === 'es' ? 'Inicio, con todo donde lo dejaste' : 'Home, with everything where you left it' }}
+                    {{ __('landing.features.group3_heading') }}
                 </p>
             </div>
 
-            <div class="mt-6 grid gap-6 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
-                @foreach(['f6','f7','f8'] as $key)
-                    <div class="min-w-0">
-                        <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-base)] font-semibold">{{ __('landing.features.'.$key.'_title') }}</p>
-                        <p class="mt-1 text-[color:var(--color-ink-mute)] text-[length:var(--text-sm)] leading-relaxed">{{ __('landing.features.'.$key.'_body') }}</p>
-                    </div>
-                @endforeach
-            </div>
+            {{-- f6/f7/f8 eran una rejilla de tres bloques iguales: el último
+                 resto de plantilla que quedaba tras el rediseño. Ahora son
+                 anotaciones junto a la captura, como el resto de la página. --}}
+            <div class="mt-8 grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center md:gap-12">
+                <div class="min-w-0">
+                    <ul class="space-y-5">
+                        @foreach(['f6','f7','f8'] as $key)
+                            <li class="min-w-0">
+                                <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-base)] font-semibold">{{ __('landing.features.'.$key.'_title') }}</p>
+                                <p class="mt-1 text-[color:var(--color-ink-mute)] text-[length:var(--text-sm)] leading-relaxed">{{ __('landing.features.'.$key.'_body') }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
 
-            <div class="mt-8 px-0">
-                <figure class="shot">
+                <figure class="shot min-w-0">
                     <img src="/images/app/spa-board.webp" width="1600" height="910" loading="lazy"
-                         alt="{{ app()->getLocale() === 'es' ? 'Pantalla de inicio con continuar viendo en Yammbo Tv' : 'Home screen with continue watching in Yammbo Tv' }}"
+                         alt="{{ __('landing.shots.board_alt') }}"
                          class="w-full h-auto">
-                    <figcaption>{{ app()->getLocale() === 'es' ? 'Inicio — continúa donde lo dejaste' : 'Home — pick up right where you left off' }}</figcaption>
+                    <figcaption>{{ __('landing.shots.board_caption') }}</figcaption>
                 </figure>
             </div>
         </x-container>
@@ -152,7 +157,7 @@
             <div class="flex items-center gap-3">
                 <a href="/pricing" class="btn btn-accent">{{ __('landing.pricing.cta') }}</a>
                 <button @click="closed = true; show = false" type="button"
-                        aria-label="{{ app()->getLocale() === 'es' ? 'Cerrar' : 'Close' }}"
+                        aria-label="{{ __('landing.ui.close') }}"
                         class="absolute right-6 sm:static text-[color:var(--color-ink-dim)] hover:text-[color:var(--color-ink)]">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                 </button>

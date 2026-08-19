@@ -16,9 +16,28 @@ return [
         'hint' => 'Cancela cuando quieras · Sin permanencia',
     ],
 
+    // Textos de las capturas del reproductor. Vivían como ternarios de idioma
+    // dentro de index.blade.php: salían bien en ES y EN, pero no había forma de
+    // traducirlos sin tocar la plantilla.
+    'shots' => [
+        'discover_alt' => 'Pantalla de inicio de Yammbo Tv con el catálogo de películas y series',
+        'discover_caption' => 'Catálogo — descubre qué ver',
+        'detail_alt' => 'Ficha de un título en Yammbo Tv con sinopsis, géneros y reparto',
+        'detail_caption' => 'Ficha de título — sinopsis, géneros y reparto',
+        'search_alt' => 'Búsqueda en Yammbo Tv con resultados de películas y series',
+        'search_caption' => 'Búsqueda instantánea en todo el catálogo',
+        'board_alt' => 'Pantalla de inicio con continuar viendo en Yammbo Tv',
+        'board_caption' => 'Inicio — continúa donde lo dejaste',
+    ],
+
+    'ui' => [
+        'close' => 'Cerrar',
+    ],
+
     'features' => [
         'heading' => 'Una experiencia hecha para disfrutar',
         'subheading' => 'Yammbo Tv reúne lo mejor del streaming en una interfaz limpia, rápida y pensada para ti.',
+        'group3_heading' => 'Inicio, con todo donde lo dejaste',
 
         'f1_title' => 'Catálogo infinito',
         'f1_body' => 'Accede a cientos de miles de películas y series gracias a nuestros catálogos expandibles. Siempre hay algo nuevo que descubrir.',

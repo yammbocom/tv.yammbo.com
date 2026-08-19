@@ -53,7 +53,10 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
             "Wave\\": "wave/src/"
-        }
+        },
+        "files": [
+            "app/Helpers/globals.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

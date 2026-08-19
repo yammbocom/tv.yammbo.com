@@ -63,7 +63,11 @@ class StripeWebhook extends Controller
                 $plan_price_column = ($subscriptionCycle == 'year') ? 'yearly_price_id' : 'monthly_price_id';
                 $updatedPlan = Plan::where($plan_price_column, $stripeSubscription->plan->id)->first();
 
-                $subscription->user->switchPlans($updatedPlan);
+                // Lo que hacía Wave\User::switchPlans(), en línea: ese método
+                // exige un Wave\Plan y aquí llega un App\Models\Plan, así que
+                // llamarlo lanzaba TypeError y el webhook devolvía 500.
+                $subscription->user->syncRoles([]);
+                $subscription->user->assignRole($updatedPlan->role->name);
 
                 $subscription->cycle = $subscriptionCycle;
                 $subscription->plan_id = $updatedPlan->id;

@@ -17,23 +17,153 @@
         'image'         => asset('/images/yambo-icon.png'),
         'type'          => 'website'
     ]"
-    bodyClass="bg-black text-white"
 >
-    <x-marketing.sections.hero />
+    {{-- 1. Apertura funcional --}}
+    <section class="pt-10 sm:pt-14 fade-in">
+        <x-container>
+            <div class="max-w-2xl">
+                <h1 class="font-display text-[color:var(--color-ink)] text-[length:var(--text-display-s)] leading-[1.1]"
+                    style="overflow-wrap: anywhere; min-width: 0;">
+                    {{ __('landing.hero.heading_1') }} {{ __('landing.hero.heading_2') }}
+                </h1>
+                <p class="mt-4 max-w-xl text-[length:var(--text-lg)] text-[color:var(--color-ink-mute)]">
+                    {{ __('landing.hero.tagline') }}
+                </p>
+            </div>
+        </x-container>
 
-    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
-        <x-marketing.sections.features />
-    </x-container>
+        <div class="mt-8 sm:mt-10 px-4 sm:px-6 lg:px-10 xl:px-16">
+            <figure class="shot">
+                <img src="/images/app/spa-discover.webp" width="1600" height="1000"
+                     alt="{{ app()->getLocale() === 'es' ? 'Pantalla de inicio de Yammbo Tv con el catálogo de películas y series' : 'Yammbo Tv home screen showing the movie and series catalog' }}"
+                     class="w-full h-auto">
+                <figcaption>{{ app()->getLocale() === 'es' ? 'Catálogo — descubre qué ver' : 'Catalog — discover what to watch' }}</figcaption>
+            </figure>
+        </div>
+    </section>
 
-    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+    {{-- 2. Secuencia Workbench --}}
+    <section class="mt-24 sm:mt-32">
+        <x-container>
+            <div class="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center md:gap-12">
+                <div class="min-w-0">
+                    <ul class="space-y-5">
+                        @foreach(['f1','f3','f4'] as $key)
+                            <li class="min-w-0">
+                                <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-base)] font-semibold">{{ __('landing.features.'.$key.'_title') }}</p>
+                                <p class="mt-1 text-[color:var(--color-ink-mute)] text-[length:var(--text-sm)] leading-relaxed">{{ __('landing.features.'.$key.'_body') }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <figure class="shot min-w-0">
+                    <img src="/images/app/spa-detail.webp" width="1600" height="1000" loading="lazy"
+                         alt="{{ app()->getLocale() === 'es' ? 'Ficha de un título en Yammbo Tv con sinopsis, géneros y reparto' : 'Title detail view in Yammbo Tv with synopsis, genres and cast' }}"
+                         class="w-full h-auto">
+                    <figcaption>{{ app()->getLocale() === 'es' ? 'Ficha de título — sinopsis, géneros y reparto' : 'Title page — synopsis, genres and cast' }}</figcaption>
+                </figure>
+            </div>
+        </x-container>
+    </section>
+
+    <section class="mt-20 sm:mt-28">
+        <x-container>
+            <div class="grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-center md:gap-12">
+                <figure class="shot min-w-0 md:order-1">
+                    <img src="/images/app/spa-search.webp" width="1600" height="1000" loading="lazy"
+                         alt="{{ app()->getLocale() === 'es' ? 'Búsqueda en Yammbo Tv con resultados de películas y series' : 'Search in Yammbo Tv showing movie and series results' }}"
+                         class="w-full h-auto">
+                    <figcaption>{{ app()->getLocale() === 'es' ? 'Búsqueda instantánea en todo el catálogo' : 'Instant search across the whole catalog' }}</figcaption>
+                </figure>
+                <div class="min-w-0 md:order-2">
+                    <ul class="space-y-5">
+                        @foreach(['f2','f5'] as $key)
+                            <li class="min-w-0">
+                                <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-base)] font-semibold">{{ __('landing.features.'.$key.'_title') }}</p>
+                                <p class="mt-1 text-[color:var(--color-ink-mute)] text-[length:var(--text-sm)] leading-relaxed">{{ __('landing.features.'.$key.'_body') }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </x-container>
+    </section>
+
+    <section class="mt-20 sm:mt-28">
+        <x-container>
+            <div class="max-w-xl">
+                <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-xl)] font-semibold">
+                    {{ app()->getLocale() === 'es' ? 'Inicio, con todo donde lo dejaste' : 'Home, with everything where you left it' }}
+                </p>
+            </div>
+
+            <div class="mt-6 grid gap-6 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
+                @foreach(['f6','f7','f8'] as $key)
+                    <div class="min-w-0">
+                        <p class="font-display text-[color:var(--color-ink)] text-[length:var(--text-base)] font-semibold">{{ __('landing.features.'.$key.'_title') }}</p>
+                        <p class="mt-1 text-[color:var(--color-ink-mute)] text-[length:var(--text-sm)] leading-relaxed">{{ __('landing.features.'.$key.'_body') }}</p>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-8 px-0">
+                <figure class="shot">
+                    <img src="/images/app/spa-board.webp" width="1600" height="910" loading="lazy"
+                         alt="{{ app()->getLocale() === 'es' ? 'Pantalla de inicio con continuar viendo en Yammbo Tv' : 'Home screen with continue watching in Yammbo Tv' }}"
+                         class="w-full h-auto">
+                    <figcaption>{{ app()->getLocale() === 'es' ? 'Inicio — continúa donde lo dejaste' : 'Home — pick up right where you left off' }}</figcaption>
+                </figure>
+            </div>
+        </x-container>
+    </section>
+
+    {{-- 3. CTA pegajoso: aparece cuando ya se ha visto el recorrido y se
+         retira al llegar a los precios, donde estorbaría.
+
+         Antes colgaba de un IntersectionObserver sobre un <span hidden>: con
+         display:none la caja mide 0×0 y no intersecta nunca, así que la barra
+         no llegó a aparecerle a nadie. Y el marcador estaba a 98px de #pricing,
+         con lo que la ventana útil habría sido de menos de un scroll. --}}
+    <div
+        x-data="{ show: false, closed: false }"
+        x-init="
+            const pricingEl = document.getElementById('pricing');
+            const update = () => {
+                if (closed || !pricingEl) return;
+                const pricingTop = pricingEl.getBoundingClientRect().top;
+                show = window.scrollY > window.innerHeight && pricingTop > window.innerHeight * 0.9;
+            };
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update, { passive: true });
+        "
+        x-show="show && !closed"
+        x-cloak
+        x-transition:enter="transition ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-out" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        style="transition-duration: var(--dur-mid)"
+        class="sticky-cta fixed inset-x-0 bottom-0 z-40"
+    >
+        <x-container class="flex items-center justify-between gap-4 py-3">
+            <p class="hidden sm:block text-[length:var(--text-sm)] text-[color:var(--color-ink-mute)] whitespace-nowrap">{{ __('landing.hero.hint') }}</p>
+            <div class="flex flex-1 items-center justify-between gap-3 sm:flex-none">
+                <a href="/pricing" class="btn btn-accent">{{ __('landing.pricing.cta') }}</a>
+                <button @click="closed = true; show = false" type="button"
+                        aria-label="{{ app()->getLocale() === 'es' ? 'Cerrar' : 'Close' }}"
+                        class="text-[color:var(--color-ink-dim)] hover:text-[color:var(--color-ink)]">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </x-container>
+    </div>
+
+    {{-- 4. Precios --}}
+    <x-container class="py-16 sm:py-24 border-t border-rule">
         <x-marketing.sections.pricing />
     </x-container>
 
-    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
+    {{-- 5. FAQ --}}
+    <x-container class="py-16 sm:py-24 border-t border-rule">
         <x-marketing.sections.faq />
-    </x-container>
-
-    <x-container class="py-16 sm:py-24 border-t border-zinc-800">
-        <x-marketing.sections.cta />
     </x-container>
 </x-layouts.marketing>

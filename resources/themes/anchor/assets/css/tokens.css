@@ -1,0 +1,213 @@
+/* ============================================================
+   Yammbo Tv — Design tokens (Midnight theme)
+   Atmospheric dark room. One accent color, used sparingly.
+   ============================================================ */
+
+:root {
+  /* Color */
+  --color-paper:    oklch(12% 0.008 25);   /* negro de sala */
+  --color-paper-2:  oklch(17% 0.010 25);   /* superficies */
+  --color-paper-3:  oklch(22% 0.012 25);   /* superficie elevada */
+  --color-ink:      oklch(96% 0.004 60);
+  --color-ink-mute: oklch(72% 0.008 60);
+  --color-ink-dim:  oklch(63% 0.008 60);  /* 56% se quedaba en 4.11:1 sobre paper-2 */
+  --color-accent:   oklch(55% 0.223 27);   /* #E50914 de marca */
+  --color-accent-2: oklch(46% 0.200 27);
+  --color-rule:     oklch(26% 0.010 25);
+
+  /* Type */
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-body:    'Instrument Sans', system-ui, sans-serif;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 140ms;
+  --dur-mid:  240ms;
+
+  /* Spacing — 4pt scale, semantic names */
+  --space-xs:  0.5rem;   /* 8px */
+  --space-sm:  1rem;     /* 16px */
+  --space-md:  1.5rem;   /* 24px */
+  --space-lg:  2.5rem;   /* 40px */
+  --space-xl:  4rem;     /* 64px */
+  --space-2xl: 6rem;     /* 96px */
+
+  /* Fluid type scale */
+  --text-display:   clamp(2.5rem, 1.9rem + 2.6vw, 3.75rem);
+  --text-display-s: clamp(1.75rem, 1.5rem + 1.1vw, 2.5rem);
+  --text-xl:        clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --text-lg:        clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-base:      1rem;
+  --text-sm:        0.875rem;
+  --text-xs:        0.75rem;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/archivo-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Instrument Sans';
+  src: url('/fonts/instrument-sans-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Base ---- */
+html {
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Typography helpers ---- */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+
+/* ---- Color helpers (every declaration references a token) ---- */
+.text-ink      { color: var(--color-ink); }
+.text-ink-mute { color: var(--color-ink-mute); }
+.text-ink-dim  { color: var(--color-ink-dim); }
+.text-accent   { color: var(--color-accent); }
+
+.bg-paper     { background-color: var(--color-paper); }
+.bg-surface   { background-color: var(--color-paper-2); }
+.bg-surface-2 { background-color: var(--color-paper-3); }
+.bg-accent    { background-color: var(--color-accent); }
+
+.border-rule   { border-color: var(--color-rule); }
+.border-accent { border-color: var(--color-accent); }
+
+/* Muted link that brightens on hover/focus — used in nav, footer, prose */
+.link-quiet {
+  color: var(--color-ink-mute);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.link-quiet:hover,
+.link-quiet:focus-visible { color: var(--color-ink); }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: 0.7rem var(--space-md);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-ink);
+}
+.btn-accent:hover { background-color: var(--color-accent-2); }
+.btn-ghost {
+  /* El borde iba con --color-rule: 1.22:1 sobre la tarjeta, muy por debajo del
+     3:1 que pide WCAG para el límite de un control, y no se leía como botón. */
+  background-color: var(--color-paper-3);
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink-dim);
+}
+.btn-ghost:hover { color: var(--color-ink); border-color: var(--color-ink-dim); }
+
+/* ---- Nav N5 — floating pill ---- */
+.nav-pill {
+  /* Sin backdrop-filter: la píldora translúcida con blur es justo el patrón
+     de landing generada, y el género atmosférico lo descarta. Superficie
+     opaca, que además evita el repintado del blur al hacer scroll. */
+  background-color: var(--color-paper-2);
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+}
+
+/* ---- Screenshot figures (Workbench) ---- */
+.shot {
+  border: 1px solid var(--color-rule);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--color-paper-2);
+}
+.shot img { display: block; width: 100%; height: auto; }
+.shot figcaption {
+  font-family: var(--font-body);
+  color: var(--color-ink-dim);
+  font-size: var(--text-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--color-rule);
+}
+
+/* ---- Sticky CTA bar ---- */
+.sticky-cta {
+  background-color: var(--color-paper-2);
+  border-top: 1px solid var(--color-rule);
+}
+
+/* ---- Long-form content (help / privacy / terms) ---- */
+.prose-content {
+  max-width: 68ch; /* 60-75 character measure */
+  color: var(--color-ink-mute);
+  font-family: var(--font-body);
+  line-height: 1.7;
+}
+.prose-content h1 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  font-size: var(--text-display-s);
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+.prose-content h2 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  font-size: var(--text-xl);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-xs);
+}
+.prose-content h3 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-xs);
+}
+.prose-content p { margin-top: var(--space-sm); }
+.prose-content ul { margin-top: var(--space-sm); padding-left: 1.25rem; list-style: disc; }
+.prose-content li { margin-top: var(--space-xs); }
+.prose-content li::marker { color: var(--color-ink-dim); }
+.prose-content a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
+.prose-content a:hover { color: var(--color-ink); }
+.prose-content strong { color: var(--color-ink); font-weight: 600; }
+.prose-content em { color: var(--color-ink-dim); font-style: normal; }
+
+/* ---- Motion: fade only ---- */
+.fade-in { animation: yammbo-fade var(--dur-mid) var(--ease-out) both; }
+@keyframes yammbo-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

@@ -5,7 +5,7 @@
 
 <x-layouts.marketing>
 
-    <x-container class="py-10">
+    <x-container class="py-16 sm:py-24">
         <x-marketing.sections.pricing />
     </x-container>
 

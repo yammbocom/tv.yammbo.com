@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './component-styles.css';
+@import './tokens.css';
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
@@ -130,8 +131,11 @@
 }
 
 body {
-    background-color: #000 !important;
-    color: #e4e4e7 !important;
+    /* Estos !important son de un parche anterior y ganaban a las utilidades
+       del tema, así que el negro de sala de los tokens no llegaba a aplicarse
+       en ninguna página. Se conserva la precedencia y se apuntan a los tokens. */
+    background-color: var(--color-paper) !important;
+    color: var(--color-ink) !important;
 }
 
 /* --- Backgrounds WHITE → BLACK (pero NO bg-black nativo, ese es Yambo ya) --- */

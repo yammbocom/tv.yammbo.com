@@ -10,9 +10,10 @@
         'type' => 'website',
     ]"
 >
-    <x-container class="max-w-3xl py-12 sm:py-24 prose prose-lg">
+    <x-container class="max-w-3xl py-16 sm:py-24">
+    <div class="prose-content">
         <h1>Términos de Servicio</h1>
-        <p class="text-zinc-500"><em>Última actualización: 29 de mayo de 2026</em></p>
+        <p class="text-[color:var(--color-ink-dim)]"><em>Última actualización: 29 de mayo de 2026</em></p>
 
         <p>
             Estos Términos rigen tu uso de Yammbo Tv (el «Servicio»), operado por Yammbo. Al crear una cuenta
@@ -103,5 +104,6 @@
             Para cualquier consulta sobre estos Términos, escríbenos a
             <a href="mailto:soporte@yammbo.com">soporte@yammbo.com</a>.
         </p>
+    </div>
     </x-container>
 </x-layouts.marketing>

@@ -10,7 +10,8 @@
         'type' => 'website',
     ]"
 >
-    <x-container class="max-w-3xl py-12 sm:py-24 prose prose-lg">
+    <x-container class="max-w-3xl py-16 sm:py-24">
+    <div class="prose-content">
         <h1>Ayuda y Soporte</h1>
         <p>¿Necesitas una mano? Aquí tienes lo esencial para empezar y resolver dudas frecuentes.</p>
 
@@ -74,5 +75,6 @@
             Escríbenos a <a href="mailto:soporte@yammbo.com">soporte@yammbo.com</a> e incluye tu dispositivo, qué
             intentabas hacer y, si puedes, una captura del error. Te ayudamos lo antes posible.
         </p>
+    </div>
     </x-container>
 </x-layouts.marketing>

@@ -11,24 +11,21 @@ class DatabaseSeeder extends Seeder
     /**
      * Run the database seeds.
      */
+    /**
+     * Los seeders de blog, changelog, páginas, temas, formularios y claves de
+     * API se fueron con sus tablas (migración 2026_08_20_000000). Lo que queda
+     * es lo que el sitio usa de verdad.
+     */
     public function run(): void
     {
         $this->call(RolesTableSeeder::class);
         $this->call(UsersTableSeeder::class);
-        $this->call(ChangelogsTableSeeder::class);
-        $this->call(ApiKeysTableSeeder::class);
-        $this->call(CategoriesTableSeeder::class);
-        $this->call(NotificationsTableSeeder::class);
-        $this->call(PagesTableSeeder::class);
         $this->call(PasswordResetsTableSeeder::class);
         $this->call(PermissionsTableSeeder::class);
         $this->call(PermissionRoleTableSeeder::class);
         $this->call(ModelHasRolesTableSeeder::class);
         $this->call(PlansTableSeeder::class);
-        $this->call(PostsTableSeeder::class);
         $this->call(SettingsTableSeeder::class);
-        $this->call(ProfileKeyValuesTableSeeder::class);
-        $this->call(ThemesTableSeeder::class);
         fixPostgresSequence();
     }
 }

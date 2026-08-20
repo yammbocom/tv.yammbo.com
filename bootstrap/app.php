@@ -8,7 +8,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Lab404\Impersonate\ImpersonateServiceProvider::class,
-        \DevDojo\Themes\ThemesServiceProvider::class,
+        // DevDojo\Themes\ThemesServiceProvider ya no se registra: resolvía el tema
+        // contra la tabla `themes`, que salió con el esquema de Wave. Lo que sí
+        // hacía falta (Folio, componentes y vistas del tema) lo monta ahora
+        // App\Providers\FolioServiceProvider sin tocar la base de datos.
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

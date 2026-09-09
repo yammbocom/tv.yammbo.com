@@ -6,6 +6,7 @@
         'expired' => 'El codigo expiro. Genera uno nuevo desde tu TV.',
         'already_linked' => 'Este codigo ya fue usado para vincular una TV.',
         'success' => 'Vinculacion exitosa. Vuelve a tu TV en unos segundos.',
+        'registered' => 'Cuenta creada. Verifica tu correo y tu TV entrara sola.',
     ];
     $message = $statusMessages[$status] ?? '';
 @endphp
@@ -128,6 +129,29 @@
             text-align: center;
             margin-bottom: 16px;
         }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tabs .tab {
+            flex: 1;
+            width: auto;
+            margin: 0;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #bfbfbf;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 11px;
+        }
+        .tabs .tab.active {
+            background: #e50914;
+            border-color: #e50914;
+            color: #fff;
+        }
+        .tabs .tab:hover { background: #1a1a1a; }
+        .tabs .tab.active:hover { background: #c40811; }
     </style>
 </head>
 <body>
@@ -155,22 +179,63 @@
                     style="text-transform:uppercase; letter-spacing:4px; text-align:center; font-size:20px;">
                 <button type="submit">Continuar</button>
             </form>
+        @elseif ($status === 'registered')
+            <h1>Cuenta creada!</h1>
+            <div class="code-box">{{ $code }}</div>
+            <div class="info" style="margin-bottom:8px;">
+                Te enviamos un correo para <b>verificar tu cuenta</b>.
+                Abrelo desde tu telefono y, en cuanto lo confirmes, tu TV entrara sola.
+            </div>
+            <div class="subtitle">Tienes 7 dias de prueba gratis al confirmar.</div>
         @else
-            <h1>Iniciar sesion</h1>
-            <div class="subtitle">{{ $message }}</div>
+            @php($mode = $mode ?? 'login')
+            <h1 id="ttl">{{ $mode === 'register' ? 'Crear cuenta' : 'Iniciar sesion' }}</h1>
+            <div class="subtitle">Vincula tu TV: inicia sesion o crea una cuenta nueva.</div>
             <div class="code-box">{{ $code }}</div>
             @if ($error)
                 <div class="error">{{ $error }}</div>
             @endif
-            <form method="POST" action="{{ url('/tv-link/confirm') }}">
+
+            {{-- Pestanas --}}
+            <div class="tabs">
+                <button type="button" class="tab {{ $mode !== 'register' ? 'active' : '' }}" onclick="ymbTab('login')" id="tab-login">Ya tengo cuenta</button>
+                <button type="button" class="tab {{ $mode === 'register' ? 'active' : '' }}" onclick="ymbTab('register')" id="tab-register">Soy nuevo</button>
+            </div>
+
+            {{-- Iniciar sesion --}}
+            <form method="POST" action="{{ url('/tv-link/confirm') }}" id="form-login" style="{{ $mode === 'register' ? 'display:none;' : '' }}">
                 @csrf
                 <input type="hidden" name="code" value="{{ $code }}">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required autofocus>
+                <label for="email">Correo</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
                 <label for="password">Contrasena</label>
                 <input type="password" id="password" name="password" required>
-                <button type="submit">Vincular TV</button>
+                <button type="submit">Iniciar sesion y vincular</button>
             </form>
+
+            {{-- Crear cuenta --}}
+            <form method="POST" action="{{ url('/tv-link/register') }}" id="form-register" style="{{ $mode === 'register' ? '' : 'display:none;' }}">
+                @csrf
+                <input type="hidden" name="code" value="{{ $code }}">
+                <label for="rname">Nombre</label>
+                <input type="text" id="rname" name="name" value="{{ old('name') }}" autocomplete="name">
+                <label for="remail">Correo</label>
+                <input type="email" id="remail" name="email" value="{{ old('email') }}" autocomplete="email">
+                <label for="rpassword">Contrasena (minimo 6)</label>
+                <input type="password" id="rpassword" name="password" autocomplete="new-password">
+                <button type="submit">Crear cuenta y vincular</button>
+            </form>
+
+            <script>
+                function ymbTab(m){
+                    var login = m === 'login';
+                    document.getElementById('form-login').style.display = login ? '' : 'none';
+                    document.getElementById('form-register').style.display = login ? 'none' : '';
+                    document.getElementById('tab-login').classList.toggle('active', login);
+                    document.getElementById('tab-register').classList.toggle('active', !login);
+                    document.getElementById('ttl').textContent = login ? 'Iniciar sesion' : 'Crear cuenta';
+                }
+            </script>
         @endif
     </div>
 </body>

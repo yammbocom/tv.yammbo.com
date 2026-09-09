@@ -10,9 +10,9 @@
                 <a href="/privacy" class="link-quiet whitespace-nowrap">{{ __('landing.footer.link_privacy') }}</a>
                 <a href="/terms" class="link-quiet whitespace-nowrap">{{ __('landing.footer.link_terms') }}</a>
                 <a href="/help" class="link-quiet whitespace-nowrap">{{ __('landing.footer.link_help') }}</a>
-                {{-- /app-tv/download es una ruta viva y este era su único enlace
-                     público; se quedó fuera al rehacer el footer. --}}
-                <a href="/app-tv/download" class="link-quiet whitespace-nowrap">{{ __('landing.footer.link_download') }}</a>
+                {{-- /install explica como instalar en movil y en TV; la descarga
+                     directa del APK deja al usuario sin contexto. --}}
+                <a href="/install" class="link-quiet whitespace-nowrap">{{ __('landing.footer.link_download') }}</a>
                 <a href="mailto:support@yammbo.com" class="link-quiet whitespace-nowrap">support@yammbo.com</a>
             </nav>
 

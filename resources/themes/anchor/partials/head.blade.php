@@ -36,8 +36,40 @@
     @endif
 @endif
 
-<meta name="robots" content="index,follow">
-<meta name="googlebot" content="index,follow">
+{{-- El sitio no debe aparecer en buscadores: se accede por enlace directo.
+     robots.txt solo "pide" no rastrear; el que de verdad evita que se indexe
+     es este noindex (y la cabecera X-Robots-Tag del .htaccess). --}}
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+
+{{-- yambo-seo-extra: canonical, hreflang, twitter card y datos estructurados.
+     Sin canonical, las mismas paginas servidas con ?lang= o con/sin barra final
+     se ven como duplicados. El hreflang le dice a Google que hay version en
+     ingles y en espanol de la MISMA pagina, no dos paginas distintas. --}}
+@php
+    $yamboUrl  = url()->current();
+    $yamboEs   = $yamboUrl.(request()->getQueryString() ? '?'.request()->getQueryString() : '');
+    $yamboBase = rtrim(config('app.url') ?: 'https://tv.yammbo.com', '/');
+    $yamboPath = '/'.ltrim(request()->path() === '/' ? '' : request()->path(), '/');
+    $yamboCanonical = $yamboBase.($yamboPath === '/' ? '' : $yamboPath);
+@endphp
+<link rel="canonical" href="{{ $yamboCanonical }}">
+<link rel="alternate" hreflang="es" href="{{ $yamboCanonical }}{{ $yamboPath === '/' ? '/' : '' }}?lang=es">
+<link rel="alternate" hreflang="en" href="{{ $yamboCanonical }}{{ $yamboPath === '/' ? '/' : '' }}?lang=en">
+<link rel="alternate" hreflang="x-default" href="{{ $yamboCanonical }}">
+
+<meta name="twitter:card" content="summary_large_image">
+@if(isset($seo->title))
+    <meta name="twitter:title" content="{{ $seo->title }}">
+@endif
+@if(isset($seo->description))
+    <meta name="twitter:description" content="{{ $seo->description }}">
+@endif
+@if(isset($seo->image))
+    <meta name="twitter:image" content="{{ $seo->image }}">
+@endif
+
+
 
 @if(isset($seo->description))
     <meta name="description" content="{{ $seo->description }}">

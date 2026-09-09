@@ -1,2 +1,5 @@
+# Yammbo Tv no quiere aparecer en buscadores.
+# El acceso al sitio sigue siendo normal por enlace directo; esto solo
+# le pide a los rastreadores que no lo indexen.
 User-agent: *
-Disallow:
+Disallow: /

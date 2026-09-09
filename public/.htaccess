@@ -42,3 +42,10 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Yammbo Tv: fuera de los buscadores.
+# robots.txt solo pide no rastrear; esta cabecera se aplica a TODA respuesta
+# (incluidos APK y respuestas de API) y la respetan los buscadores serios.
+<IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+</IfModule>

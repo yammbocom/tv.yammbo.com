@@ -20,3 +20,8 @@ anchor/**/*.orig
 anchor/**/*.rej
 anchor/**/.env
 anchor/**/.env.*
+
+# Copias con marca de tiempo: nunca al repo (el raiz no gana a !anchor/**/*)
+anchor/**/*.bak-*
+anchor/**/*.bak
+anchor/**/*.pre-*

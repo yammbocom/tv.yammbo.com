@@ -1,0 +1,10 @@
+{
+  "build": 27,
+  "version_code": 60507,
+  "version_name": "build 27",
+  "url": "https://github.com/yammbocom/YammboTv-APK-Releases/releases/download/m27/YammboMobile.apk",
+  "size": 46627581,
+  "sha256": "f49df6fa1e5fbefa8a117bac107f18149e61518432477d67ab302f2d51359750",
+  "notes": "Aviso cuando el contenido esta restringido en tu pais, con acceso directo a la VPN.",
+  "mandatory": false
+}

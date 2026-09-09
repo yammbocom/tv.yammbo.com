@@ -1,8 +1,17 @@
 @php
     $isEs = str_starts_with(app()->getLocale(), 'es');
-    $svc  = '/download/YammboTV-Service-Setup-v2.exe';
-    $apk  = '/download/YamboTV.apk';
-    $vpn  = '/download/VPN-Yammbo.apk';
+
+    // Los APK viven en GitHub Releases, no en el VPS.
+    // Estas URLs "latest" NO cambian al publicar una version nueva.
+    $apkTv     = 'https://github.com/yammbocom/yammbo-androidtv-releases/releases/latest/download/YamboTV.apk';
+    $apkMobile = '/download/movil';   // el asset se llama YammboMobile.apk, no YamboTV.apk
+    $svc       = '/download/YammboTV-Service-Setup-v4.exe';
+
+    // Codigos de la app Downloader (go.aftvnews.com). Al rellenarlos, la web
+    // los muestra sola; mientras esten vacios se ensena solo la direccion corta.
+    $codeTv     = '4874406';   // go.aftvnews.com -> https://tv.yammbo.com/tv
+    $codeMobile = null;
+    $vpn       = '/download/VPN-Yammbo.apk';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -10,170 +19,268 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#E50914">
-<title>{{ $isEs ? 'Instalar y reproducir' : 'Install & play' }} — Yammbo Tv</title>
+<meta name="color-scheme" content="dark">
+<title>{{ $isEs ? 'Descargar Yammbo Tv' : 'Download Yammbo Tv' }} — Yammbo Tv</title>
+<meta name="description" content="{{ $isEs ? 'Descarga Yammbo Tv para tu televisor o tu telefono Android.' : 'Download Yammbo Tv for your TV or Android phone.' }}">
+@php
+    $ogImg = file_exists(public_path('images/og-install.jpg'))
+        ? '/images/og-install.jpg'
+        : (file_exists(public_path('images/og-install.png')) ? '/images/og-install.png' : '/images/yambo-icon.png');
+    $ogTitle = $isEs ? 'Instala Yammbo Tv en tu televisor' : 'Install Yammbo Tv on your TV';
+    $ogDesc  = $isEs
+        ? 'Peliculas, series y TV en vivo. Instalala en tu Fire TV Stick, TV Box o Smart TV con el codigo 4874406 en Downloader, o descargala para Android.'
+        : 'Movies, series and live TV. Install it on your Fire TV Stick, TV Box or Smart TV with code 4874406 in Downloader, or download it for Android.';
+@endphp
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Yammbo Tv">
+<meta property="og:locale" content="{{ $isEs ? 'es_ES' : 'en_US' }}">
+<meta property="og:title" content="{{ $ogTitle }}">
+<meta property="og:description" content="{{ $ogDesc }}">
+<meta property="og:url" content="{{ url('/install') }}">
+<meta property="og:image" content="{{ url($ogImg) }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ $ogTitle }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $ogTitle }}">
+<meta name="twitter:description" content="{{ $ogDesc }}">
+<meta name="twitter:image" content="{{ url($ogImg) }}">
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-  .wrap{max-width:700px;margin:0 auto;padding:32px 20px 80px}
-  .logo-wrap{display:flex;justify-content:center;margin-bottom:20px}
-  .logo-wrap img{height:42px;width:auto}
-  h1{font-size:26px;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.02em}
-  .subtitle{text-align:center;color:#bdbdbd;margin:0 0 28px;font-size:15px;line-height:1.55}
-  .card{background:#111;border:1px solid #2A2A2A;border-radius:14px;padding:22px 24px;margin-bottom:16px}
-  .card h2{margin:0 0 10px;font-size:18px;font-weight:700;display:flex;align-items:center;gap:9px}
-  .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#E50914;color:#fff;font-size:14px;font-weight:800;flex:0 0 auto}
-  .card p{margin:0 0 12px;color:#ddd;font-size:14px;line-height:1.6}
-  .cta-card{background:linear-gradient(135deg,#1a0608 0%,#2a0a0e 100%);border:1px solid #E50914;box-shadow:0 4px 24px rgba(229,9,20,.15)}
-  .btn-row{text-align:center;margin:6px 0 2px}
-  .cta-btn{display:inline-block;background:#E50914;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 28px;border-radius:10px;letter-spacing:.02em;transition:transform .15s ease,background .15s ease}
-  .cta-btn:hover,.cta-btn:active{background:#c8070f;transform:translateY(-1px)}
-  .cta-btn svg{vertical-align:-3px;margin-right:8px}
-  .cta-btn.ghost{background:transparent;border:1px solid #444;color:#ddd;font-weight:600;font-size:13px;padding:10px 20px}
-  .cta-btn.ghost:hover{background:#1a1a1a;border-color:#666}
-  .platform{text-align:center;color:#9a9a9a;font-size:12px;margin:10px 0 0}
+  html,body{margin:0;padding:0;background:#000;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit}
 
-  /* Switch (toggle) que despliega la guía */
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #2a2a2a}
-  .toggle-row .t-label{font-size:13.5px;font-weight:600;color:#eee}
-  .acc-input{position:absolute;opacity:0;width:0;height:0}
-  .switch{position:relative;display:inline-block;width:46px;height:26px;flex:0 0 auto;cursor:pointer}
-  .switch .track{position:absolute;inset:0;background:#3a3a3a;border-radius:999px;transition:.25s}
-  .switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.25s}
-  .acc-input:checked + .toggle-row .switch .track{background:#E50914}
-  .acc-input:checked + .toggle-row .switch .knob{transform:translateX(20px)}
-  .acc-content{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .acc-input:checked ~ .acc-content{max-height:1600px}
-  .guide{padding-top:14px}
-  .guide ol{margin:0;padding-left:20px;color:#cfcfcf;font-size:13.5px;line-height:1.75}
-  .guide ol li{margin-bottom:7px}
-  .guide ol li b{color:#fff}
-  .dialog{background:#0e1726;border:1px solid #24344d;border-radius:10px;padding:13px 15px;margin:14px 0;font-size:13px;line-height:1.6;color:#cdd9ee}
-  .dialog .dlg-title{display:flex;align-items:center;gap:8px;font-weight:700;color:#9ec1ff;margin-bottom:6px}
-  .dialog .steps{margin:8px 0 0;padding-left:18px}
-  .dialog code{background:#1c2741;padding:1px 6px;border-radius:5px;color:#fff;font-size:12.5px}
-  .reassure{background:#0d1f12;border:1px solid #1f4d2c;border-radius:10px;padding:11px 14px;margin:12px 0 0;font-size:12.5px;line-height:1.55;color:#a7e0b8}
-  .vpn-sub{margin-top:18px;padding-top:16px;border-top:1px dashed #333}
-  .vpn-sub h3{margin:0 0 6px;font-size:15px;font-weight:700;color:#fff}
-  .vpn-sub p{font-size:13px;color:#cfcfcf;margin:0 0 12px;line-height:1.55}
-  .back{display:block;text-align:center;color:#888;text-decoration:none;font-size:13px;margin-top:28px}
-  .back:hover{color:#fff}
+  /* Halo rojo de fondo, igual que la landing */
+  .glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 480px at 50% -8%,rgba(229,9,20,.20),transparent 60%)}
+
+  .wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:40px 20px 90px}
+
+  header{text-align:center;margin-bottom:38px}
+  header img{height:44px;width:auto;margin-bottom:22px}
+  h1{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;line-height:1.1}
+  .sub{color:#b8b8bd;font-size:clamp(15px,2.2vw,17px);line-height:1.6;margin:0 auto;max-width:560px}
+
+  /* Tarjetas de descarga */
+  .apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:34px}
+  .app{position:relative;background:linear-gradient(160deg,#141416 0%,#0d0d0f 100%);
+    border:1px solid #26262b;border-radius:20px;padding:30px 28px;display:flex;flex-direction:column;
+    transition:border-color .2s ease,transform .2s ease}
+  .app:hover{border-color:#3a3a42;transform:translateY(-2px)}
+  .app.primary{border-color:rgba(229,9,20,.45);box-shadow:0 0 0 1px rgba(229,9,20,.12),0 18px 50px -20px rgba(229,9,20,.5)}
+  .badge{position:absolute;top:16px;right:16px;background:#E50914;color:#fff;font-size:10.5px;font-weight:800;
+    letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+  .ico{width:52px;height:52px;border-radius:14px;background:#1c1c20;display:flex;align-items:center;
+    justify-content:center;margin-bottom:18px}
+  .ico svg{width:27px;height:27px;stroke:#E50914;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .app:nth-child(3) .ico svg{fill:#E50914;stroke:none}
+  .app h2{margin:0 0 7px;font-size:21px;font-weight:750;letter-spacing:-.01em}
+  .app .for{color:#8b8b93;font-size:13.5px;line-height:1.55;margin:0 0 18px;flex:1}
+  .feat{list-style:none;margin:0 0 22px;padding:0}
+  .feat li{color:#c9c9cf;font-size:13.5px;line-height:1.5;padding-left:20px;position:relative;margin-bottom:7px}
+  .feat li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:#E50914}
+
+  /* Tarjeta de TV: instalacion por codigo */
+  .tvlead{margin:0 0 16px;color:#c9c9cf;font-size:13.5px;line-height:1.6}
+  .codebox{background:#0b0b0d;border:1px solid rgba(229,9,20,.4);border-radius:14px;
+    padding:16px 18px;text-align:center;margin-bottom:18px}
+  .code-label{color:#8b8b93;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+  .code-num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:34px;
+    font-weight:800;color:#E50914;letter-spacing:.14em;line-height:1}
+  .tvsteps{margin:0 0 14px;padding:0 0 0 4px;list-style:none;counter-reset:tv}
+  .tvsteps li{counter-increment:tv;position:relative;padding-left:31px;margin-bottom:11px;
+    color:#b0b0b8;font-size:13.5px;line-height:1.55}
+  .tvsteps li::before{content:counter(tv);position:absolute;left:0;top:0;width:21px;height:21px;
+    border-radius:50%;background:#26262c;color:#fff;font-size:11.5px;font-weight:800;
+    display:flex;align-items:center;justify-content:center}
+  .tvsteps b{color:#fff;font-weight:650}
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;background:#E50914;color:#fff;
+    text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;
+    transition:background .15s ease}
+  .btn:hover{background:#c8070f}
+  .btn.ghost{background:#1c1c20;border:1px solid #303038;font-weight:600;font-size:14px}
+  .btn.ghost:hover{background:#26262c}
+  .btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .meta{text-align:center;color:#6e6e77;font-size:11.5px;margin-top:11px}
+
+  /* Guia de instalacion */
+  .guide{background:#0e0e10;border:1px solid #212126;border-radius:20px;padding:30px 28px;margin-bottom:18px}
+  .guide h3{margin:0 0 22px;font-size:18px;font-weight:750}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px}
+  .step{display:flex;gap:13px}
+  .num{flex:0 0 auto;width:27px;height:27px;border-radius:50%;background:#E50914;color:#fff;
+    font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .step p{margin:0;color:#b0b0b8;font-size:13.5px;line-height:1.6}
+  .step b{color:#fff;font-weight:650}
+
+  /* Extras */
+  .extras{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .extra{background:#0e0e10;border:1px solid #212126;border-radius:16px;padding:20px 22px}
+  .extra h4{margin:0 0 6px;font-size:15px;font-weight:700}
+  .extra p{margin:0 0 14px;color:#8b8b93;font-size:13px;line-height:1.55}
+
+  /* Instalar con Downloader (Fire TV / Android TV) */
+  .dl{background:linear-gradient(160deg,#141416 0%,#0d0d0f 100%);border:1px solid #26262b;
+    border-radius:20px;padding:30px 28px;margin-bottom:18px}
+  .dl h3{margin:0 0 6px;font-size:18px;font-weight:750}
+  .dl .lead{margin:0 0 22px;color:#8b8b93;font-size:13.5px;line-height:1.6}
+  .codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .code{background:#0b0b0d;border:1px solid #26262b;border-radius:14px;padding:18px 20px;text-align:center}
+  .code .what{color:#8b8b93;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+  .code .val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:22px;
+    font-weight:700;color:#fff;letter-spacing:.04em;word-break:break-all}
+  .code .alt{color:#6e6e77;font-size:12px;margin-top:9px}
+  .code .val.big{font-size:30px;color:#E50914;letter-spacing:.12em}
+  footer{text-align:center;margin-top:44px;color:#5c5c66;font-size:12.5px;line-height:1.7}
+  footer a{color:#9a9aa3;text-decoration:none}
+  footer a:hover{color:#E50914}
+
+  @media (max-width:520px){
+    .app{padding:26px 22px}
+    .guide{padding:24px 20px}
+  }
 </style>
 </head>
 <body>
+<div class="glow"></div>
 <div class="wrap">
-  <div class="logo-wrap"><img src="/images/yambo-logo.png" alt="Yammbo Tv"></div>
-  <h1>{{ $isEs ? 'Pon todo a funcionar' : 'Get everything working' }}</h1>
-  <p class="subtitle">{{ $isEs ? 'Descarga lo que necesitas para disfrutar Yammbo Tv al máximo. Toca el interruptor de cada paso para ver la guía detallada.' : 'Download what you need to enjoy Yammbo Tv to the fullest. Flip each switch to see the detailed guide.' }}</p>
 
-  {{-- 1 · Yammbo TV Service (PC / Windows) --}}
-  <div class="card cta-card">
-    <h2><span class="num">1</span> Yammbo TV Service · PC (Windows)</h2>
-    <p>{{ $isEs
-        ? 'El reproductor del navegador necesita este pequeño servicio gratuito para reproducir películas y series. Se instala una sola vez y queda corriendo en segundo plano.'
-        : 'The browser player needs this small free service to play movies and series. Install it once and leave it running in the background.' }}</p>
-    <div class="btn-row">
-      <a href="{{ $svc }}" class="cta-btn" download>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{{ $isEs ? 'Descargar para Windows' : 'Download for Windows' }}
-      </a>
+  <header>
+    <img src="/images/yambo-logo.png" alt="Yammbo Tv"
+         onerror="this.onerror=null;this.src='/images/yambo-icon.png'">
+    <h1>{{ $isEs ? 'Descarga Yammbo Tv' : 'Download Yammbo Tv' }}</h1>
+    <p class="sub">
+      {{ $isEs
+        ? 'Elige la version para tu dispositivo. Peliculas, series, anime y TV en vivo, donde quieras.'
+        : 'Pick the version for your device. Movies, series, anime and live TV, anywhere.' }}
+    </p>
+  </header>
+
+  <div class="apps">
+
+    {{-- App de TELEVISORES --}}
+    <div class="app primary">
+      <span class="badge">{{ $isEs ? 'Para tu TV' : 'For your TV' }}</span>
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <h2>{{ $isEs ? 'Yammbo Tv para Televisores' : 'Yammbo Tv for TV' }}</h2>
+      <p class="for">Android TV · Google TV · Fire TV · TV Box</p>
+      <p class="tvlead">
+        {!! $isEs
+          ? 'Se instala <b>desde el propio televisor</b>, con la app gratuita Downloader. No necesitas ordenador ni memoria USB.'
+          : 'Install it <b>from the TV itself</b> with the free Downloader app. No computer or USB drive needed.' !!}
+      </p>
+
+      <div class="codebox">
+        <div class="code-label">{{ $isEs ? 'Tu codigo de instalacion' : 'Your install code' }}</div>
+        <div class="code-num">{{ $codeTv }}</div>
+      </div>
+
+      <ol class="tvsteps">
+        <li>{!! $isEs
+          ? 'En tu televisor, busca <b>Downloader</b> en la tienda de apps (Google Play o Amazon Appstore) e instalala. Es gratis.'
+          : 'On your TV, search for <b>Downloader</b> in the app store (Google Play or Amazon Appstore) and install it. It is free.' !!}</li>
+        <li>{!! $isEs
+          ? 'Abre Downloader y escribe el codigo <b>' . $codeTv . '</b> con el mando. Pulsa <b>Go</b>.'
+          : 'Open Downloader, type the code <b>' . $codeTv . '</b> with your remote and press <b>Go</b>.' !!}</li>
+        <li>{!! $isEs
+          ? 'Espera a que descargue y pulsa <b>Instalar</b>. Si te pide permiso para instalar apps, aceptalo: es normal.'
+          : 'Wait for the download and press <b>Install</b>. If it asks permission to install apps, allow it: that is normal.' !!}</li>
+        <li>{!! $isEs
+          ? 'Abre Yammbo Tv y <b>escanea el codigo QR</b> con tu telefono para iniciar sesion.'
+          : 'Open Yammbo Tv and <b>scan the QR code</b> with your phone to sign in.' !!}</li>
+      </ol>
+
+      <p class="meta">{{ $isEs ? 'o escribe' : 'or type' }} tv.yammbo.com/tv · Android TV 5.0+</p>
     </div>
-    <input type="checkbox" id="g1" class="acc-input">
-    <label for="g1" class="toggle-row">
-      <span class="t-label">{{ $isEs ? 'Ver guía paso a paso + aviso de Windows' : 'Show step-by-step guide + Windows warning' }}</span>
-      <span class="switch"><span class="track"></span><span class="knob"></span></span>
-    </label>
-    <div class="acc-content">
-      <div class="guide">
-        <ol>
-          <li>{{ $isEs ? 'Descarga y abre el instalador' : 'Download and open the installer' }} (<b>YammboTV-Service-Setup.exe</b>).</li>
-          <li>{!! $isEs ? 'Windows mostrará un aviso azul — <b>es normal</b>, mira el recuadro de abajo para continuar.' : 'Windows will show a blue warning — <b>this is normal</b>, see the box below to continue.' !!}</li>
-          <li>{{ $isEs ? 'Sigue el instalador (Siguiente / Instalar). Termina en segundos.' : 'Follow the installer (Next / Install). It finishes in seconds.' }}</li>
-          <li>{!! $isEs ? 'El servicio queda en la <b>bandeja del sistema</b> (junto al reloj, abajo a la derecha).' : 'The service stays in the <b>system tray</b> (next to the clock, bottom-right).' !!}</li>
-          <li>{!! $isEs ? 'Vuelve a <b>tv.yammbo.com</b>, recarga, y ya puedes reproducir.' : 'Go back to <b>tv.yammbo.com</b>, reload, and you can play.' !!}</li>
-        </ol>
-        <div class="dialog">
-          <div class="dlg-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-            {{ $isEs ? '“Windows protegió tu PC” / Editor desconocido' : '“Windows protected your PC” / Unknown publisher' }}
-          </div>
-          {{ $isEs
-            ? 'Aparece una pantalla azul de Windows Defender SmartScreen. NO es un virus: sale porque la app no tiene una licencia de firma digital (un certificado de pago anual). Para continuar:'
-            : 'A blue Windows Defender SmartScreen screen appears. It is NOT a virus: it shows because the app does not have a paid digital-signature license. To continue:' }}
-          <ol class="steps">
-            <li>{!! $isEs ? 'Haz clic en <code>Más información</code>' : 'Click <code>More info</code>' !!}</li>
-            <li>{!! $isEs ? 'Luego en <code>Ejecutar de todas formas</code>' : 'Then click <code>Run anyway</code>' !!}</li>
-          </ol>
-        </div>
-        <div class="reassure">{{ $isEs ? '✓ El servicio es de código abierto, sin anuncios y no recopila datos. Solo permite que tu navegador reproduzca el contenido.' : '✓ The service is open-source, ad-free and collects no data. It only lets your browser play the content.' }}</div>
+
+    {{-- App MOVIL --}}
+    <div class="app">
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+      </div>
+      <h2>{{ $isEs ? 'Yammbo Tv para Movil' : 'Yammbo Tv for Mobile' }}</h2>
+      <p class="for">{{ $isEs ? 'Telefonos y tabletas Android' : 'Android phones and tablets' }}</p>
+      <ul class="feat">
+        <li>{{ $isEs ? 'Llevalo contigo a cualquier parte' : 'Take it anywhere' }}</li>
+        <li>{{ $isEs ? 'Misma cuenta que en tu televisor' : 'Same account as your TV' }}</li>
+        <li>{{ $isEs ? 'Controles pensados para pantalla tactil' : 'Touch-friendly controls' }}</li>
+      </ul>
+      <a class="btn" href="{{ $apkMobile }}" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        {{ $isEs ? 'Descargar para Movil' : 'Download for Mobile' }}
+      </a>
+      <p class="meta">APK · {{ $isEs ? 'Android 5.0 o superior' : 'Android 5.0+' }}</p>
+    </div>
+
+    {{-- App de WINDOWS --}}
+    <div class="app">
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><path d="M3 6.5l7-1v6H3v-5zM11 5.2l10-1.4v7.7H11V5.2zM3 12.5h7v6l-7-1v-5zM11 12.5h10v7.7l-10-1.4v-6.3z"/></svg>
+      </div>
+      <h2>{{ $isEs ? 'Yammbo Tv para Windows' : 'Yammbo Tv for Windows' }}</h2>
+      <p class="for">{{ $isEs ? 'Ordenadores con Windows 10 y 11' : 'Windows 10 and 11 computers' }}</p>
+      <ul class="feat">
+        <li>{{ $isEs ? 'Vela en pantalla grande sin televisor' : 'Watch on a big screen, no TV needed' }}</li>
+        <li>{{ $isEs ? 'Misma cuenta que en tus otros dispositivos' : 'Same account as your other devices' }}</li>
+        <li>{{ $isEs ? 'Instalador guiado, sin complicaciones' : 'Guided installer, no hassle' }}</li>
+      </ul>
+      <a class="btn" href="{{ $svc }}">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        {{ $isEs ? 'Descargar para Windows' : 'Download for Windows' }}
+      </a>
+      <p class="meta">{{ $isEs ? 'Instalador .exe · Windows 10 o superior' : '.exe installer · Windows 10+' }}</p>
+    </div>
+
+  </div>
+
+  {{-- Como instalar --}}
+  <div class="guide">
+    <h3>{{ $isEs ? 'Como instalarla' : 'How to install' }}</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <p>{{ $isEs
+          ? 'Descarga el archivo pulsando el boton de arriba.'
+          : 'Download the file using the button above.' }}</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <p>{!! $isEs
+          ? 'Abrelo. Si te avisa de <b>origenes desconocidos</b>, permite la instalacion: es normal al instalar fuera de la tienda.'
+          : 'Open it. If it warns about <b>unknown sources</b>, allow the install: that is normal outside the store.' !!}</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <p>{!! $isEs
+          ? 'Abre Yammbo Tv e <b>inicia sesion</b>. En el televisor solo tienes que escanear el codigo QR con tu telefono.'
+          : 'Open Yammbo Tv and <b>sign in</b>. On TV just scan the QR code with your phone.' !!}</p>
       </div>
     </div>
   </div>
 
-  {{-- 2 · App YamboTV (Android) + VPN --}}
-  <div class="card">
-    <h2><span class="num">2</span> {{ $isEs ? 'App YamboTV · Android' : 'YamboTV App · Android' }}</h2>
-    <p>{{ $isEs ? 'La app nativa para tu teléfono, tablet y Android TV. La mejor experiencia en pantalla grande, sin instalar nada más.' : 'The native app for your phone, tablet and Android TV. The best big-screen experience, nothing else to install.' }}</p>
-    <div class="btn-row">
-      <a href="{{ $apk }}" class="cta-btn" download>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{{ $isEs ? 'Descargar APK' : 'Download APK' }}
-      </a>
-    </div>
-    <input type="checkbox" id="g2" class="acc-input">
-    <label for="g2" class="toggle-row">
-      <span class="t-label">{{ $isEs ? 'Ver guía de instalación + permisos de Android' : 'Show install guide + Android permissions' }}</span>
-      <span class="switch"><span class="track"></span><span class="knob"></span></span>
-    </label>
-    <div class="acc-content">
-      <div class="guide">
-        <ol>
-          <li>{{ $isEs ? 'Descarga el archivo .apk en tu dispositivo.' : 'Download the .apk file to your device.' }}</li>
-          <li>{!! $isEs ? 'Abre el archivo descargado (desde la notificación o la app Archivos).' : 'Open the downloaded file (from the notification or the Files app).' !!}</li>
-          <li>{{ $isEs ? 'Aparecerán uno o dos avisos de seguridad — mira los recuadros de abajo.' : 'One or two security prompts will appear — see the boxes below.' }}</li>
-          <li>{{ $isEs ? 'Pulsa Instalar, espera, y abre la app.' : 'Tap Install, wait, and open the app.' }}</li>
-        </ol>
-        <div class="dialog">
-          <div class="dlg-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-            {{ $isEs ? 'Origen desconocido' : 'Unknown source' }}
-          </div>
-          {{ $isEs
-            ? 'Android pide permiso para instalar apps fuera de Play Store. Es normal al instalar un APK directo:'
-            : 'Android asks permission to install apps from outside the Play Store. This is normal for a direct APK:' }}
-          <ol class="steps">
-            <li>{!! $isEs ? 'Pulsa <code>Configuración</code> en el aviso' : 'Tap <code>Settings</code> in the prompt' !!}</li>
-            <li>{!! $isEs ? 'Activa <code>Permitir de esta fuente</code> y vuelve atrás' : 'Enable <code>Allow from this source</code> and go back' !!}</li>
-          </ol>
-        </div>
-        <div class="dialog">
-          <div class="dlg-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            {{ $isEs ? 'Play Protect: “app no reconocida”' : 'Play Protect: “unrecognized app”' }}
-          </div>
-          {{ $isEs
-            ? 'Google Play Protect puede avisar porque la app no se descargó de Play Store. No significa que sea dañina:'
-            : 'Google Play Protect may warn because the app was not downloaded from the Play Store. It does not mean it is harmful:' }}
-          <ol class="steps">
-            <li>{!! $isEs ? 'Pulsa <code>Más detalles</code> y luego <code>Instalar de todas formas</code>' : 'Tap <code>More details</code> then <code>Install anyway</code>' !!}</li>
-          </ol>
-        </div>
-        <div class="reassure">{{ $isEs ? '✓ El APK incluye el reproductor completo: en Android NO necesitas el servicio de PC ni nada extra.' : '✓ The APK includes the full player: on Android you do NOT need the PC service or anything extra.' }}</div>
-      </div>
-    </div>
-
-    {{-- VPN: solo Android, dentro de esta sección --}}
-    <div class="vpn-sub">
-      <h3>{{ $isEs ? 'VPN Yammbo · opcional (solo Android)' : 'Yammbo VPN · optional (Android only)' }}</h3>
-      <p>{{ $isEs ? 'Si tu operador o país bloquea algún contenido, instala la VPN (también es un APK) para un acceso sin límites y mayor privacidad. Se instala igual que la app de arriba.' : 'If your provider or country blocks some content, install the VPN (also an APK) for unrestricted access and more privacy. Install it the same way as the app above.' }}</p>
-      <div class="btn-row" style="text-align:left">
-        <a href="{{ $vpn }}" class="cta-btn" download>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{{ $isEs ? 'Descargar VPN' : 'Download VPN' }}
-        </a>
-        <a href="/app-tv/vpn-info" class="cta-btn ghost" style="margin-left:8px">{{ $isEs ? 'Más info' : 'More info' }}</a>
-      </div>
+  {{-- Extras --}}
+  <div class="extras">
+    <div class="extra">
+      <h4>{{ $isEs ? 'No carga el contenido?' : 'Content not loading?' }}</h4>
+      <p>{!! $isEs
+        ? 'Algunos operadores bloquean el servidor de video. Cambia el DNS de tu red a <b>1.1.1.1</b> y <b>8.8.8.8</b>, o usa esta VPN una vez.'
+        : 'Some carriers block the video server. Set your network DNS to <b>1.1.1.1</b> and <b>8.8.8.8</b>, or use this VPN once.' !!}</p>
+      <a class="btn ghost" href="{{ $vpn }}">{{ $isEs ? 'Descargar VPN' : 'Download VPN' }}</a>
     </div>
   </div>
 
-  <a href="javascript:history.back()" class="back">{{ $isEs ? '← Volver' : '← Back' }}</a>
+  <footer>
+    {{ $isEs ? 'Ya tienes cuenta?' : 'Already have an account?' }}
+    <a href="/mi-suscripcion">{{ $isEs ? 'Gestiona tu suscripcion' : 'Manage your subscription' }}</a>
+    <br>
+    &copy; {{ date('Y') }} Yammbo Tv
+  </footer>
+
 </div>
 </body>
 </html>

@@ -27,6 +27,20 @@ class BillingController extends Controller
 {
     public function show(Request $request)
     {
+        // Magic-link desde la TV: ?t=<jwt> manda SIEMPRE, aunque el navegador ya
+        // tenga sesion de otra cuenta (si no, el telefono abria la cuenta vieja).
+        if ($request->filled('t')) {
+            try {
+                $magicUser = \Tymon\JWTAuth\Facades\JWTAuth::setToken($request->query('t'))->authenticate();
+                if ($magicUser && (! auth()->check() || auth()->id() !== $magicUser->id)) {
+                    auth()->guard('web')->login($magicUser);
+                    $request->session()->regenerate();
+                }
+            } catch (\Throwable $e) {
+                // token invalido/caducado -> sigue el flujo normal (redirige a login)
+            }
+        }
+
         $user = auth()->user();
         if (! $user) {
             return redirect('/auth/login?redirect='.urlencode('/mi-suscripcion'));
@@ -50,12 +64,19 @@ class BillingController extends Controller
         $plan = Plan::find($subscription->plan_id);
         $isStripe = ($subscription->vendor_slug === 'stripe' && ! empty($subscription->vendor_customer_id));
 
+        $changeToken = '';
+        try {
+            \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
+            $changeToken = \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
+        } catch (\Throwable $e) {}
+
         return view('app-tv.billing', [
             'user' => $user,
             'subscription' => $subscription,
             'plan' => $plan,
             'planName' => $plan->name ?? 'Premium',
             'isStripe' => $isStripe,
+            'changeToken' => $changeToken,
         ]);
     }
 

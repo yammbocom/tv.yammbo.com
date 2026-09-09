@@ -113,7 +113,7 @@
         <p class="hint">{{ __('app-tv.billing.manage_subscription_hint') }}</p>
       @else
         {{-- Sub manual/admin: cancel local + cambiar via /pricing --}}
-        <a class="btn secondary" href="/pricing">{{ __('app-tv.billing.change_plan') }}</a>
+        <a class="btn secondary" href="/precios-tv?t={{ urlencode($changeToken ?? '') }}">{{ __('app-tv.billing.change_plan') }}</a>
         <form id="cancel-form" method="POST" action="/mi-suscripcion/cancelar" style="margin:0">
           @csrf
           <button type="button" class="btn danger" onclick="confirmCancel()" style="width:100%">{{ __('app-tv.billing.cancel_subscription') }}</button>
@@ -124,7 +124,7 @@
       <div class="info">
         {{ __('app-tv.billing.cancelled_info', ['date' => $subscription->ends_at ? \Carbon\Carbon::parse($subscription->ends_at)->format('d/m/Y') : __('app-tv.billing.cancelled_until_period_end')]) }}
       </div>
-      <a class="btn" href="/pricing">{{ __('app-tv.billing.reactivate') }}</a>
+      <a class="btn" href="/precios-tv?t={{ urlencode($changeToken ?? '') }}">{{ __('app-tv.billing.reactivate') }}</a>
     @endif
   </div>
 

@@ -34,8 +34,11 @@ class UserController extends Controller
     {
         // Solo roles del guard "web": es el único que usa la app.
         $roles = Role::where('guard_name', 'web')->orderBy('name')->get();
+        $plans = \App\Models\Plan::orderBy('id')->get();
+        $sub = \App\Models\Subscription::where('billable_type', 'user')
+            ->where('billable_id', $user->id)->orderByDesc('id')->first();
 
-        return view('admin.users.edit', compact('user', 'roles'));
+        return view('admin.users.edit', compact('user', 'roles', 'plans', 'sub'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -44,6 +47,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'role' => 'required|exists:roles,id',
+            'access_plan'   => 'nullable',
+            'access_status' => 'nullable|in:active,cancelled',
         ]);
 
         $user->update([
@@ -68,6 +73,16 @@ class UserController extends Controller
 
         $user->syncRoles([$role]);
         $user->clearUserCache();
+
+        // Acceso real de la app: vive en la tabla subscriptions, no en el rol.
+        // Aqui el admin puede activar/cancelar el acceso a mano.
+        if ($request->filled('access_plan') && $request->input('access_plan') !== 'none') {
+            \App\Support\AccessAdmin::grant(
+                $user,
+                (int) $request->input('access_plan'),
+                $request->input('access_status', 'active')
+            );
+        }
 
         return Redirect::route('panel.users.index')->with('success', 'Usuario actualizado.');
     }

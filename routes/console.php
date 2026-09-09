@@ -12,3 +12,6 @@ Artisan::command('inspire', function () {
 Schedule::command('subscriptions:cancel-expired')->hourly();
 Schedule::command('accounts:process-deletions')->daily();
 Schedule::command('activity:clean')->daily();
+
+// Aviso de proxima renovacion: una vez al dia, 5 dias antes del cobro.
+Illuminate\Support\Facades\Schedule::command('yambo:avisos-renovacion')->dailyAt('09:00');

@@ -52,6 +52,7 @@ resources/plugins/*
 !.env.example
 *.bak
 *.bak.*
+*.bak-*
 *.pre-*
 *.orig
 *.rej

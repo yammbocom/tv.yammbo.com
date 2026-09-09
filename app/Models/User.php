@@ -189,10 +189,32 @@ class User extends AuthUser implements JWTSubject
         static::created(function ($user) {
             $user->syncRoles([]);
 
+            // Cuenta nueva (cualquier plataforma): pedir confirmacion de correo
+            try {
+                if (empty($user->email_verified_at) && ! empty($user->email)) {
+                    \App\Http\Controllers\AppTv\EmailVerificationController::sendLink($user);
+                    \App\Support\YamboMail::welcome($user,
+                        $user->trial_ends_at ? \Carbon\Carbon::parse($user->trial_ends_at)->format('d/m/Y') : null);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('alta usuario, correos: '.$e->getMessage());
+            }
+
             $defaultRole = config('yammbo.default_user_role', 'registered');
             if (\Spatie\Permission\Models\Role::where('name', $defaultRole)->where('guard_name', 'web')->exists()) {
                 $user->assignRole($defaultRole);
             }
         });
+    }
+
+    /** Correo de restablecer contrasena con la plantilla de Yambo TV. */
+    public function sendPasswordResetNotification($token)
+    {
+        try {
+            $url = url('/auth/reset-password/'.$token.'?email='.urlencode($this->email));
+            \App\Support\YamboMail::resetPassword($this, $url);
+        } catch (\Throwable $e) {
+            parent::sendPasswordResetNotification($token);
+        }
     }
 }

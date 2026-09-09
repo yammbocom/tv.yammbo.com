@@ -52,6 +52,7 @@ class AppTvAuthController extends Controller
             ], 401);
         }
 
+
         $token = JWTAuth::fromUser($user);
 
         return $this->successResponse($user, $token);
@@ -113,7 +114,19 @@ class AppTvAuthController extends Controller
             ],
             'subscription_active' => $this->isSubscriptionActive($user),
             'access_token' => $token,
+            'manage_token' => $this->longToken($user),
         ]);
+    }
+
+    /** JWT de larga duracion (30 dias) para el gate de acceso del movil/TV. */
+    private function longToken(User $user): string
+    {
+        try {
+            \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
+            return \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     public static function isSubscriptionActive(User $user): bool

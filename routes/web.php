@@ -25,6 +25,36 @@ Route::get('/catalog/{type}/{id}/{extra}.json', [StremioAddonController::class, 
 Route::get('/meta/{type}/{id}.json', [StremioAddonController::class, 'meta']);
 Route::get('/stream/{type}/{id}.json', [StremioAddonController::class, 'stream']);
 
+/*
+ * Auto-actualizacion del Yammbo TV Service (el .exe de PC). El servicio pide
+ * /updater/check al arrancar y, si hay version mayor, descarga el instalador
+ * del descriptor, verifica su SHA256 y lo ejecuta en silencio.
+ *
+ * Publicas: el servicio corre sin sesion. Con throttle porque el endpoint
+ * abre un fichero de 37 MB para hashearlo (aunque va cacheado).
+ */
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/updater/check', [\App\Http\Controllers\AppTv\ServiceUpdaterController::class, 'check']);
+    Route::get('/updater/descriptor/{version}.json', [\App\Http\Controllers\AppTv\ServiceUpdaterController::class, 'descriptor'])
+        ->where('version', '[0-9]+\.[0-9]+\.[0-9]+');
+});
+
+/*
+ * Catalogo de complementos propio. Mismo formato `addon_catalog` que consume
+ * stremio-core, pero la lista la elegimos nosotros (config/yammbo_addons.php)
+ * y los logos salen de nuestro dominio en vez de 53 hosts de terceros.
+ */
+Route::get('/addon_catalog/{type}/{id}.json', [\App\Http\Controllers\AppTv\AddonCatalogController::class, 'catalog']);
+Route::get('/addon-logo/{slug}', [\App\Http\Controllers\AppTv\AddonCatalogController::class, 'logo'])
+    ->where('slug', '[a-z0-9\-]+');
+
+/*
+ * Proxy del addon de streams premium. Un token por cuenta, revocable, y 403
+ * en cuanto la suscripcion deja de estar activa.
+ */
+Route::match(['get', 'options'], '/aio/{token}/{path}', [\App\Http\Controllers\AppTv\AddonProxyController::class, 'handle'])
+    ->where(['token' => '[a-z0-9]{32,64}', 'path' => '.*']);
+
 /**
  * Stremio SPA (/app) — sirve index.html con el user Wave/Laravel inyectado
  * como window.YAMBO_USER para que el NavMenu y User.tsx muestren el email
@@ -94,7 +124,7 @@ $serveStremioApp = function () use ($yamboSubscriptionFor) {
 };
 
 Route::get('/app', $serveStremioApp)->middleware('auth');
-Route::get('/app/', $serveStremioApp)->middleware('auth');
+Route::get('/app/', $serveStremioApp)->middleware(['auth', \App\Http\Middleware\EnsureEmailVerified::class]);
 
 // Yambo user identity endpoint for Stremio SPA — fallback when window.YAMBO_USER
 // is not injected (stale SW cache). Stateful session via web middleware.
@@ -114,6 +144,28 @@ Route::get('/api/app-tv/whoami', function () use ($yamboSubscriptionFor) {
             'subscription_active' => (bool) $sub['active'],
             'plan' => $sub['plan'],
         ],
+    ]);
+});
+
+/*
+ * URL del addon premium para el SPA. Se devuelve ya tokenizada para esta
+ * cuenta; el cliente nunca ve la del proveedor.
+ */
+Route::get('/api/app-tv/addon-url', function () use ($yamboSubscriptionFor) {
+    $user = auth()->user();
+    if (! $user) {
+        return response()->json(['active' => false, 'url' => null]);
+    }
+
+    if (! $yamboSubscriptionFor($user)['active']) {
+        return response()->json(['active' => false, 'url' => null]);
+    }
+
+    $row = \App\Models\YamboAddonToken::forUser((int) $user->id);
+
+    return response()->json([
+        'active' => true,
+        'url' => url('/aio/'.$row->token.'/manifest.json'),
     ]);
 });
 
@@ -182,14 +234,19 @@ Route::get('/app-tv/download', function () {
 // Forgot password (WebView)
 Route::get('/forgot-password', [AppTvForgotPasswordController::class, 'show'])->name('app-tv.forgot-password');
 Route::post('/forgot-password', [AppTvForgotPasswordController::class, 'submit']);
+Route::get('/auth/reset-password/{token}', [\App\Http\Controllers\AppTv\ResetPasswordController::class, 'show'])->middleware('web')->name('app-tv.reset-password');
+Route::post('/auth/reset-password', [\App\Http\Controllers\AppTv\ResetPasswordController::class, 'reset'])->middleware('web');
 
 // TV-LINK-QR-ROUTES-V54: QR login para APK Android TV (NativeAuthAty redirige al WebView aqui)
 use App\Http\Controllers\AppTv\TvLinkController;
 Route::get('/tv-link-app', function () {
     return view('tv-link-app');
 })->name('app-tv.tv-link-app');
+Route::get('/mi-cuenta-app', function () { return view('mi-cuenta-app'); })->name('app-tv.mi-cuenta-app');
+Route::get('/acceso', function () { return view('acceso'); })->name('app-tv.acceso');
 Route::get('/tv-link', [TvLinkController::class, 'show'])->name('app-tv.tv-link.show');
 Route::post('/tv-link/confirm', [TvLinkController::class, 'confirm'])->name('app-tv.tv-link.confirm');
+Route::post('/tv-link/register', [TvLinkController::class, 'register'])->name('app-tv.tv-link.register')->middleware('web');
 
 
 /*
@@ -259,7 +316,7 @@ Route::post('/pricing/checkout', function (\Illuminate\Http\Request $request) {
         ],
         'client_reference_id' => (string) $user->id,
         'customer_email' => $user->email,
-        'success_url' => url('/app'),
+        'success_url' => url('/precios-tv/listo?src=web'),
         'cancel_url' => url('/pricing'),
     ]);
 
@@ -337,3 +394,50 @@ Route::get('/logout', function (\Illuminate\Http\Request $request) {
 
     return redirect('/');
 });  // sin ->name(): devdojo/auth ya registra el nombre "logout" para POST /auth/logout, y duplicarlo rompe route:cache
+
+// TV-CHECKOUT: flujo de suscripcion desde la app de TV (QR del paywall).
+// El token JWT identifica al usuario: el telefono no inicia sesion.
+Route::get('/precios-tv', [\App\Http\Controllers\AppTv\TvCheckoutController::class, 'plans'])->middleware('web')->name('tv.precios');
+Route::post('/precios-tv/checkout', [\App\Http\Controllers\AppTv\TvCheckoutController::class, 'checkout'])->middleware('web')->name('tv.precios.checkout');
+Route::get('/precios-tv/listo', [\App\Http\Controllers\AppTv\TvCheckoutController::class, 'done'])->middleware('web')->name('tv.precios.listo');
+
+// QR en PNG para pantallas nativas de la app de TV (Android no lee SVG).
+Route::get('/qr.png', \App\Http\Controllers\AppTv\QrPngController::class)->name('tv.qr.png');
+
+// Verificacion de correo (cuentas nuevas). Enlace firmado que caduca en 48h.
+Route::get('/verificar-correo/{id}/{hash}', [\App\Http\Controllers\AppTv\EmailVerificationController::class, 'verify'])
+    ->name('app-tv.verificar-correo')->middleware('web');
+Route::post('/reenviar-verificacion', [\App\Http\Controllers\AppTv\EmailVerificationController::class, 'resend'])
+    ->name('app-tv.reenviar-verificacion')->middleware(['web', 'throttle:5,10']);
+
+// Aviso para quien aun no confirmo su correo (web).
+Route::view('/verifica-tu-correo', 'verificar-aviso')->name('app-tv.verificar-aviso')->middleware('web');
+
+// --- descargas-github ---------------------------------------------------
+// Los APK ya no se alojan en el VPS: se sirven desde GitHub Releases.
+// Estas rutas mantienen vivos los enlaces de siempre y dan URLs cortas.
+// Las "latest" de GitHub no cambian al publicar una version nueva.
+Route::get('/download/tv', function () {
+    return redirect()->away('https://github.com/yammbocom/yammbo-androidtv-releases/releases/latest/download/YamboTV.apk');
+})->name('download.tv');
+
+Route::get('/download/movil', function () {
+    return redirect()->away('https://github.com/yammbocom/YammboTv-APK-Releases/releases/latest/download/YammboMobile.apk');
+})->name('download.movil');
+
+// Alias en ingles y el enlace historico que ya circula por ahi
+Route::get('/download/mobile', fn () => redirect()->route('download.movil'));
+Route::get('/download/YamboTV.apk', fn () => redirect()->route('download.movil'));
+Route::get('/download/YamboTV-TV.apk', fn () => redirect()->route('download.tv'));
+
+// --- rutas-cortas-downloader --------------------------------------------
+// Para escribirlas con el mando en la app Downloader (Fire TV / Android TV).
+// Cuanto mas corta, menos teclea el usuario: tv.yammbo.com/tv
+Route::get('/tv', fn () => redirect()->route('download.tv'));
+Route::get('/apk', fn () => redirect()->route('download.movil'));
+Route::get('/pc', fn () => redirect()->away(url('/download/YammboTV-Service-Setup-v2.exe')));
+
+
+
+
+

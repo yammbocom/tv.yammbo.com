@@ -435,7 +435,7 @@ Route::get('/download/YamboTV-TV.apk', fn () => redirect()->route('download.tv')
 // Cuanto mas corta, menos teclea el usuario: tv.yammbo.com/tv
 Route::get('/tv', fn () => redirect()->route('download.tv'));
 Route::get('/apk', fn () => redirect()->route('download.movil'));
-Route::get('/pc', fn () => redirect()->away(url('/download/YammboTV-Service-Setup-v2.exe')));
+Route::get('/pc', fn () => redirect()->away(url(config('yammbo_service.installers.windows'))));
 
 
 

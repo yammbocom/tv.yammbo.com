@@ -22,4 +22,15 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    /*
+     * Addon de streams premium. La URL del proveedor vive en .env y NUNCA se
+     * manda al navegador: el SPA instala /aio/{token}/manifest.json, que la
+     * proxea. Antes iba escrita en App.js, o sea que viajaba en el bundle y
+     * el dialogo "Compartir complemento" la repartia con un clic.
+     */
+    'aio' => [
+        'base' => env('YAMBO_AIO_BASE'),
+        'max_ips_per_day' => (int) env('YAMBO_AIO_MAX_IPS', 8),
+    ],
+
 ];

@@ -13,13 +13,19 @@ class StremioAddonController extends Controller
 
     public function manifest(): JsonResponse
     {
+        // La ficha de este complemento se ve en /app/#/addons junto al resto,
+        // asi que el texto va en el idioma del usuario y no en ingles fijo.
+        $spanish = ! str_starts_with(strtolower((string) request()->header('Accept-Language', 'es')), 'en');
+
         return $this->cors(response()->json([
             'id' => 'com.yammbo.tv',
-            'version' => '0.2.0',
+            'version' => '0.3.0',
             'name' => 'Yammbo Tv',
-            'description' => 'Yammbo streaming catalog, powered by TMDB.',
-            'logo' => url('/favicon.ico'),
-            'resources' => ['catalog', 'meta', 'stream'],
+            'description' => $spanish
+                ? 'Los catálogos y las fichas propias de Yammbo Tv, con datos de TMDB.'
+                : 'Yammbo Tv own catalogs and metadata, powered by TMDB.',
+            'logo' => url('/images/yambo-icon.png'),
+            'resources' => ['catalog', 'meta', 'stream', 'addon_catalog'],
             'types' => ['movie', 'series'],
             'idPrefixes' => ['tt', 'yammbo'],
             'catalogs' => [
@@ -34,6 +40,16 @@ class StremioAddonController extends Controller
                     'id' => 'yammbo-series-popular',
                     'name' => 'Yammbo · Popular Series',
                     'extra' => [['name' => 'skip', 'isRequired' => false]],
+                ],
+            ],
+            // Declarar addonCatalogs es lo que hace aparecer "Yammbo" en el
+            // selector de /app/#/addons. El contenido lo sirve
+            // AddonCatalogController en /addon_catalog/all/yammbo.json.
+            'addonCatalogs' => [
+                [
+                    'type' => 'all',
+                    'id' => 'yammbo',
+                    'name' => 'Yammbo',
                 ],
             ],
             'behaviorHints' => [

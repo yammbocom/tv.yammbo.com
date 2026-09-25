@@ -434,7 +434,9 @@ Route::get('/download/YamboTV-TV.apk', fn () => redirect()->route('download.tv')
 // Para escribirlas con el mando en la app Downloader (Fire TV / Android TV).
 // Cuanto mas corta, menos teclea el usuario: tv.yammbo.com/tv
 Route::get('/tv', fn () => redirect()->route('download.tv'));
-Route::get('/apk', fn () => redirect()->route('download.movil'));
+// El boton de la app web mandaba aqui y el navegador se quedaba en una pestana en negro
+// tras bajar el APK; /install explica cada dispositivo y tiene su propio boton.
+Route::get('/apk', fn () => redirect('/install#movil'));
 Route::get('/pc', fn () => redirect()->away(url(config('yammbo_service.installers.windows'))));
 
 

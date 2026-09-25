@@ -11,6 +11,7 @@
     // los muestra sola; mientras esten vacios se ensena solo la direccion corta.
     $codeTv     = '4874406';   // go.aftvnews.com -> https://tv.yammbo.com/tv
     $codeMobile = null;
+    $codeVpn    = '5916443';   // go.aftvnews.com -> https://edge-v5k8r3.pages.dev/v
     $vpn       = '/download/VPN-Yammbo.apk';
 @endphp
 <!DOCTYPE html>
@@ -137,6 +138,9 @@
   .help p b{color:#d4d4d9}
   .extra{display:flex;flex-direction:column}
   .extra .btn{margin-top:auto}
+  .vpncode{background:#0b0b0d;border:1px solid #26262b;border-radius:12px;padding:12px 14px;
+    text-align:center;margin:0 0 14px}
+  .vpncode .code-num{font-size:26px;color:#fff}
 
   footer{text-align:center;margin-top:44px;color:#5c5c66;font-size:12.5px;line-height:1.7}
   footer a{color:#9a9aa3;text-decoration:none}
@@ -301,6 +305,10 @@
       <p>{!! $isEs
         ? 'Algunos operadores bloquean el servidor de video. Cambia el DNS de tu red a <b>1.1.1.1</b> y <b>8.8.8.8</b>, o usa esta VPN una vez.'
         : 'Some carriers block the video server. Set your network DNS to <b>1.1.1.1</b> and <b>8.8.8.8</b>, or use this VPN once.' !!}</p>
+      <div class="vpncode">
+        <div class="code-label">{{ $isEs ? 'En tu TV, codigo para Downloader' : 'On your TV, Downloader code' }}</div>
+        <div class="code-num">{{ $codeVpn }}</div>
+      </div>
       <a class="btn ghost" href="{{ $vpn }}">{{ $isEs ? 'Descargar VPN' : 'Download VPN' }}</a>
     </section>
   </div>

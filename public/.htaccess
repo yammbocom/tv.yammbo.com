@@ -49,3 +49,15 @@
 <IfModule mod_headers.c>
     Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
 </IfModule>
+
+# Caché de estáticos en el origen. Sin esto el navegador solo recibía el TTL
+# que añade Cloudflare por su cuenta. Lo que lleva hash en la ruta cambia de
+# nombre en cada build, así que puede ser inmutable; lo demás, una semana.
+# Ni HTML, ni JSON (el addon sirve /manifest.json y /catalog/*.json), ni APK.
+<IfModule mod_headers.c>
+    SetEnvIf Request_URI "^/(app/[a-f0-9]{40}|build/assets)/" HASHED_ASSET
+    <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|css|js)$">
+        Header set Cache-Control "public, max-age=604800"
+        Header set Cache-Control "public, max-age=31536000, immutable" env=HASHED_ASSET
+    </FilesMatch>
+</IfModule>

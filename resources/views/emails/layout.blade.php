@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>{{ $subject ?? 'Yambo TV' }}</title>
+    <title>{{ $subject ?? 'Yammbo Tv' }}</title>
 </head>
 {{-- Correos: tablas + estilos en linea (los clientes de correo ignoran CSS moderno) --}}
 <body style="margin:0;padding:0;background:#0a0a0a;">
@@ -104,7 +104,7 @@
                         <div style="height:1px;background:#232327;margin-bottom:18px;"></div>
                         <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
                                     color:#6b6b70;font-size:12px;line-height:1.6;">
-                            Este mensaje es de <span style="color:#9b9b9f;">Yambo TV</span>.<br>
+                            Este mensaje es de <span style="color:#9b9b9f;">Yammbo Tv</span>.<br>
                             Gestiona tu cuenta en <a href="https://tv.yammbo.com/mi-suscripcion"
                                style="color:#e50914;text-decoration:none;">tv.yammbo.com</a>
                         </div>
@@ -114,7 +114,7 @@
 
             <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
                         color:#4a4a50;font-size:11px;margin-top:16px;">
-                &copy; {{ date('Y') }} Yambo TV
+                &copy; {{ date('Y') }} Yammbo Tv
             </div>
 
         </td>

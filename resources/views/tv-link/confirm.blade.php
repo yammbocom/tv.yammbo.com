@@ -16,7 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Vincular Yambo TV</title>
+    <title>Vincular Yammbo Tv</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {

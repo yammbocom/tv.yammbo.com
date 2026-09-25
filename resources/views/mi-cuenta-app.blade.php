@@ -31,7 +31,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Cuenta - Yambo TV</title>
+    <title>Mi Cuenta - Yammbo Tv</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { min-height: 100%; }
@@ -140,7 +140,7 @@
             </div>
             <div class="row">
                 <span class="label">Cuenta</span>
-                <span class="value">Yambo TV</span>
+                <span class="value">Yammbo Tv</span>
             </div>
         </div>
 

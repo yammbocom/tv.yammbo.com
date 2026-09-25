@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vincular Yambo TV</title>
+    <title>Vincular Yammbo Tv</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { min-height: 100%; }
@@ -136,7 +136,7 @@
             <ol class="steps">
                 <li>Escanea el QR con la camara de tu telefono o entra a <strong>tv.yammbo.com/tv-link</strong></li>
                 <li>Ingresa el codigo de 8 caracteres que aparece a la derecha</li>
-                <li>Inicia sesion con tu correo y contrasena de Yambo TV</li>
+                <li>Inicia sesion con tu correo y contrasena de Yammbo Tv</li>
                 <li>Tu TV se vinculara automaticamente</li>
             </ol>
         </div>
@@ -218,7 +218,7 @@
                         var status = document.getElementById('poll-status');
                         if (!data || !data.status) return;
                         if (data.status === 'linked' && data.user) {
-                            if (status) { status.className = 'status linked'; status.innerHTML = 'Vinculado! Abriendo Yambo TV...'; }
+                            if (status) { status.className = 'status linked'; status.innerHTML = 'Vinculado! Abriendo Yammbo Tv...'; }
                             clearInterval(pollInterval); pollInterval = null;
                             var subActive = data.subscription_active ? '1' : '0';
                             var url = 'yambotvapp://authorized'

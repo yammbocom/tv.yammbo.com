@@ -37,6 +37,7 @@
 <meta property="og:locale" content="{{ $isEs ? 'es_ES' : 'en_US' }}">
 <meta property="og:title" content="{{ $ogTitle }}">
 <meta property="og:description" content="{{ $ogDesc }}">
+<link rel="canonical" href="{{ url('/install') }}">
 <meta property="og:url" content="{{ url('/install') }}">
 <meta property="og:image" content="{{ url($ogImg) }}">
 <meta property="og:image:width" content="1200">
@@ -62,7 +63,9 @@
     padding:clamp(28px,5vw,56px) clamp(16px,4vw,32px) 80px}
 
   header{text-align:center;margin-bottom:clamp(28px,4vw,44px)}
-  header img{height:44px;width:auto;margin-bottom:22px}
+  .brand{display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;text-decoration:none;
+    font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .brand img{width:40px;height:40px}
   h1{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;line-height:1.1}
   .sub{color:#b8b8bd;font-size:clamp(15px,2.2vw,17px);line-height:1.6;margin:0 auto;max-width:560px}
   .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px;padding:0;list-style:none}
@@ -170,8 +173,10 @@
 <div class="wrap">
 
   <header>
-    <img src="/images/yambo-logo.png" alt="Yammbo Tv" width="147" height="44"
-         onerror="this.onerror=null;this.src='/images/yambo-icon.png'">
+    <a class="brand" href="/">
+      <img src="/images/yambo-icon.png" alt="" width="40" height="40">
+      <span>Yammbo Tv</span>
+    </a>
     <h1>{{ $isEs ? 'Descarga Yammbo Tv' : 'Download Yammbo Tv' }}</h1>
     <p class="sub">
       {{ $isEs

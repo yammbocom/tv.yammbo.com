@@ -233,7 +233,7 @@ Route::get('/app-tv/download', function () {
 
 // Forgot password (WebView)
 Route::get('/forgot-password', [AppTvForgotPasswordController::class, 'show'])->name('app-tv.forgot-password');
-Route::post('/forgot-password', [AppTvForgotPasswordController::class, 'submit']);
+Route::post('/forgot-password', [AppTvForgotPasswordController::class, 'submit'])->middleware('throttle:5,10');
 Route::get('/auth/reset-password/{token}', [\App\Http\Controllers\AppTv\ResetPasswordController::class, 'show'])->middleware('web')->name('app-tv.reset-password');
 Route::post('/auth/reset-password', [\App\Http\Controllers\AppTv\ResetPasswordController::class, 'reset'])->middleware('web');
 

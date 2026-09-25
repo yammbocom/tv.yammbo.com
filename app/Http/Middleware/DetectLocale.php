@@ -32,6 +32,15 @@ class DetectLocale
 
         App::setLocale($locale);
 
+        // devdojo/auth lee sus textos de config en cada render; en español se
+        // sustituyen por los de language_es.php (language.php queda como base).
+        if ($locale === 'es' && is_array(config('devdojo.auth.language_es'))) {
+            config(['devdojo.auth.language' => array_replace_recursive(
+                (array) config('devdojo.auth.language'),
+                config('devdojo.auth.language_es')
+            )]);
+        }
+
         $response = $next($request);
 
         // Persiste la elección del query param en cookie para futuras visitas

@@ -35,6 +35,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
         );
 
+        // SharePreviewForGuests responde a invitados con ?ver en /app/, así que
+        // tiene que ejecutarse antes que Authenticate (que, por prioridad, Laravel
+        // adelanta por delante del orden declarado en la ruta).
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\SharePreviewForGuests::class,
+        );
+
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(AppServiceProvider::HOME);
 

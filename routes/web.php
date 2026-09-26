@@ -117,14 +117,19 @@ $serveStremioApp = function () use ($yamboSubscriptionFor) {
 
     $jsonUser = json_encode($payload, JSON_UNESCAPED_SLASHES);
     $swGuard = 'if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){if(r.active){r.update();}});});var YAMBO_SW_KEY="yambo_sw_build";var prev=localStorage.getItem(YAMBO_SW_KEY);if(prev && prev!==window.YAMBO_BUILD){navigator.serviceWorker.getRegistrations().then(function(rs){Promise.all(rs.map(function(r){return r.unregister();})).then(function(){localStorage.setItem(YAMBO_SW_KEY,window.YAMBO_BUILD);location.reload();});});}else{localStorage.setItem(YAMBO_SW_KEY,window.YAMBO_BUILD);}}';
-    $inject = '<script>window.YAMBO_USER = '.$jsonUser.';window.YAMBO_BUILD = "'.$buildHash.'";'.$swGuard.'</script>';
+    // En una ficha, la barra muestra /app/?ver=tipo/id#/detail/...: así el enlace
+    // copiado de la barra también tiene vista previa (el servidor no ve el "#",
+    // pero sí ?ver; ver SharePreviewForGuests). Solo cambia la query con
+    // replaceState, sin recargar ni tocar el hash que usa el router.
+    $shareSync = '(function(){function s(){var m=/^#\\/detail\\/([a-z]+)\\/([^\\/?#]+)/.exec(location.hash);var q=m?"?ver="+m[1]+"/"+m[2]:"";if(location.search!==q){try{history.replaceState(history.state,"",location.pathname+q+location.hash);}catch(e){}}}window.addEventListener("hashchange",s);s();})();';
+    $inject = '<script>window.YAMBO_USER = '.$jsonUser.';window.YAMBO_BUILD = "'.$buildHash.'";'.$swGuard.$shareSync.'</script>';
     $html = str_replace('</head>', $inject.'</head>', $html);
 
     return response($html, 200, ['Content-Type' => 'text/html']);
 };
 
-Route::get('/app', $serveStremioApp)->middleware('auth');
-Route::get('/app/', $serveStremioApp)->middleware(['auth', \App\Http\Middleware\EnsureEmailVerified::class]);
+Route::get('/app', $serveStremioApp)->middleware([\App\Http\Middleware\SharePreviewForGuests::class, 'auth']);
+Route::get('/app/', $serveStremioApp)->middleware([\App\Http\Middleware\SharePreviewForGuests::class, 'auth', \App\Http\Middleware\EnsureEmailVerified::class]);
 
 // Yambo user identity endpoint for Stremio SPA — fallback when window.YAMBO_USER
 // is not injected (stale SW cache). Stateful session via web middleware.

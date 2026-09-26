@@ -81,6 +81,20 @@ return [
 
     // Plan blurbs live here, not in the `plans.description` column: that column
     // holds a single string, so the English page rendered three Spanish cards.
+    // Features de los planes (plans.features en BD, en español). Clave = slug del texto.
+    'plan_features' => [
+        'peliculas-y-series-a-la-carta' => 'Movies and series on demand',
+        '1-dispositivo-a-la-vez' => '1 device at a time',
+        '2-dispositivos-a-la-vez' => '2 devices at a time',
+        '3-dispositivos-a-la-vez' => '3 devices at a time',
+        'apps-para-movil-y-smart-tv' => 'Apps for mobile and Smart TV',
+        'subtitulos-en-espanol' => 'Spanish subtitles',
+        'sin-publicidad' => 'No ads',
+        'cancela-cuando-quieras' => 'Cancel anytime',
+        'tv-en-vivo' => 'Live TV',
+        'tv-en-vivo-incluida' => 'Live TV included',
+    ],
+
     'plans' => [
         'basic' => 'Perfect for getting started with streaming',
         'standard' => 'The best pick for families and film lovers',

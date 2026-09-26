@@ -23,6 +23,36 @@ class Plan extends Model
         'features' => 'array',
     ];
 
+    /**
+     * Features listas para pintar: [['label' => ..., 'excluded' => bool], ...].
+     * En BD van como texto separado por comas, en español, y con "-" delante
+     * las que el plan NO incluye. Se traducen por slug con
+     * landing.plan_features.<slug>; si no hay traducción se muestra el texto
+     * tal cual (así una feature nueva creada desde el panel nunca desaparece).
+     */
+    public function featureList(): array
+    {
+        $raw = $this->features;
+        $items = is_array($raw) ? $raw : explode(',', (string) $raw);
+
+        $list = [];
+        foreach ($items as $item) {
+            $item = trim((string) $item);
+            if ($item === '') {
+                continue;
+            }
+            $excluded = str_starts_with($item, '-');
+            $label = trim(ltrim($item, '-'));
+            $key = 'landing.plan_features.'.\Illuminate\Support\Str::slug($label);
+            if (\Illuminate\Support\Facades\Lang::has($key, null, false)) {
+                $label = __($key);
+            }
+            $list[] = ['label' => $label, 'excluded' => $excluded];
+        }
+
+        return $list;
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

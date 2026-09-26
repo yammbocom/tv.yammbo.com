@@ -98,14 +98,14 @@
                 <h2>{{ $plan->name }}</h2>
                 <div class="desc">{{ $plan->description ?? 'Acceso completo al catalogo' }}</div>
                 @php
-                    $feats = array_filter(array_map('trim', explode(',', (string) $plan->features)));
+                    $feats = $plan->featureList();
                 @endphp
                 @if(count($feats))
                     <ul class="feats">
                         @foreach($feats as $f)
                             @php
-                                $no  = str_starts_with($f, '-');
-                                $txt = trim(ltrim($f, '-'));
+                                $no  = $f['excluded'];
+                                $txt = $f['label'];
                             @endphp
                             <li class="{{ $no ? 'no' : 'si' }}">{{ $no ? '×' : '✓' }} {{ $txt }}</li>
                         @endforeach

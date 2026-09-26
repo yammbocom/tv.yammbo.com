@@ -29,6 +29,8 @@
   .features{list-style:none;padding:0;margin:14px 0 20px;color:#ddd;font-size:14px;line-height:1.55;flex:1}
   .features li{padding-left:18px;position:relative;margin-bottom:6px}
   .features li::before{content:"✓";color:#E50914;position:absolute;left:0;font-weight:700}
+  .features li.no{color:#777}
+  .features li.no::before{content:"×";color:#777}
   .btn{display:block;width:100%;background:#E50914;color:#fff;border:0;border-radius:8px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px;transition:background .15s}
   .btn:hover{background:#B0070F}
   .btn.paypal{background:#1A1A1A;border:1px solid #333;margin-top:8px;color:#fff}
@@ -60,7 +62,7 @@
   <div class="plans">
     @forelse($plans as $plan)
       @php
-        $features = array_filter(array_map('trim', explode(',', (string) $plan->features)));
+        $features = $plan->featureList();
         $monthly = $plan->monthly_price ?: '—';
         $yearly = $plan->yearly_price ?: '—';
       @endphp
@@ -76,7 +78,7 @@
         <div class="price year-price" style="display:none">{{ $plan->currency }}{{ $yearly }}<small> {{ __('app-tv.subscription.per_year') }}</small></div>
         <ul class="features">
           @foreach($features as $f)
-            <li>{{ $f }}</li>
+            <li class="{{ $f['excluded'] ? 'no' : '' }}">{{ $f['label'] }}</li>
           @endforeach
         </ul>
         <button type="button" class="btn checkout-btn" data-gateway="stripe">{{ __('app-tv.subscription.pay_card') }}</button>

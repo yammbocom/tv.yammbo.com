@@ -62,7 +62,7 @@
                 @php
                     $isDefault = (int) ($plan->default ?? 0) === 1;
                     $isCurrent = $activePlanId === $plan->id;
-                    $features = array_filter(array_map('trim', explode(',', (string) $plan->features)));
+                    $features = $plan->featureList();
                 @endphp
                 <div class="relative p-8 rounded-2xl bg-surface border {{ $isDefault ? 'border-accent' : 'border-rule' }} flex flex-col">
                     @if($isDefault)
@@ -93,10 +93,8 @@
                     <ul class="flex-1 space-y-3 mb-8 text-sm">
                         @foreach($features as $feat)
                             @php
-                                $excluded = \Illuminate\Support\Str::startsWith($feat, '-');
-                                $label    = trim(ltrim($feat, '-'));
-                                $featKey  = 'landing.features.'.\Illuminate\Support\Str::slug($label);
-                                $label    = \Illuminate\Support\Facades\Lang::has($featKey) ? __($featKey) : $label;
+                                $excluded = $feat['excluded'];
+                                $label    = $feat['label'];
                             @endphp
                             <li class="flex items-start {{ $excluded ? 'text-[color:var(--color-ink-dim)]' : 'text-[color:var(--color-ink-mute)]' }}">
                                 @if($excluded)

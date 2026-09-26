@@ -1,5 +1,22 @@
 # Yammbo Tv no quiere aparecer en buscadores.
 # El acceso al sitio sigue siendo normal por enlace directo; esto solo
 # le pide a los rastreadores que no lo indexen.
+#
+# Excepción: los bots que generan la vista previa al compartir un enlace
+# (no indexan nada) pueden leer las fichas compartidas. X/Twitter y otros
+# no pintan la tarjeta si robots.txt se lo prohíbe.
+User-agent: facebookexternalhit
+User-agent: Facebot
+User-agent: WhatsApp
+User-agent: TelegramBot
+User-agent: Twitterbot
+User-agent: Slackbot-LinkExpanding
+User-agent: Discordbot
+User-agent: LinkedInBot
+User-agent: Pinterestbot
+User-agent: redditbot
+Allow: /app/detail/
+Disallow: /
+
 User-agent: *
 Disallow: /

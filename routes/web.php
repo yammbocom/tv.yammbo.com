@@ -170,6 +170,14 @@ Route::get('/api/app-tv/addon-url', function () use ($yamboSubscriptionFor) {
 });
 
 // /app/<path> sin el hash → redirigir con hash (Stremio usa HashRouter)
+// Enlace para compartir una ficha con vista previa (og:image/título/descripción).
+// Sin auth a propósito: lo leen los bots de WhatsApp/Telegram/Facebook. Tiene que
+// ir antes del catch-all /app/{path}, que exige sesión y manda al login.
+Route::get('/app/detail/{type}/{id}/{rest?}', [\App\Http\Controllers\SharePreviewController::class, 'show'])
+    ->where(['type' => '[a-z]+', 'id' => '[^/]+', 'rest' => '.*'])
+    ->middleware('throttle:60,1')
+    ->name('share.preview');
+
 Route::get('/app/{path}', function ($path) {
     // Excluir assets reales (build con SHA-hash prefix) — Apache los sirve directo, no Laravel.
     if (preg_match('/^[a-f0-9]{40}/', $path) || preg_match('/^(images|fonts|favicons|screenshots|manifest\.json|service-worker)/', $path)) {

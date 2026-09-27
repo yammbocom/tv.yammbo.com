@@ -38,12 +38,19 @@
                 <p class="text-xs uppercase tracking-wide text-[#888] mb-1">Acceso a la app</p>
                 <p class="text-xs text-[#666] mb-3">
                     El acceso lo da la suscripción, no el rol. Aquí activas o cancelas el plan a mano.
-                    @if($sub)
-                        <span class="text-[#aaa]">Actual: {{ optional($sub->plan)->name ?? '—' }} · {{ $sub->status }}</span>
-                    @else
-                        <span class="text-[#aaa]">Actual: sin suscripción</span>
-                    @endif
                 </p>
+                <div class="mb-3 rounded-md border {{ $hasAccess ? 'border-[#1f5a35] bg-[#0a2818] text-[#9be4af]' : 'border-[#5a1d22] bg-[#2a0e10] text-[#ffb3b8]' }} px-3 py-2 text-sm">
+                    @if($hasAccess && $sub)
+                        <strong>Con acceso</strong> · {{ optional($sub->plan)->name ?? '—' }}
+                        · {{ $sub->vendor_slug === 'stripe' ? 'pago con Stripe' : ($sub->vendor_slug === 'manual' ? 'acceso manual' : ($sub->vendor_slug ?: 'sin origen')) }}
+                        · {{ $sub->ends_at ? 'hasta '.\Carbon\Carbon::parse($sub->ends_at)->format('d/m/Y') : 'sin fecha de fin' }}
+                    @elseif($hasAccess)
+                        <strong>Con acceso</strong> · prueba gratis
+                    @else
+                        <strong>Sin acceso</strong>
+                        @if($sub) · última: {{ optional($sub->plan)->name ?? '—' }} · {{ $sub->status }}@if($sub->ends_at) · terminó {{ \Carbon\Carbon::parse($sub->ends_at)->format('d/m/Y') }}@endif @endif
+                    @endif
+                </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -52,7 +59,7 @@
                                 class="w-full rounded-md bg-[#1A1A1A] border border-[#333] px-3 py-2 text-sm text-white focus:outline-none focus:border-[#E50914]">
                             <option value="none">Sin cambios</option>
                             @foreach($plans as $plan)
-                                <option value="{{ $plan->id }}" @selected(optional($sub)->plan_id == $plan->id)>{{ $plan->name }}</option>
+                                <option value="{{ $plan->id }}">{{ $plan->name }}{{ optional($sub)->plan_id == $plan->id ? ' (actual)' : '' }}</option>
                             @endforeach
                         </select>
                     </div>

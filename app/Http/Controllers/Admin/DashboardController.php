@@ -18,7 +18,10 @@ class DashboardController extends Controller
     {
         $stats = [
             'users' => User::count(),
-            'active_subscriptions' => Subscription::whereIn('status', ['active', 'trialing'])->count(),
+            // Misma regla que la app: activa y sin caducar.
+            'active_subscriptions' => Subscription::whereIn('status', ['active', 'trialing'])
+                ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+                ->count(),
             'active_plans' => Plan::where('active', true)->count(),
             'push_sent' => PushLog::count(),
         ];

@@ -20,19 +20,28 @@ use Illuminate\Support\Facades\DB;
  */
 class AccessAdmin
 {
-    /** Activa (o cancela) el acceso de un usuario a un plan. */
-    public static function grant(User $user, int $planId, string $status = 'active'): void
+    /**
+     * Activa (o cancela) el acceso de un usuario a un plan.
+     *
+     * @return string|null aviso para el admin (p. ej. si Stripe sigue cobrando)
+     */
+    public static function grant(User $user, int $planId, string $status = 'active'): ?string
     {
         $plan = Plan::find($planId);
         if (! $plan) {
-            return;
+            return 'Plan no encontrado: no se cambió el acceso.';
         }
 
         $status = $status === 'cancelled' ? 'cancelled' : 'active';
 
-        // Reutiliza la suscripcion existente del usuario si la hay
+        // Reutiliza la suscripcion manual/prueba del usuario si la hay. Nunca se
+        // pisa una fila de Stripe: su webhook la volveria a sobrescribir en la
+        // siguiente renovacion y el panel mentiria sobre lo que se cobra.
         $sub = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
+            ->where(function ($q) {
+                $q->whereNull('vendor_slug')->orWhereIn('vendor_slug', ['', 'trial', 'manual']);
+            })
             ->orderByDesc('id')
             ->first();
 
@@ -55,10 +64,7 @@ class AccessAdmin
         if ($sub) {
             // Un acceso dado a mano deja de ser "prueba": si no, Mi Cuenta lo
             // sigue mostrando como "Prueba gratis" en vez del plan real.
-            // Las de Stripe conservan su origen para no falsear la facturacion.
-            if (in_array((string) $sub->vendor_slug, ['', 'trial', 'manual'], true)) {
-                $data['vendor_slug'] = 'manual';
-            }
+            $data['vendor_slug'] = 'manual';
 
             DB::table('subscriptions')->where('id', $sub->id)->update($data);
         } else {
@@ -79,5 +85,22 @@ class AccessAdmin
         } catch (\Throwable $e) {
             // el rol es secundario; el acceso ya quedo en subscriptions
         }
+
+        // El panel no cancela nada en Stripe: si paga por ahi, se avisa.
+        $stripeActive = Subscription::where('billable_type', 'user')
+            ->where('billable_id', $user->id)
+            ->where('vendor_slug', 'stripe')
+            ->whereIn('status', ['active', 'trialing'])
+            ->where(function ($q) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+            })
+            ->exists();
+        if ($stripeActive) {
+            return $status === 'cancelled'
+                ? 'Acceso manual cancelado, pero este usuario tiene una suscripción de Stripe activa: sigue teniendo acceso y Stripe le sigue cobrando. Cancélala en Stripe.'
+                : 'Este usuario además paga una suscripción en Stripe: el cobro continúa. Si el acceso manual la sustituye, cancélala en Stripe.';
+        }
+
+        return null;
     }
 }

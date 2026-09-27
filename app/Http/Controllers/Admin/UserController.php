@@ -35,10 +35,15 @@ class UserController extends Controller
         // Solo roles del guard "web": es el único que usa la app.
         $roles = Role::where('guard_name', 'web')->orderBy('name')->get();
         $plans = \App\Models\Plan::orderBy('id')->get();
-        $sub = \App\Models\Subscription::where('billable_type', 'user')
-            ->where('billable_id', $user->id)->orderByDesc('id')->first();
+        // Se muestra la suscripcion que da acceso con la misma regla que la app
+        // (activa y sin caducar); si no hay ninguna, la ultima que exista.
+        $subs = \App\Models\Subscription::where('billable_type', 'user')
+            ->where('billable_id', $user->id)->orderByDesc('id')->get();
+        $sub = $subs->first(fn ($s) => in_array($s->status, ['active', 'trialing'], true)
+            && ($s->ends_at === null || \Carbon\Carbon::parse($s->ends_at)->isFuture())) ?? $subs->first();
+        $hasAccess = \App\Http\Controllers\AppTv\AppTvAuthController::isSubscriptionActive($user);
 
-        return view('admin.users.edit', compact('user', 'roles', 'plans', 'sub'));
+        return view('admin.users.edit', compact('user', 'roles', 'plans', 'sub', 'hasAccess'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -47,13 +52,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'role' => 'required|exists:roles,id',
-            'access_plan'   => 'nullable',
+            'access_plan'   => ['nullable', \Illuminate\Validation\Rule::in(array_merge(['none'], \App\Models\Plan::pluck('id')->map(fn ($id) => (string) $id)->all()))],
             'access_status' => 'nullable|in:active,cancelled',
-        ]);
-
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
         ]);
 
         // Un solo rol por usuario, igual que hace Plan::switchPlans().
@@ -76,15 +76,18 @@ class UserController extends Controller
 
         // Acceso real de la app: vive en la tabla subscriptions, no en el rol.
         // Aqui el admin puede activar/cancelar el acceso a mano.
+        $warning = null;
         if ($request->filled('access_plan') && $request->input('access_plan') !== 'none') {
-            \App\Support\AccessAdmin::grant(
+            $warning = \App\Support\AccessAdmin::grant(
                 $user,
                 (int) $request->input('access_plan'),
                 $request->input('access_status', 'active')
             );
         }
 
-        return Redirect::route('panel.users.index')->with('success', 'Usuario actualizado.');
+        $redirect = Redirect::route('panel.users.index')->with('success', 'Usuario actualizado.');
+
+        return $warning ? $redirect->with('error', $warning) : $redirect;
     }
 
     public function destroy(Request $request, User $user): RedirectResponse

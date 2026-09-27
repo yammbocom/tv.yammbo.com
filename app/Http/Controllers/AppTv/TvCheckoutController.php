@@ -23,11 +23,11 @@ class TvCheckoutController extends Controller
         if ($t === '') {
             return null;
         }
-        try {
-            return \Tymon\JWTAuth\Facades\JWTAuth::setToken($t)->authenticate() ?: null;
-        } catch (\Throwable $e) {
-            return null;
-        }
+        // El QR de la TV lleva el token que guarda la app, que no se renueva: si se
+        // exige vigente, al caducar nadie puede suscribirse ni renovar desde la TV
+        // (reescanear da el mismo token). Aceptarlo caducado solo permite pagar
+        // para esa cuenta, lo que no perjudica a su titular.
+        return \App\Support\AppTvToken::userForReadOnly($t);
     }
 
     public function plans(Request $request)
@@ -36,10 +36,39 @@ class TvCheckoutController extends Controller
         $plans = Plan::where('active', true)->orderBy('id')->get();
 
         return view('precios-tv', [
-            'user'  => $user,
-            'plans' => $plans,
-            't'     => (string) $request->query('t', ''),
+            'user'    => $user,
+            'plans'   => $plans,
+            't'       => (string) $request->query('t', ''),
+            'current' => $user ? $this->paidSubscription($user) : null,
         ]);
+    }
+
+    /**
+     * Suscripción vigente que NO es prueba (de pago o acceso manual). Si existe,
+     * no se ofrece otro checkout: crearía una segunda suscripción en Stripe que
+     * cobra aparte y el webhook reasignaría el rol al plan nuevo. Los cambios de
+     * plan se hacen desde Mi suscripción.
+     */
+    private function paidSubscription($user): ?array
+    {
+        $sub = \App\Models\Subscription::where('billable_type', 'user')
+            ->where('billable_id', $user->id)
+            ->where('status', 'active')
+            ->where(fn ($q) => $q->whereNull('vendor_slug')->orWhere('vendor_slug', '!=', 'trial'))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+            ->orderByRaw("vendor_slug = 'stripe' desc")
+            ->orderByDesc('id')
+            ->first();
+        if (! $sub) {
+            return null;
+        }
+        $plan = Plan::find($sub->plan_id);
+
+        return [
+            'plan'   => $plan->name ?? 'Premium',
+            'ends'   => $sub->ends_at ? \Carbon\Carbon::parse($sub->ends_at)->format('d/m/Y') : null,
+            'stripe' => $sub->vendor_slug === 'stripe',
+        ];
     }
 
     public function checkout(Request $request)
@@ -47,6 +76,10 @@ class TvCheckoutController extends Controller
         $user = $this->userFromToken($request);
         if (! $user) {
             return redirect('/precios-tv');
+        }
+        if ($this->paidSubscription($user)) {
+            // Ya tiene plan: sin segundo checkout (ver paidSubscription()).
+            return redirect('/precios-tv?t='.urlencode((string) $request->input('t', '')));
         }
 
         $planId = (int) $request->input('plan_id');

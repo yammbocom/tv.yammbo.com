@@ -128,7 +128,8 @@ class TvLinkController extends Controller
         $manageToken = null;
         try {
             \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
-            $manageToken = \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
+            // typ marca el token de la app: solo este puede usar la gracia de AppTvToken.
+            $manageToken = \Tymon\JWTAuth\Facades\JWTAuth::claims(['typ' => \App\Support\AppTvToken::TYP])->fromUser($user);
         } catch (\Throwable $e) {
             $manageToken = null;
         }

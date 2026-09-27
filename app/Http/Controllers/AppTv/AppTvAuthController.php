@@ -123,7 +123,8 @@ class AppTvAuthController extends Controller
     {
         try {
             \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
-            return \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
+            // typ marca el token de la app: solo este puede usar la gracia de AppTvToken.
+            return \Tymon\JWTAuth\Facades\JWTAuth::claims(['typ' => \App\Support\AppTvToken::TYP])->fromUser($user);
         } catch (\Throwable $e) {
             return '';
         }

@@ -80,6 +80,13 @@
             El codigo expiro o no es valido.<br>
             Vuelve a abrir la pantalla de suscripcion en tu TV y escanea el QR otra vez.
         </div>
+    @elseif(! empty($current))
+        <div class="who">Cuenta: <strong>{{ $user->email }}</strong></div>
+        <div class="err" style="border-color:#1f5a35;background:#0a2818;color:#9be4af">
+            Ya tienes el plan <strong>{{ $current['plan'] }}</strong> activo{{ $current['ends'] ? ' hasta el '.$current['ends'] : '' }}.<br>
+            No necesitas pagar de nuevo: vuelve a la app de tu TV o del movil y entrara sola.
+            @if($current['stripe'])<br>Para cambiar de plan o cancelarlo, entra en tv.yammbo.com/mi-suscripcion.@endif
+        </div>
     @else
         <div class="who">Cuenta: <strong>{{ $user->email }}</strong></div>
 

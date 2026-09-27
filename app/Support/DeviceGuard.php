@@ -33,9 +33,26 @@ class DeviceGuard
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
             })
             ->orderByDesc('id')
-            ->first();
+            ->get();
 
-        return $sub ? Plan::find($sub->plan_id) : null;
+        // Si conviven varias (p. ej. Stripe + acceso manual), manda la de más
+        // aparatos: así un acceso manual menor no expulsa aparatos de quien paga.
+        $best = null;
+        $bestDevices = -1;
+        foreach ($sub as $row) {
+            $plan = Plan::find($row->plan_id);
+            if (! $plan) {
+                continue;
+            }
+            $limits = is_array($plan->limits) ? $plan->limits : (json_decode((string) $plan->limits, true) ?: []);
+            $devices = (int) ($limits['devices'] ?? self::DEFAULT_DEVICES);
+            if ($devices > $bestDevices) {
+                $best = $plan;
+                $bestDevices = $devices;
+            }
+        }
+
+        return $best;
     }
 
     /** Limites efectivos: del plan, o los de prueba si no hay plan de pago. */

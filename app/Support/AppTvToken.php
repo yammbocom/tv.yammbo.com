@@ -25,16 +25,26 @@ class AppTvToken
 
     public static function userForReadOnly(string $token): ?User
     {
+        return self::resolve($token)[0];
+    }
+
+    /**
+     * @return array{0: ?User, 1: bool} usuario y si el token estaba caducado.
+     * Con token caducado el llamador no debe dar de alta aparatos nuevos: un
+     * token filtrado podría expulsar a los del usuario (DeviceGuard::register).
+     */
+    public static function resolve(string $token): array
+    {
         if ($token === '') {
-            return null;
+            return [null, false];
         }
 
         try {
-            return JWTAuth::setToken($token)->authenticate() ?: null;
+            return [JWTAuth::setToken($token)->authenticate() ?: null, false];
         } catch (TokenExpiredException $e) {
-            return self::expiredButSigned($token);
+            return [self::expiredButSigned($token), true];
         } catch (\Throwable $e) {
-            return null;
+            return [null, false];
         }
     }
 

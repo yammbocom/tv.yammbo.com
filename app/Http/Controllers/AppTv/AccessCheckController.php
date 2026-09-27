@@ -23,7 +23,7 @@ class AccessCheckController extends Controller
 
         try {
             // Acepta tokens caducados con firma válida (ver AppTvToken): la app no los renueva.
-            $user = \App\Support\AppTvToken::userForReadOnly($token);
+            [$user, $tokenExpired] = \App\Support\AppTvToken::resolve($token);
             if (! $user) {
                 return response()->json(['active' => false]);
             }
@@ -38,7 +38,11 @@ class AccessCheckController extends Controller
                     // asi el movil, que no pasa por el flujo QR de la TV, queda dado de alta.
                     $exists = \Illuminate\Support\Facades\DB::table('tv_devices')
                         ->where('user_id', $user->id)->where('device_id', $deviceId)->exists();
-                    if (! $exists && $active) {
+                    // Con token caducado solo se da de alta un aparato si el usuario no
+                    // tiene ninguno vivo: así un token viejo filtrado no expulsa a nadie.
+                    $mayRegister = ! $tokenExpired || ! \Illuminate\Support\Facades\DB::table('tv_devices')
+                        ->where('user_id', $user->id)->whereNull('revoked_at')->exists();
+                    if (! $exists && $active && $mayRegister) {
                         $platform = (string) $request->query('platform', 'tv');
                         \App\Support\DeviceGuard::register($user, $deviceId, $platform);
                     }

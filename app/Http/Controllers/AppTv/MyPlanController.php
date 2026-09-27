@@ -52,7 +52,8 @@ class MyPlanController extends Controller
                 ->where(function ($q) use ($now) {
                     $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
                 })
-                ->orderByDesc('id')
+                ->orderByRaw("vendor_slug = 'stripe' desc") // la de pago manda sobre un acceso manual
+            ->orderByDesc('id')
                 ->first();
 
             // Sin suscripcion de pago: puede seguir vigente la prueba gratis

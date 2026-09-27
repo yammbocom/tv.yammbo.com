@@ -54,6 +54,7 @@ class BillingController extends Controller
             ->where(function ($q) use ($now) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
             })
+            ->orderByRaw("vendor_slug = 'stripe' desc") // la de pago manda sobre un acceso manual
             ->orderByDesc('id')
             ->first();
 
@@ -101,6 +102,7 @@ class BillingController extends Controller
             ->whereIn('status', ['active', 'trialing'])
             ->whereNotNull('vendor_customer_id')
             ->where('vendor_slug', 'stripe')
+            ->orderByRaw("vendor_slug = 'stripe' desc") // la de pago manda sobre un acceso manual
             ->orderByDesc('id')
             ->first();
 
@@ -147,6 +149,7 @@ class BillingController extends Controller
         $subscription = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
             ->whereIn('status', ['active', 'trialing'])
+            ->orderByRaw("vendor_slug = 'stripe' desc") // la de pago manda sobre un acceso manual
             ->orderByDesc('id')
             ->first();
 

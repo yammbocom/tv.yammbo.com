@@ -35,7 +35,8 @@ class MyPlanController extends Controller
         }
 
         try {
-            $user = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->authenticate();
+            // Acepta tokens caducados con firma válida (ver AppTvToken): la app no los renueva.
+            $user = \App\Support\AppTvToken::userForReadOnly($token);
             if (! $user) {
                 return response()->json($out);
             }

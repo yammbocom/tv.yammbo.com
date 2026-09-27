@@ -63,7 +63,27 @@ class AccessCheckController extends Controller
                 $payFail = \Illuminate\Support\Facades\Cache::get('pago_fallido_'.$user->id);
             } catch (\Throwable $e) {}
 
+            // Renovación del token para las apps (móvil y TV): si caduca en menos
+            // de 7 días o ya caducó, y este aparato está vinculado y no expulsado,
+            // se devuelve uno nuevo en "token". La app solo tiene que guardarlo en
+            // lugar del que tenía. Sin device_id no se renueva: un token filtrado
+            // no podría alargarse para siempre.
+            $newToken = null;
+            try {
+                $parts = explode('.', $token);
+                $claims = json_decode(base64_decode(strtr($parts[1] ?? '', '-_', '+/')), true) ?: [];
+                $expSoon = (int) ($claims['exp'] ?? 0) < time() + 7 * 86400;
+                if ($expSoon && $deviceId !== '' && $deviceOk
+                    && \App\Support\DeviceGuard::isAllowed($user, $deviceId)) {
+                    \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
+                    $newToken = \Tymon\JWTAuth\Facades\JWTAuth::claims(['typ' => \App\Support\AppTvToken::TYP])->fromUser($user);
+                }
+            } catch (\Throwable $e) {
+                $newToken = null;
+            }
+
             return response()->json([
+                'token'                 => $newToken,
                 'payment_failed'        => ! empty($payFail),
                 'payment_failed_amount' => $payFail['importe'] ?? null,
                 'active'      => $active && $deviceOk,

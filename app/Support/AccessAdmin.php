@@ -86,21 +86,35 @@ class AccessAdmin
             // el rol es secundario; el acceso ya quedo en subscriptions
         }
 
-        // El panel no cancela nada en Stripe: si paga por ahi, se avisa.
-        $stripeActive = Subscription::where('billable_type', 'user')
+        $stripeSubs = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
             ->where('vendor_slug', 'stripe')
             ->whereIn('status', ['active', 'trialing'])
             ->where(function ($q) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
             })
-            ->exists();
-        if ($stripeActive) {
-            return $status === 'cancelled'
-                ? 'Acceso manual cancelado, pero este usuario tiene una suscripción de Stripe activa: sigue teniendo acceso y Stripe le sigue cobrando. Cancélala en Stripe.'
-                : 'Este usuario además paga una suscripción en Stripe: el cobro continúa. Si el acceso manual la sustituye, cancélala en Stripe.';
+            ->get();
+        if ($stripeSubs->isEmpty()) {
+            return null;
         }
 
-        return null;
+        // Cancelar desde la ficha también para el cobro en Stripe (al fin del período).
+        if ($status === 'cancelled') {
+            $msgs = [];
+            foreach ($stripeSubs as $stripeSub) {
+                $r = StripeCancel::atPeriodEnd($stripeSub);
+                if ($r['ok']) {
+                    DB::table('subscriptions')->where('id', $stripeSub->id)->update(
+                        $r['ends_at'] ? ['ends_at' => $r['ends_at'], 'updated_at' => now()] : ['status' => 'cancelled', 'updated_at' => now()]
+                    );
+                }
+                $msgs[] = $r['message'];
+            }
+            $user->clearUserCache();
+
+            return 'Acceso manual cancelado. Stripe: '.implode(' ', $msgs);
+        }
+
+        return 'Este usuario además paga una suscripción en Stripe: el cobro continúa. Si el acceso manual la sustituye, cancélala marcando "Cancelada" o desde Suscripciones.';
     }
 }

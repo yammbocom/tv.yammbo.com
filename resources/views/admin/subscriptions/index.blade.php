@@ -58,7 +58,7 @@
                             {{-- Sin usuario vivo no hay nada que cancelar: el controlador lo rechaza igual --}}
                             @if($subscription->status !== 'cancelled' && $subscription->user)
                                 <form method="POST" action="{{ route('panel.subscriptions.cancel', $subscription) }}"
-                                      onsubmit="return confirm('Marcar como cancelada la suscripción #{{ $subscription->id }} de {{ $subscription->user->email }}.\n\nMantiene el acceso hasta la fecha de fin y NO detiene el cobro en Stripe.');">
+                                      onsubmit="return confirm('Cancelar la suscripción #{{ $subscription->id }} de {{ $subscription->user->email }}.\n\n{{ $subscription->vendor_slug === 'stripe' ? 'Se cancela también en Stripe: no se renueva y el acceso sigue hasta el fin del período pagado.' : 'No tiene cobro en Stripe: el acceso se corta ya.' }}');">
                                     @csrf
                                     <button type="submit" class="text-[#FFB3B8] hover:text-[#ff8b9b] text-xs font-semibold">Cancelar</button>
                                 </form>

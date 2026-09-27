@@ -164,8 +164,31 @@ class BillingController extends Controller
             ]);
         }
 
-        // Cancelación: mantener `ends_at` (el usuario sigue con acceso hasta esa fecha)
-        // pero marcar status='cancelled' para que no se renueve.
+        // De Stripe: se cancela allí al final del período pagado y la fila sigue
+        // activa hasta esa fecha (antes solo se marcaba 'cancelled' aquí: el acceso
+        // se cortaba en el acto y Stripe seguía cobrando).
+        if ($subscription->vendor_slug === 'stripe') {
+            $r = \App\Support\StripeCancel::atPeriodEnd($subscription);
+            if (! $r['ok']) {
+                \Log::error('self-cancel: stripe refused', ['user_id' => $user->id, 'subscription_id' => $subscription->id]);
+
+                return redirect($backUrl)->with([
+                    'message' => 'No pudimos cancelar tu suscripción ahora mismo. No se te ha cobrado nada extra; inténtalo de nuevo en unos minutos o escríbenos.',
+                    'message_type' => 'warning',
+                ]);
+            }
+            DB::table('subscriptions')->where('id', $subscription->id)->update(
+                $r['ends_at'] ? ['ends_at' => $r['ends_at'], 'updated_at' => Carbon::now()] : ['status' => 'cancelled', 'updated_at' => Carbon::now()]
+            );
+            $user->clearUserCache();
+
+            return redirect($backUrl)->with([
+                'message' => __('app-tv.billing.msg_cancel_success'),
+                'message_type' => 'success',
+            ]);
+        }
+
+        // Manual o prueba (sin cobro): se marca cancelada.
         DB::table('subscriptions')
             ->where('id', $subscription->id)
             ->update([

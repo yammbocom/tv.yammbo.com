@@ -43,12 +43,31 @@ class SubscriptionController extends Controller
                 ->with('error', 'La suscripción #'.$subscription->id.' pertenece a un usuario eliminado.');
         }
 
+        // De Stripe: se para el cobro allí primero (al final del período pagado).
+        if ($subscription->vendor_slug === 'stripe') {
+            $r = \App\Support\StripeCancel::atPeriodEnd($subscription);
+            if (! $r['ok']) {
+                return Redirect::route('panel.subscriptions.index')->with('error', 'Suscripción #'.$subscription->id.': '.$r['message']);
+            }
+            if ($r['ends_at']) {
+                // Sigue activa hasta el fin del período; el webhook la cierra ese día.
+                $subscription->ends_at = $r['ends_at'];
+            } else {
+                $subscription->status = 'cancelled';
+            }
+            $subscription->save();
+            $subscription->user->clearUserCache();
+
+            return Redirect::route('panel.subscriptions.index')->with('success', 'Suscripción #'.$subscription->id.': '.$r['message']);
+        }
+
+        // Manual o prueba: no hay cobro; se corta el acceso.
         $subscription->status = 'cancelled';
         $subscription->save();
 
         $subscription->user->clearUserCache();
 
         return Redirect::route('panel.subscriptions.index')
-            ->with('success', 'Suscripción #'.$subscription->id.' marcada como cancelada. El acceso se mantiene hasta la fecha de fin. Ojo: esto NO detiene el cobro en Stripe.');
+            ->with('success', 'Suscripción #'.$subscription->id.' cancelada: el acceso se corta ya (no tenía cobro en Stripe).');
     }
 }

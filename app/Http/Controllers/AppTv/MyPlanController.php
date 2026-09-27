@@ -19,7 +19,8 @@ class MyPlanController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $token = (string) $request->query('t', '');
+        // Cabecera X-App-Token preferida: en la query (?t=) el token queda en los logs de acceso.
+        $token = (string) ($request->header('X-App-Token') ?: $request->query('t', ''));
         $out = [
             'ok'        => false,
             'plan'      => null,

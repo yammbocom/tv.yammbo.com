@@ -53,6 +53,20 @@ class StripeCancel
                 return ['ok' => true, 'ends_at' => null, 'message' => 'Stripe no tiene ninguna suscripción cobrando para esta fila.'];
             }
 
+            // Ya terminada en Stripe (webhook perdido) o borrada: nada que parar;
+            // la fila se marca cancelada en vez de quedarse activa para siempre.
+            try {
+                $current = $stripe->subscriptions->retrieve($ids[0]);
+            } catch (\Stripe\Exception\InvalidRequestException $e) {
+                if ($e->getStripeCode() === 'resource_missing') {
+                    return ['ok' => true, 'ends_at' => null, 'message' => 'La suscripción ya no existe en Stripe: no hay cobro que parar.'];
+                }
+                throw $e;
+            }
+            if (in_array($current->status, ['canceled', 'incomplete_expired'], true)) {
+                return ['ok' => true, 'ends_at' => null, 'message' => 'Ya estaba cancelada en Stripe: no hay cobro que parar.'];
+            }
+
             $updated = $stripe->subscriptions->update($ids[0], ['cancel_at_period_end' => true]);
             $end = $updated->cancel_at ?? ($updated->items->data[0]->current_period_end ?? null);
 

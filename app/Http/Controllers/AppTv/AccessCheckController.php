@@ -16,7 +16,8 @@ class AccessCheckController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $token = (string) $request->query('t', '');
+        // Cabecera X-App-Token preferida: en la query (?t=) el token queda en los logs de acceso.
+        $token = (string) ($request->header('X-App-Token') ?: $request->query('t', ''));
         if ($token === '') {
             return response()->json(['active' => false]);
         }
@@ -42,7 +43,9 @@ class AccessCheckController extends Controller
                     // tiene ninguno vivo: así un token viejo filtrado no expulsa a nadie.
                     $mayRegister = ! $tokenExpired || ! \Illuminate\Support\Facades\DB::table('tv_devices')
                         ->where('user_id', $user->id)->whereNull('revoked_at')->exists();
+                    $registeredNow = false;
                     if (! $exists && $active && $mayRegister) {
+                        $registeredNow = true;
                         $platform = (string) $request->query('platform', 'tv');
                         \App\Support\DeviceGuard::register($user, $deviceId, $platform);
                     }
@@ -72,9 +75,19 @@ class AccessCheckController extends Controller
             try {
                 $parts = explode('.', $token);
                 $claims = json_decode(base64_decode(strtr($parts[1] ?? '', '-_', '+/')), true) ?: [];
-                $expSoon = (int) ($claims['exp'] ?? 0) < time() + 7 * 86400;
-                if ($expSoon && $deviceId !== '' && $deviceOk
-                    && \App\Support\DeviceGuard::isAllowed($user, $deviceId)) {
+                $exp = (int) ($claims['exp'] ?? 0);
+                $iat = (int) ($claims['iat'] ?? 0);
+                // Ventana: le quedan <7 días o caducó hace ≤14. Más atrás no se
+                // renueva (sigue valiendo solo para lectura vía AppTvToken).
+                $inWindow = $exp < time() + 7 * 86400 && $exp > time() - 14 * 86400;
+                // El aparato tiene que existir desde que se emitió el token (el QR y
+                // el login lo registran en ese momento) y no darse de alta ahora:
+                // un device_id inventado con un token filtrado no sirve para renovar.
+                $linkedBefore = $deviceId !== '' && \Illuminate\Support\Facades\DB::table('tv_devices')
+                    ->where('user_id', $user->id)->where('device_id', $deviceId)->whereNull('revoked_at')
+                    ->where('created_at', '<=', \Carbon\Carbon::createFromTimestamp($iat + 300))
+                    ->exists();
+                if ($inWindow && $deviceOk && empty($registeredNow) && $linkedBefore) {
                     \Tymon\JWTAuth\Facades\JWTAuth::factory()->setTTL(43200);
                     $newToken = \Tymon\JWTAuth\Facades\JWTAuth::claims(['typ' => \App\Support\AppTvToken::TYP])->fromUser($user);
                 }

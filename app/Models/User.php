@@ -197,7 +197,7 @@ class User extends AuthUser implements JWTSubject
                         $user->trial_ends_at ? \Carbon\Carbon::parse($user->trial_ends_at)->format('d/m/Y') : null);
                 }
             } catch (\Throwable $e) {
-                \Log::warning('alta usuario, correos: '.$e->getMessage());
+                \Log::error('alta usuario, correos: '.$e->getMessage());
             }
 
             $defaultRole = config('yammbo.default_user_role', 'registered');

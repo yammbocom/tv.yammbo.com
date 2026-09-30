@@ -36,7 +36,7 @@ class YamboMail
             });
             return true;
         } catch (\Throwable $e) {
-            Log::warning('YamboMail fallo (' . $subject . '): ' . $e->getMessage());
+            Log::error('YamboMail fallo (' . $subject . '): ' . $e->getMessage());
             return false;
         }
     }

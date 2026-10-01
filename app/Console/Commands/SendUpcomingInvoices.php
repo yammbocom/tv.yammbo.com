@@ -28,6 +28,9 @@ class SendUpcomingInvoices extends Command
 
         $subs = Subscription::where('billable_type', 'user')
             ->where('status', 'active')
+            // Solo se avisa de un cobro a quien paga por Stripe; los accesos
+            // manuales y la promo de alta no se cobran.
+            ->where('vendor_slug', 'stripe')
             ->whereNotNull('ends_at')
             ->whereBetween('ends_at', [$desde, $hasta])
             ->get();

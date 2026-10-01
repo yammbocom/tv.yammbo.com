@@ -87,17 +87,26 @@ class AppTvAuthController extends Controller
             'trial_ends_at' => Carbon::now()->addDays(7),
         ]);
 
-        Subscription::create([
-            'billable_type' => 'user',
-            'billable_id' => $user->id,
-            'plan_id' => config('apptv.trial_plan_id', 1),
-            'vendor_slug' => 'trial',
-            'cycle' => 'month',
-            'status' => 'trialing',
-            'seats' => 1,
-            'trial_ends_at' => $user->trial_ends_at,
-            'ends_at' => $user->trial_ends_at,
-        ]);
+        // Si la promo de alta ya le dio una fila 'promo' (ver User::created), no
+        // se crea tambien la prueba normal de 7 dias.
+        $tienePromo = Subscription::where('billable_type', 'user')
+            ->where('billable_id', $user->id)
+            ->where('vendor_slug', 'promo')
+            ->exists();
+
+        if (! $tienePromo) {
+            Subscription::create([
+                'billable_type' => 'user',
+                'billable_id' => $user->id,
+                'plan_id' => config('apptv.trial_plan_id', 1),
+                'vendor_slug' => 'trial',
+                'cycle' => 'month',
+                'status' => 'trialing',
+                'seats' => 1,
+                'trial_ends_at' => $user->trial_ends_at,
+                'ends_at' => $user->trial_ends_at,
+            ]);
+        }
 
         $token = JWTAuth::fromUser($user);
 

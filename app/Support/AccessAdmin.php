@@ -40,7 +40,7 @@ class AccessAdmin
         $sub = Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
             ->where(function ($q) {
-                $q->whereNull('vendor_slug')->orWhereIn('vendor_slug', ['', 'trial', 'manual']);
+                $q->whereNull('vendor_slug')->orWhereIn('vendor_slug', ['', 'trial', 'manual', 'promo']);
             })
             ->orderByDesc('id')
             ->first();

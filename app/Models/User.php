@@ -189,20 +189,35 @@ class User extends AuthUser implements JWTSubject
         static::created(function ($user) {
             $user->syncRoles([]);
 
+            // Promo de alta: Premium gratis por N dias (toggle en config/yammbo.php).
+            // Va en su propia fila de subscriptions; trial_ends_at no se toca para
+            // que cancelar la promo corte el acceso de verdad.
+            $promoUntil = null;
+            try {
+                $promoUntil = \App\Support\SignupPromo::grant($user);
+            } catch (\Throwable $e) {
+                \Log::error('alta usuario, promo: '.$e->getMessage());
+            }
+
             // Cuenta nueva (cualquier plataforma): pedir confirmacion de correo
             try {
                 if (empty($user->email_verified_at) && ! empty($user->email)) {
                     \App\Http\Controllers\AppTv\EmailVerificationController::sendLink($user);
                     \App\Support\YamboMail::welcome($user,
-                        $user->trial_ends_at ? \Carbon\Carbon::parse($user->trial_ends_at)->format('d/m/Y') : null);
+                        $promoUntil ? $promoUntil->format('d/m/Y')
+                            : ($user->trial_ends_at ? \Carbon\Carbon::parse($user->trial_ends_at)->format('d/m/Y') : null),
+                        (bool) $promoUntil);
                 }
             } catch (\Throwable $e) {
                 \Log::error('alta usuario, correos: '.$e->getMessage());
             }
 
-            $defaultRole = config('yammbo.default_user_role', 'registered');
-            if (\Spatie\Permission\Models\Role::where('name', $defaultRole)->where('guard_name', 'web')->exists()) {
-                $user->assignRole($defaultRole);
+            // Si la promo se concedio, ya dejo asignado el rol del plan Premium.
+            if (! $promoUntil) {
+                $defaultRole = config('yammbo.default_user_role', 'registered');
+                if (\Spatie\Permission\Models\Role::where('name', $defaultRole)->where('guard_name', 'web')->exists()) {
+                    $user->assignRole($defaultRole);
+                }
             }
         });
     }

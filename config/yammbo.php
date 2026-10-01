@@ -33,4 +33,14 @@ return [
         'max_ips_per_day' => (int) env('YAMBO_AIO_MAX_IPS', 8),
     ],
 
+    /*
+     * Promo de alta: toda cuenta nueva recibe este plan gratis durante N dias
+     * (fila en subscriptions con vendor_slug 'promo'). 0 = desactivada: vuelve
+     * la prueba normal de 7 dias. Puesta 2026-10-01 a peticion del dueño.
+     */
+    'signup_promo' => [
+        'days' => (int) env('TV_SIGNUP_PROMO_DAYS', 365),
+        'plan_id' => (int) env('TV_SIGNUP_PROMO_PLAN_ID', 3),
+    ],
+
 ];

@@ -90,11 +90,11 @@ class YamboMail
         ]);
     }
 
-    public static function welcome(User $user, ?string $trialEnds = null): bool
+    public static function welcome(User $user, ?string $trialEnds = null, bool $premium = false): bool
     {
         $rows = [];
         if ($trialEnds) {
-            $rows['Prueba gratis hasta'] = $trialEnds;
+            $rows[$premium ? 'Premium gratis hasta' : 'Prueba gratis hasta'] = $trialEnds;
         }
         return self::send($user->email, 'Bienvenido a Yambo TV', [
             'accent'     => self::RED,

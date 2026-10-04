@@ -104,9 +104,10 @@ class TvLinkController extends Controller
             return response()->json(['status' => 'invalid'], 404);
         }
 
-        // Sin correo confirmado no se entra (la TV muestra el aviso)
+        // Sin correo confirmado no se entra (la TV muestra el aviso). Esto se
+        // consulta cada 3 s: como mucho un correo cada 15 min (el alta ya mando uno).
         if (!$user->email_verified_at) {
-            EmailVerificationController::sendLink($user);
+            EmailVerificationController::sendLink($user, 900);
             return response()->json([
                 'status' => 'unverified',
                 'email'  => $user->email,

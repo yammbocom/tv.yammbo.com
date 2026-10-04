@@ -228,6 +228,13 @@
                                 + '&subscription_active=' + subActive
                                 + '&manage_token=' + encodeURIComponent(data.manage_token || '');
                             setTimeout(function () { location.href = url; }, 800);
+                        } else if (data.status === 'unverified') {
+                            // Se sigue consultando: al abrir el enlace del correo, la TV entra sola
+                            if (status) {
+                                status.className = 'status';
+                                status.textContent = 'Confirma tu correo: te enviamos un enlace a '
+                                    + (data.email || 'tu correo') + '. Al abrirlo, la TV entrara sola.';
+                            }
                         } else if (data.status === 'expired') {
                             if (status) { status.className = 'status error'; status.textContent = 'Codigo expirado'; }
                             clearInterval(pollInterval); pollInterval = null;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AppTv;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
@@ -20,12 +21,26 @@ use Illuminate\Support\Facades\URL;
  */
 class EmailVerificationController extends Controller
 {
-    /** Genera y envia el enlace de verificacion. Devuelve true si salio el correo. */
-    public static function sendLink(User $user): bool
+    /**
+     * Genera y envia el enlace de verificacion. Devuelve true si salio el correo
+     * o si ya se mando uno hace menos de $minGapSeconds.
+     *
+     * El hueco minimo es por usuario y vale para todos los que llaman: el QR de
+     * la TV consulta cada 3 s y, sin el, mandaba un correo en cada consulta.
+     */
+    public static function sendLink(User $user, int $minGapSeconds = 60): bool
     {
         if ($user->email_verified_at) {
             return true;
         }
+
+        $key = 'tv-verify-mail:' . $user->id;
+        $last = (int) Cache::get($key, 0);
+        if ($last > 0 && time() - $last < $minGapSeconds) {
+            return true;
+        }
+        // Se marca antes de enviar para que dos consultas seguidas no manden dos
+        Cache::put($key, time(), now()->addDay());
 
         $url = URL::temporarySignedRoute(
             'app-tv.verificar-correo',
@@ -34,7 +49,12 @@ class EmailVerificationController extends Controller
         );
 
         // Plantilla comun de Yambo TV (resources/views/emails/layout)
-        return \App\Support\YamboMail::verifyEmail($user, $url);
+        $sent = \App\Support\YamboMail::verifyEmail($user, $url);
+        if (! $sent) {
+            Cache::forget($key);
+        }
+
+        return $sent;
     }
 
     /** Enlace del correo: marca la cuenta como verificada. */

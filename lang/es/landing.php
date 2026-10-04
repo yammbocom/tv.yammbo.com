@@ -43,16 +43,16 @@ return [
         'f1_body' => 'Accede a cientos de miles de películas y series gracias a nuestros catálogos expandibles. Siempre hay algo nuevo que descubrir.',
 
         'f2_title' => 'Multi-dispositivo',
-        'f2_body' => 'Úsalo en Android, Android TV, iPhone, en el navegador o desde tu computadora. Tu cuenta, todos tus dispositivos.',
+        'f2_body' => 'Úsalo en móviles Android, Android TV, Google TV y Fire TV, Windows o en el navegador. Tu cuenta, todos tus dispositivos.',
 
         'f3_title' => 'Subtítulos en tu idioma',
         'f3_body' => 'Subtítulos automáticos en decenas de idiomas para que nunca te pierdas un diálogo, sin importar el país de la producción.',
 
-        'f4_title' => 'Calidad 4K HDR',
-        'f4_body' => 'Disfruta la máxima calidad visual con audio Dolby Digital / DTS en tu plan Premium. Todo lo que una buena pantalla merece.',
+        'f4_title' => 'Alta calidad',
+        'f4_body' => 'Las fuentes de reproducción en alta calidad vienen en todos los planes. La calidad final depende de la fuente de cada título.',
 
-        'f5_title' => 'Chromecast & AirPlay',
-        'f5_body' => 'Envía tu contenido a la pantalla grande con un toque. Compatible con los principales dispositivos de casting.',
+        'f5_title' => 'Chromecast',
+        'f5_body' => 'Envía a tu televisor lo que ves en el reproductor web, con Chromecast.',
 
         'f6_title' => 'Sin anuncios',
         'f6_body' => 'Tu tiempo vale. Ningún plan te interrumpe con publicidad durante la reproducción.',
@@ -93,13 +93,13 @@ return [
         'q1_q' => '¿Cómo empiezo?',
         'q1_a' => 'Crea tu cuenta, elige el plan que mejor te encaje y empieza a ver al instante. Puedes cambiar de plan o cancelar cuando quieras.',
         'q2_q' => '¿En qué dispositivos puedo usar Yammbo Tv?',
-        'q2_a' => 'Android (móvil y TV), iOS, Windows, Mac, Linux y en tu navegador web. Compatible con Chromecast y AirPlay.',
+        'q2_a' => 'Móviles Android, Android TV, Google TV y Fire TV, Windows, y el navegador de cualquier computadora. No hay app para iPhone ni Apple TV. El reproductor web funciona con Chromecast.',
         'q3_q' => '¿Puedo cancelar en cualquier momento?',
         'q3_a' => 'Sí. Cancela desde la sección "Mi cuenta" en un solo clic. Mantienes el acceso hasta el fin del período pagado.',
         'q4_q' => '¿Cuántos dispositivos puedo usar a la vez?',
-        'q4_a' => 'Basic: 1 dispositivo. Standard: 3 simultáneos. Premium: 5 simultáneos.',
+        'q4_a' => 'Basic: 1 dispositivo a la vez. Standard: 2 a la vez. Premium: 3 a la vez.',
         'q5_q' => '¿Qué calidad de imagen ofrecen?',
-        'q5_a' => 'Basic hasta HD 720p, Standard Full HD 1080p, Premium 4K Ultra HD con HDR y audio Dolby Digital / DTS.',
+        'q5_a' => 'La calidad no depende del plan: todos los planes tienen las mismas fuentes en alta calidad, y la calidad final depende de la fuente de cada título.',
     ],
 
     'cta' => [

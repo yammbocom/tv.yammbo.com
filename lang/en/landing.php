@@ -43,16 +43,16 @@ return [
         'f1_body' => 'Access hundreds of thousands of movies and series thanks to our expandable catalogs. There is always something new to discover.',
 
         'f2_title' => 'Multi-device',
-        'f2_body' => 'Use it on Android, Android TV, iPhone, the browser or from your computer. Your account, all your devices.',
+        'f2_body' => 'Use it on Android phones, Android TV, Google TV and Fire TV, Windows or in the browser. Your account, all your devices.',
 
         'f3_title' => 'Subtitles in your language',
         'f3_body' => 'Automatic subtitles in dozens of languages so you never miss a line, no matter where the content comes from.',
 
-        'f4_title' => '4K HDR Quality',
-        'f4_body' => 'Enjoy maximum visual quality with Dolby Digital / DTS audio on the Premium plan. Everything a great screen deserves.',
+        'f4_title' => 'High quality',
+        'f4_body' => 'High quality playback sources come with every plan. The final quality depends on the source of each title.',
 
-        'f5_title' => 'Chromecast & AirPlay',
-        'f5_body' => 'Send your content to the big screen with one tap. Compatible with the main casting devices.',
+        'f5_title' => 'Chromecast',
+        'f5_body' => 'Send what you watch in the web player to your TV with Chromecast.',
 
         'f6_title' => 'Ad-free',
         'f6_body' => 'Your time matters. No plan interrupts playback with ads.',
@@ -106,13 +106,13 @@ return [
         'q1_q' => 'How do I get started?',
         'q1_a' => 'Create your account, pick the plan that fits you and start watching right away. You can switch plans or cancel anytime.',
         'q2_q' => 'Which devices can I use Yammbo Tv on?',
-        'q2_a' => 'Android (phone and TV), iOS, Windows, Mac, Linux and web browsers. Compatible with Chromecast and AirPlay.',
+        'q2_a' => 'Android phones, Android TV, Google TV and Fire TV, Windows, and the web browser on any computer. There is no app for iPhone or Apple TV. The web player works with Chromecast.',
         'q3_q' => 'Can I cancel anytime?',
         'q3_a' => 'Yes. Cancel from the "My account" section in a single click. You keep access until the end of the paid period.',
         'q4_q' => 'How many devices can I use at once?',
-        'q4_a' => 'Basic: 1 device. Standard: 3 simultaneous. Premium: 5 simultaneous.',
+        'q4_a' => 'Basic: 1 device at a time. Standard: 2 at a time. Premium: 3 at a time.',
         'q5_q' => 'What image quality do you offer?',
-        'q5_a' => 'Basic up to HD 720p, Standard Full HD 1080p, Premium 4K Ultra HD with HDR and Dolby Digital / DTS audio.',
+        'q5_a' => 'Quality is not limited by plan: every plan gets the same high quality sources, and the final quality depends on the source of each title.',
     ],
 
     'cta' => [

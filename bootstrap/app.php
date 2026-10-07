@@ -43,6 +43,9 @@ return Application::configure(basePath: dirname(__DIR__))
             prepend: \App\Http\Middleware\SharePreviewForGuests::class,
         );
 
+        // Respuestas de la app iguales para todos → cacheables en Cloudflare.
+        $middleware->appendToGroup('api', \App\Http\Middleware\AppTvEdgeCache::class);
+
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(AppServiceProvider::HOME);
 

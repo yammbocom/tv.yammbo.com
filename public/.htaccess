@@ -56,8 +56,13 @@
 # Ni HTML, ni JSON (el addon sirve /manifest.json y /catalog/*.json), ni APK.
 <IfModule mod_headers.c>
     SetEnvIf Request_URI "^/(app/[a-f0-9]{40}|build/assets)/" HASHED_ASSET
-    <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|css|js)$">
+    <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|css|js|wasm|map)$">
         Header set Cache-Control "public, max-age=604800"
         Header set Cache-Control "public, max-age=31536000, immutable" env=HASHED_ASSET
+    </FilesMatch>
+    # APK: 1 dia. Algunos se reemplazan con el mismo nombre (VPN-Yammbo.apk),
+    # asi que no conviene que el edge guarde una version vieja un mes.
+    <FilesMatch "\.apk$">
+        Header set Cache-Control "public, max-age=86400"
     </FilesMatch>
 </IfModule>

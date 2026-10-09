@@ -39,10 +39,16 @@ class ResolveAppTvUser
             // Solo se registra a quien manda user_id: ese es el cliente legacy
             // que queremos detectar (el APK publicado). Los escaneos sueltos no
             // lo mandan y quedarían fuera, que es justo lo que interesa para no
-            // ahogar el log. Va como error porque el canal `single` filtra por
-            // debajo de ese nivel y un info no llegaría a escribirse nunca.
+            // ahogar el log. Va a su propio fichero diario y no a laravel.log:
+            // bots como Go-http-client imitan al APK viejo, y como error allí
+            // contaban en verify-site (100 al día) tapando los fallos reales.
             if ($request->has('user_id')) {
-                Log::channel('single')->error('app-tv: cliente legacy sin credenciales', [
+                Log::build([
+                    'driver' => 'daily',
+                    'path' => storage_path('logs/app-tv-legacy.log'),
+                    'level' => 'info',
+                    'days' => 14,
+                ])->info('app-tv: cliente legacy sin credenciales', [
                     'path' => $request->path(),
                     'ua' => substr(preg_replace('/[[:cntrl:]]/', '', (string) $request->userAgent()), 0, 120),
                     'had_bearer' => $request->bearerToken() !== null,

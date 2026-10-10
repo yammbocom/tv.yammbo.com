@@ -1,10 +1,10 @@
 {
-  "source": "github",
-  "version_code": 43407,
-  "mandatory": false,
-  "build": 30,
-  "version_name": "4.35.4",
-  "url": "https://tv.yammbo.com/download/YamboTV-b30-20260822-012518.apk",
-  "size": 41193820,
-  "notes": "Respaldo si GitHub no responde."
+    "source": "github",
+    "version_code": 43407,
+    "mandatory": true,
+    "build": 57,
+    "version_name": "4.36.24",
+    "url": "https://tv.yammbo.com/download/YamboTV-b57-20261007-0045.apk",
+    "size": 40649917,
+    "notes": "Respaldo si GitHub no responde."
 }

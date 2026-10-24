@@ -13,6 +13,8 @@
     $codeMobile = null;
     $codeVpn    = '5916443';   // go.aftvnews.com -> https://edge-v5k8r3.pages.dev/v
     $vpn       = '/download/VPN-Yammbo.apk';
+    // Yammbo Tv Instalador: /instalador redirige al APK vigente.
+    $codeSetup = '2915414';   // go.aftvnews.com -> https://tv.yammbo.com/instalador
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -100,6 +102,20 @@
     font-weight:800;color:#E50914;letter-spacing:.14em;line-height:1}
   .code-alt{color:#8b8b93;font-size:12.5px;margin-top:10px}
   .code-alt b{color:#d4d4d9;font-weight:600}
+  .other{margin:14px 0 0;color:#8b8b93;font-size:13px;line-height:1.5}
+  .other a{color:#d4d4d9;font-weight:600}
+  /* Tele completa: en blanco, para que no se confunda con la tarjeta roja de la app sola */
+  .tv.full{border-color:rgba(255,255,255,.4);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 60px -24px rgba(255,255,255,.25)}
+  .tv.full .badge{background:#fff;color:#000}
+  .tv.full .ico svg{stroke:#fff}
+  .tv.full .codebox{border-color:rgba(255,255,255,.35)}
+  .tv.full .code-num{color:#fff}
+  .tv.full .feat li::before{background:#fff}
+  .tv.full .feat b{color:#fff}
+  .tv.full .steps li::before{background:#fff;color:#000}
+  .shot{margin:0 0 18px}
+  .shot img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid #26262b;background:#000}
+  .shot figcaption{color:#8b8b93;font-size:12.5px;margin-top:8px}
   .tv-steps{background:#0b0b0d;border:1px solid #1f1f24;border-radius:16px;padding:22px 22px 10px}
   .tv-steps h3{margin:0 0 16px;font-size:13px;font-weight:700;color:#8b8b93;text-transform:uppercase;letter-spacing:.09em}
   .steps{margin:0;padding:0;list-style:none;counter-reset:st}
@@ -184,7 +200,8 @@
         : 'Pick the version for your device. Movies, series, anime and live TV, anywhere.' }}
     </p>
     <ul class="chips" aria-label="{{ $isEs ? 'Ir a tu dispositivo' : 'Jump to your device' }}">
-      <li><a href="#tv"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ $isEs ? 'Televisor' : 'TV' }}</a></li>
+      <li><a href="#tv"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ $isEs ? 'Televisor: solo la app' : 'TV: app only' }}</a></li>
+      <li><a href="#instalador"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 10.5l3 3 5-5M8 21h8"/></svg>{{ $isEs ? 'Televisor: tele completa' : 'TV: full setup' }}</a></li>
       <li><a href="#movil"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>{{ $isEs ? 'Movil' : 'Mobile' }}</a></li>
       <li><a href="#windows"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/></svg>Windows</a></li>
     </ul>
@@ -192,7 +209,7 @@
 
   {{-- App de TELEVISORES --}}
   <section class="card tv" id="tv">
-    <span class="badge">{{ $isEs ? 'Para tu TV' : 'For your TV' }}</span>
+    <span class="badge">{{ $isEs ? 'Solo la app' : 'App only' }}</span>
     <div class="tv-grid">
       <div>
         <div class="ico">
@@ -202,8 +219,8 @@
         <p class="for">Android TV · Google TV · Fire TV · TV Box</p>
         <p class="tvlead">
           {!! $isEs
-            ? 'Se instala <b>desde el propio televisor</b>, con la app gratuita Downloader. No necesitas ordenador ni memoria USB.'
-            : 'Install it <b>from the TV itself</b> with the free Downloader app. No computer or USB drive needed.' !!}
+            ? 'Instala <b>solo la app Yammbo Tv</b>; el resto de la tele queda como esta. Se instala desde el propio televisor, con la app gratuita Downloader. No necesitas ordenador ni memoria USB.'
+            : 'Installs <b>just the Yammbo Tv app</b>; the rest of the TV stays as it is. Install it from the TV itself with the free Downloader app. No computer or USB drive needed.' !!}
         </p>
         <div class="codebox">
           <div class="code-label">{{ $isEs ? 'Tu codigo de instalacion' : 'Your install code' }}</div>
@@ -211,6 +228,9 @@
           <div class="code-alt">{{ $isEs ? 'o escribe' : 'or type' }} <b>tv.yammbo.com/tv</b></div>
         </div>
         <p class="meta">Android TV 5.0+</p>
+        <p class="other">{!! $isEs
+          ? '¿Quieres ademas la pantalla de inicio, SmartTube y la VPN? Mira <a href="#instalador">Tele completa</a>.'
+          : 'Also want the home screen, SmartTube and the VPN? See <a href="#instalador">Full TV setup</a>.' !!}</p>
       </div>
 
       <div class="tv-steps">
@@ -228,6 +248,70 @@
           <li>{!! $isEs
             ? 'Abre Yammbo Tv y <b>escanea el codigo QR</b> con tu telefono para iniciar sesion.'
             : 'Open Yammbo Tv and <b>scan the QR code</b> with your phone to sign in.' !!}</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  {{-- Yammbo Tv Instalador: deja la tele lista (apps, VPN, pantalla de inicio, limpieza) --}}
+  <section class="card tv full" id="instalador">
+    <span class="badge">{{ $isEs ? 'Tele completa' : 'Full TV setup' }}</span>
+    <div class="tv-grid">
+      <div>
+        <div class="ico">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 10.5l3 3 5-5M8 21h8"/></svg>
+        </div>
+        <h2>{{ $isEs ? 'Toda la tele lista, no solo la app' : 'The whole TV ready, not just the app' }}</h2>
+        <p class="for">Google TV · Chromecast con Google TV · Android TV 11+</p>
+        <figure class="shot">
+          <picture>
+            <source srcset="/images/yammbo-tv-home.webp" type="image/webp">
+            <img src="/images/yammbo-tv-home.jpg" width="1280" height="720" loading="lazy"
+              alt="{{ $isEs ? 'Pantalla de inicio de Yammbo Tv en un televisor' : 'Yammbo Tv home screen on a TV' }}">
+          </picture>
+          <figcaption>{{ $isEs ? 'Asi queda la pantalla de inicio de tu tele' : 'This is how your TV home screen looks' }}</figcaption>
+        </figure>
+        <p class="tvlead">
+          {!! $isEs
+            ? 'Una sola app, <b>Yammbo Tv Instalador</b>, transforma el televisor entero. Incluye:'
+            : 'One app, <b>Yammbo Tv Instalador</b>, transforms the whole TV. It includes:' !!}
+        </p>
+        <ul class="feat">
+          <li>{!! $isEs ? 'La <b>pantalla de inicio de Yammbo Tv</b>, con recomendaciones y tus apps a mano' : 'The <b>Yammbo Tv home screen</b>, with recommendations and your apps at hand' !!}</li>
+          <li>{!! $isEs ? '<b>Yammbo Tv</b>, <b>SmartTube</b> (YouTube sin anuncios) y la <b>VPN</b>' : '<b>Yammbo Tv</b>, <b>SmartTube</b> (YouTube without ads) and the <b>VPN</b>' !!}</li>
+          <li>{{ $isEs ? 'Apaga las apps de publicidad que hacen lenta la tele' : 'Turns off the ad apps that slow the TV down' }}</li>
+          <li>{{ $isEs ? 'Se actualiza sola. No se borra nada y todo se puede deshacer' : 'Updates itself. Nothing is deleted and everything can be undone' }}</li>
+        </ul>
+        <div class="codebox">
+          @if ($codeSetup)
+            <div class="code-label">{{ $isEs ? 'Codigo para Downloader' : 'Downloader code' }}</div>
+            <div class="code-num">{{ $codeSetup }}</div>
+            <div class="code-alt">{{ $isEs ? 'o escribe' : 'or type' }} <b>tv.yammbo.com/instalador</b></div>
+          @else
+            <div class="code-label">{{ $isEs ? 'Escribe en Downloader' : 'Type in Downloader' }}</div>
+            <div class="code-num" style="font-size:clamp(20px,3.4vw,28px);letter-spacing:.02em">tv.yammbo.com/instalador</div>
+          @endif
+        </div>
+        <p class="other">{!! $isEs
+          ? '¿Solo quieres la app Yammbo Tv? Usa el <a href="#tv">codigo ' . $codeTv . '</a>.'
+          : 'Just want the Yammbo Tv app? Use <a href="#tv">code ' . $codeTv . '</a>.' !!}</p>
+      </div>
+
+      <div class="tv-steps">
+        <h3>{{ $isEs ? 'Paso a paso' : 'Step by step' }}</h3>
+        <ol class="steps">
+          <li>{!! $isEs
+            ? 'Abre <b>Downloader</b> en la tele, escribe ' . ($codeSetup ? 'el codigo <b>' . $codeSetup . '</b>' : '<b>tv.yammbo.com/instalador</b>') . ' y pulsa <b>Instalar</b>.'
+            : 'Open <b>Downloader</b> on the TV, type ' . ($codeSetup ? 'the code <b>' . $codeSetup . '</b>' : '<b>tv.yammbo.com/instalador</b>') . ' and press <b>Install</b>.' !!}</li>
+          <li>{!! $isEs
+            ? 'Abre <b>Yammbo Tv Instalador</b>. Te pedira permiso para instalar e instalara <b>Yammbo Tv Configurador</b>.'
+            : 'Open <b>Yammbo Tv Instalador</b>. It asks permission to install apps and installs <b>Yammbo Tv Configurador</b>.' !!}</li>
+          <li>{!! $isEs
+            ? 'Sigue lo que dice la pantalla: activar la <b>depuracion inalambrica</b> y abrir el codigo de vinculacion. La app hace el resto sola.'
+            : 'Follow the screen: turn on <b>wireless debugging</b> and open the pairing code. The app does the rest on its own.' !!}</li>
+          <li>{!! $isEs
+            ? 'En unos minutos la tele queda lista y la depuracion se apaga sola. Pulsa <b>Inicio</b> en el control.'
+            : 'In a few minutes the TV is ready and debugging turns itself off. Press <b>Home</b> on the remote.' !!}</li>
         </ol>
       </div>
     </div>

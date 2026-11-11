@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use PDO;
 
 /**
@@ -265,11 +266,42 @@ class ComxService
         return $metas;
     }
 
-    /** Ids (con su título) del repo cuyo titulo contiene la consulta. */
+    /**
+     * Ids (con su título) del repo que cuadran con la consulta, los mejores
+     * primero.
+     *
+     * Antes era un `LIKE '%consulta%'` literal: "spider man" no encontraba
+     * "Spider-Man", "casa papel" no encontraba "La casa de papel" y "pelicula"
+     * no encontraba "película". Ahora se compara por palabras, sin tildes ni
+     * signos, y se ordena: título exacto, luego los que empiezan por la
+     * consulta, luego el resto (el más corto antes).
+     */
     private function searchIds(string $type, string $query): array
     {
-        $like = '%' . $query . '%';
-        $ids = [];
+        $normQuery = self::normalizeTitle($query);
+        // Sin letras latinas ni dígitos (cirílico, japonés…) no hay palabras que
+        // comparar: se busca como antes, con LIKE literal.
+        if ($normQuery === '') {
+            return $this->searchIdsLike($type, $query);
+        }
+        // Una sola letra recorre ~55k títulos y casi todos cuadran: no aporta.
+        if (strlen($normQuery) < 2) {
+            return [];
+        }
+
+        // El endpoint es público y cada búsqueda recorre las tres bases con un
+        // callback PHP por fila (~110 ms): la misma consulta se sirve de caché.
+        return Cache::remember('comx:search:v1:' . $type . ':' . md5($normQuery), 3600, fn (): array => $this->scoreSearchIds($type, $normQuery));
+    }
+
+    /** @return array<string,string> id TMDB => título */
+    private function scoreSearchIds(string $type, string $normQuery): array
+    {
+        $tokens = array_values(array_unique(explode(' ', $normQuery)));
+        $compactQuery = str_replace(' ', '', $normQuery);
+        $score = static fn ($title): int => self::titleScore((string) $title, $normQuery, $compactQuery, $tokens);
+
+        $found = [];
         foreach (array_keys(self::SOURCES) as $source) {
             $src = self::SOURCES[$source];
             [$table, $col, $file] = $type === 'movie'
@@ -282,8 +314,38 @@ class ComxService
             }
 
             $pdo = $this->open($path);
-            $stmt = $pdo->prepare("SELECT {$col} AS id_tmdb, titulo FROM {$table} WHERE titulo LIKE :q LIMIT 40");
-            $stmt->execute([':q' => $like]);
+            $pdo->sqliteCreateFunction('yammbo_score', $score, 1, PDO::SQLITE_DETERMINISTIC);
+            $stmt = $pdo->query("SELECT id_tmdb, titulo, s FROM (SELECT {$col} AS id_tmdb, titulo, yammbo_score(titulo) AS s FROM {$table}) WHERE s > 0 ORDER BY s DESC LIMIT 40");
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $id = (string) $row['id_tmdb'];
+                if (preg_match('/^\d+$/', $id) && (! isset($found[$id]) || $found[$id][1] < (int) $row['s'])) {
+                    $found[$id] = [$row['titulo'], (int) $row['s']];
+                }
+            }
+        }
+
+        uasort($found, static fn (array $a, array $b): int => $b[1] <=> $a[1]);
+
+        return array_map(static fn (array $hit): string => $hit[0], array_slice($found, 0, 40, true));
+    }
+
+    /** La búsqueda de antes: título que contiene la consulta tal cual. */
+    private function searchIdsLike(string $type, string $query): array
+    {
+        $ids = [];
+        foreach (array_keys(self::SOURCES) as $source) {
+            $src = self::SOURCES[$source];
+            [$table, $col, $file] = $type === 'movie'
+                ? ['peliculas', 'id_tmdb', $src['movies'][0]]
+                : ['series', $src['series_col'], $src['series'][0]];
+
+            $path = $this->dbPath($file);
+            if (! is_file($path)) {
+                continue;
+            }
+
+            $stmt = $this->open($path)->prepare("SELECT {$col} AS id_tmdb, titulo FROM {$table} WHERE titulo LIKE :q LIMIT 40");
+            $stmt->execute([':q' => '%' . trim($query) . '%']);
             foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 $id = (string) $row['id_tmdb'];
                 if (preg_match('/^\d+$/', $id) && ! isset($ids[$id])) {
@@ -297,6 +359,50 @@ class ComxService
         }
 
         return $ids;
+    }
+
+    /** "Spider-Man: Lejos de Casa" → "spider man lejos de casa". */
+    private static function normalizeTitle(string $title): string
+    {
+        $title = mb_strtolower($title, 'UTF-8');
+        $title = strtr($title, [
+            'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a', 'ã' => 'a',
+            'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+            'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+            'ñ' => 'n', 'ç' => 'c',
+        ]);
+
+        return trim((string) preg_replace('/[^a-z0-9]+/', ' ', $title));
+    }
+
+    /**
+     * 0 si el título no cuadra. Cuadra si contiene todas las palabras de la
+     * consulta (también pegadas: "spiderman" cuadra con "Spider-Man").
+     */
+    private static function titleScore(string $title, string $query, string $compactQuery, array $tokens): int
+    {
+        $norm = self::normalizeTitle($title);
+        $compact = str_replace(' ', '', $norm);
+        if ($norm === $query || $compact === $compactQuery) {
+            $rank = 4;
+        } else {
+            foreach ($tokens as $token) {
+                if (! str_contains($norm, $token) && ! str_contains($compact, $token)) {
+                    return 0;
+                }
+            }
+            if (str_starts_with($norm, $query) || str_starts_with($compact, $compactQuery)) {
+                $rank = 3;
+            } elseif (str_contains(' ' . $norm . ' ', ' ' . $query . ' ')) {
+                $rank = 2;
+            } else {
+                $rank = 1;
+            }
+        }
+
+        return $rank * 1000 - min(strlen($norm), 999);
     }
 
     /** Título guardado en el repo, para fichas cuyo id de TMDB ya no existe. */

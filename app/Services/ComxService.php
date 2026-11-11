@@ -515,23 +515,7 @@ class ComxService
             return [];
         }
 
-        $streams = $this->aggregatorStreams('movie', $tmdbId);
-
-        $links = [];
-        foreach (array_keys(self::SOURCES) as $source) {
-            foreach (self::SOURCES[$source]['movies'] as $file) {
-                $path = $this->dbPath($file);
-                if (! is_file($path)) {
-                    continue;
-                }
-                $pdo = $this->open($path);
-                $stmt = $pdo->prepare('SELECT idioma, servidor, url FROM enlaces WHERE id_tmdb = :id');
-                $stmt->execute([':id' => (string) $tmdbId]);
-                $links = array_merge($links, $stmt->fetchAll(PDO::FETCH_ASSOC));
-            }
-        }
-
-        return array_merge($streams, $this->streamsFromLinks($links));
+        return $this->aggregatorStreams('movie', $tmdbId);
     }
 
     private function seriesStreams(string $id): array
@@ -542,41 +526,7 @@ class ComxService
         }
         [$tmdbId, $season, $episode] = $parts;
 
-        $streams = $this->aggregatorStreams('series', $tmdbId, $season, $episode);
-
-        $links = [];
-        foreach (array_keys(self::SOURCES) as $source) {
-            foreach (self::SOURCES[$source]['series'] as $file) {
-                $path = $this->dbPath($file);
-                if (! is_file($path)) {
-                    continue;
-                }
-                $pdo = $this->open($path);
-                // Localizar el episodio (indexado) y luego sus enlaces (un solo
-                // scan de enlaces, sin índice por episodio_id).
-                $stmt = $pdo->prepare(
-                    'SELECT e.id
-                       FROM temporadas t
-                       JOIN episodios e ON e.temporada_id = t.id
-                      WHERE t.serie_tmdb = :id AND t.numero = :season AND e.numero = :episode'
-                );
-                $stmt->execute([
-                    ':id' => (string) $tmdbId,
-                    ':season' => $season,
-                    ':episode' => $episode,
-                ]);
-                $episodeId = $stmt->fetchColumn();
-                if ($episodeId === false) {
-                    continue;
-                }
-
-                $stmt = $pdo->prepare('SELECT idioma, servidor, url FROM enlaces WHERE episodio_id = :eid');
-                $stmt->execute([':eid' => (int) $episodeId]);
-                $links = array_merge($links, $stmt->fetchAll(PDO::FETCH_ASSOC));
-            }
-        }
-
-        return array_merge($streams, $this->streamsFromLinks($links));
+        return $this->aggregatorStreams('series', $tmdbId, $season, $episode);
     }
 
     private function aggregatorStreams(string $type, string $tmdbId, ?int $season = null, ?int $episode = null): array
@@ -586,38 +536,13 @@ class ComxService
             : "https://api.moviemaster.lat/e/tv/{$tmdbId}/{$season}/{$episode}?autoplay=1";
 
         return [[
-            'name' => 'MovieMaster (HD)',
-            'title' => 'MovieMaster',
+            'name' => 'Ver ahora',
+            'title' => 'Ver ahora',
             'url' => $url,
             'behaviorHints' => [
                 'yammboEmbed' => true,
             ],
         ]];
-    }
-
-    private function streamsFromLinks(array $links): array
-    {
-        $streams = [];
-        $seen = [];
-        foreach ($links as $link) {
-            $url = $link['url'] ?? '';
-            if ($url === '') {
-                continue;
-            }
-            $key = ($link['servidor'] ?? '') . '|' . $url;
-            if (isset($seen[$key])) {
-                continue;
-            }
-            $seen[$key] = true;
-
-            $streams[] = [
-                'name' => ($link['servidor'] ?? 'Fuente') . ' (' . ($link['idioma'] ?? '?') . ')',
-                'title' => $link['servidor'] ?? 'Fuente',
-                'externalUrl' => $url,
-            ];
-        }
-
-        return $streams;
     }
 
     // --- helpers --------------------------------------------------------

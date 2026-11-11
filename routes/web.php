@@ -24,6 +24,7 @@ Route::get('/catalog/{type}/{id}.json', [StremioAddonController::class, 'catalog
 Route::get('/catalog/{type}/{id}/{extra}.json', [StremioAddonController::class, 'catalog']);
 Route::get('/meta/{type}/{id}.json', [StremioAddonController::class, 'meta']);
 Route::get('/stream/{type}/{id}.json', [StremioAddonController::class, 'stream']);
+Route::get('/similar/{type}/{id}.json', [StremioAddonController::class, 'similar']);
 
 // La URL del antiguo addon CO-MX (com.yammbo.comx) apunta ahora al addon
 // unificado: así un enlace o instalación vieja no se queda en un 404.

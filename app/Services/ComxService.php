@@ -475,7 +475,7 @@ class ComxService
     }
 
     /** De una lista de ids TMDB, cuáles existen en alguna fuente del repo. */
-    private function existingIds(string $type, array $tmdbIds): array
+    public function existingIds(string $type, array $tmdbIds): array
     {
         $tmdbIds = array_values(array_filter(array_map('strval', $tmdbIds), fn ($id) => $id !== ''));
         if ($tmdbIds === []) {

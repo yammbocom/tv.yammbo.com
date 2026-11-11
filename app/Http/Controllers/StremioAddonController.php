@@ -150,6 +150,46 @@ class StremioAddonController extends Controller
         ));
     }
 
+    /** Recomendaciones ("parecidos") del repo, para el cajón lateral del reproductor. */
+    public function similar(string $type, string $id): JsonResponse
+    {
+        $tmdbId = preg_match('/^comx:(\d+)$/', $id, $m)
+            ? (int) $m[1]
+            : (preg_match('/^\d+$/', $id, $m) ? (int) $m[1] : 0);
+        if ($tmdbId === 0 || ! in_array($type, ['movie', 'series'], true)) {
+            return $this->cors(response()->json(['metas' => []]));
+        }
+
+        $data = $this->tmdb->similar($type, $tmdbId);
+        $results = array_slice($data['results'] ?? [], 0, 30);
+        if ($results === []) {
+            return $this->cors(response()->json(['metas' => []]));
+        }
+
+        $byId = [];
+        $ids = [];
+        foreach ($results as $item) {
+            $mid = (string) ($item['id'] ?? '');
+            if ($mid === '') {
+                continue;
+            }
+            $ids[] = $mid;
+            $byId[$mid] = $item;
+        }
+
+        $metas = [];
+        foreach (array_intersect($ids, $this->comx->existingIds($type, $ids)) as $mid) {
+            $metas[] = $this->comx->metaFromTmdb($byId[$mid], $type, $mid);
+        }
+
+        return $this->cors(response()->json(
+            ['metas' => array_slice($metas, 0, 20)],
+            200,
+            [],
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        ));
+    }
+
     // --- catálogo -------------------------------------------------------
 
     private function catalogMetas(string $type, string $id, int $skip, ?string $query): array

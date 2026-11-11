@@ -70,6 +70,16 @@ class TmdbService
         return $this->cached("tmdb:find:{$imdbId}", fn () => $this->get("/find/{$imdbId}", ['external_source' => 'imdb_id']));
     }
 
+    public function similar(string $type, int $tmdbId): ?array
+    {
+        $media = $type === 'series' ? 'tv' : 'movie';
+
+        return $this->cached("tmdb:similar:{$media}:{$tmdbId}", fn () => $this->get("/{$media}/{$tmdbId}/similar", [
+            'page' => 1,
+            'language' => 'es-MX',
+        ]));
+    }
+
     /**
      * Varias fichas a la vez (p. ej. la fila "Todas las películas"), en paralelo
      * y reutilizando la misma caché que movie()/series(). Devuelve id => ficha.

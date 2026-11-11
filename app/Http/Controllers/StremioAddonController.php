@@ -160,34 +160,73 @@ class StremioAddonController extends Controller
             return $this->cors(response()->json(['metas' => []]));
         }
 
-        $data = $this->tmdb->similar($type, $tmdbId);
-        $results = array_slice($data['results'] ?? [], 0, 30);
-        if ($results === []) {
-            return $this->cors(response()->json(['metas' => []]));
-        }
-
-        $byId = [];
-        $ids = [];
-        foreach ($results as $item) {
-            $mid = (string) ($item['id'] ?? '');
-            if ($mid === '') {
-                continue;
-            }
-            $ids[] = $mid;
-            $byId[$mid] = $item;
-        }
-
+        // /recommendations (lo que vio la gente que vio esto) manda; /similar solo
+        // rellena y exige compartir género, porque por sí solo mezcla un thriller
+        // con dibujos animados. Sin póster o con pocos votos no se ofrece.
+        // Cada página se pide solo si la anterior no llegó al límite.
+        $limit = 15;
         $metas = [];
-        foreach (array_intersect($ids, $this->comx->existingIds($type, $ids)) as $mid) {
-            $metas[] = $this->comx->metaFromTmdb($byId[$mid], $type, $mid);
+        foreach ([1, 2] as $page) {
+            if (count($metas) < $limit) {
+                $metas = $this->similarFrom($type, $tmdbId, $this->tmdb->recommendations($type, $tmdbId, $page), null, $metas, $limit);
+            }
+        }
+
+        if (count($metas) < $limit) {
+            $source = $type === 'series' ? $this->tmdb->series($tmdbId, 'es-MX') : $this->tmdb->movie($tmdbId, 'es-MX');
+            $genres = array_column($source['genres'] ?? [], 'id');
+            // Sin géneros del original, /similar volvería a mezclar de todo: mejor menos.
+            foreach ($genres === [] ? [] : [1, 2] as $page) {
+                if (count($metas) < $limit) {
+                    $metas = $this->similarFrom($type, $tmdbId, $this->tmdb->similar($type, $tmdbId, $page), $genres, $metas, $limit);
+                }
+            }
         }
 
         return $this->cors(response()->json(
-            ['metas' => array_slice($metas, 0, 20)],
+            ['metas' => $metas],
             200,
             [],
             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         ));
+    }
+
+    /**
+     * Añade a $metas los resultados de una página de TMDB que están en el repo, en su orden,
+     * sin repetir y hasta $limit. Con $genres (ids) exige compartir al menos uno.
+     */
+    private function similarFrom(string $type, int $tmdbId, ?array $page, ?array $genres, array $metas, int $limit): array
+    {
+        $seen = array_flip(array_column($metas, 'id'));
+        $byId = [];
+        foreach ($page['results'] ?? [] as $item) {
+            $mid = (string) ($item['id'] ?? '');
+            if ($mid === '' || $mid === (string) $tmdbId || isset($seen['comx:' . $mid]) || isset($byId[$mid])
+                || empty($item['poster_path']) || ($item['vote_count'] ?? 0) < 50
+                || ($genres !== null && array_intersect($genres, $item['genre_ids'] ?? []) === [])) {
+                continue;
+            }
+            $byId[$mid] = $item;
+        }
+        if ($byId === []) {
+            return $metas;
+        }
+
+        $ids = array_map('strval', array_keys($byId));
+        foreach (array_intersect($ids, $this->comx->existingIds($type, $ids)) as $mid) {
+            if (count($metas) >= $limit) {
+                break;
+            }
+            $meta = $this->comx->metaFromTmdb($byId[$mid], $type, $mid);
+            // TMDB guarda a veces el título original entre corchetes ("Juego sangriento [バトル・ロワイアル]").
+            $name = trim(preg_replace('/\s*\[[^\]]*\]\s*$/u', '', $meta['name']) ?? '');
+            if ($name !== '') {
+                $meta['name'] = $name;
+            }
+            $metas[] = $meta;
+        }
+
+        return $metas;
     }
 
     // --- catálogo -------------------------------------------------------
@@ -240,6 +279,47 @@ class StremioAddonController extends Controller
 
     // --- meta -----------------------------------------------------------
 
+    /**
+     * Los repos solo dan temporada/episodio (y a veces "Serie 3x11"): nombre,
+     * sinopsis, imagen y fecha salen de TMDB, para que la lista de episodios del
+     * reproductor y de la ficha diga qué es cada uno. Orden por temporada y
+     * episodio (los repos se concatenan y llegaban mezclados).
+     */
+    private function withEpisodeDetails(int $tmdbId, array $videos): array
+    {
+        $seasons = $videos === [] ? [] : $this->tmdb->seasons($tmdbId, array_column($videos, 'season'));
+        $byKey = [];
+        foreach ($seasons as $season) {
+            foreach ($season['episodes'] ?? [] as $ep) {
+                $byKey[($ep['season_number'] ?? 0) . ':' . ($ep['episode_number'] ?? 0)] = $ep;
+            }
+        }
+
+        foreach ($videos as &$video) {
+            $ep = $byKey[$video['season'] . ':' . $video['episode']] ?? null;
+            if ($ep === null) {
+                continue;
+            }
+            if (! empty($ep['name'])) {
+                $video['title'] = $ep['name'];
+            }
+            if (! empty($ep['overview'])) {
+                $video['overview'] = $ep['overview'];
+            }
+            if (! empty($ep['still_path'])) {
+                $video['thumbnail'] = 'https://image.tmdb.org/t/p/w300' . $ep['still_path'];
+            }
+            if (! empty($ep['air_date'])) {
+                $video['released'] = $ep['air_date'] . 'T00:00:00.000Z';
+            }
+        }
+        unset($video);
+
+        usort($videos, fn ($a, $b) => [$a['season'], $a['episode']] <=> [$b['season'], $b['episode']]);
+
+        return $videos;
+    }
+
     private function resolveMeta(string $type, string $id): ?array
     {
         if (str_starts_with($id, 'comx:')) {
@@ -260,7 +340,7 @@ class StremioAddonController extends Controller
             $meta = $this->comx->metaFromTmdb($data, $type, $tmdbId);
             if ($type === 'series') {
                 // Sin `videos` la ficha no muestra temporadas ni se puede reproducir.
-                $meta['videos'] = $this->comx->seriesVideos($tmdbId);
+                $meta['videos'] = $this->withEpisodeDetails($tmdbId, $this->comx->seriesVideos($tmdbId));
             }
 
             return $meta;

@@ -70,12 +70,79 @@ class TmdbService
         return $this->cached("tmdb:find:{$imdbId}", fn () => $this->get("/find/{$imdbId}", ['external_source' => 'imdb_id']));
     }
 
-    public function similar(string $type, int $tmdbId): ?array
+    public function similar(string $type, int $tmdbId, int $page = 1): ?array
+    {
+        $media = $type === 'series' ? 'tv' : 'movie';
+        $key = $page === 1 ? "tmdb:similar:{$media}:{$tmdbId}" : "tmdb:similar:{$media}:{$tmdbId}:{$page}";
+
+        return $this->cached($key, fn () => $this->get("/{$media}/{$tmdbId}/similar", [
+            'page' => $page,
+            'language' => 'es-MX',
+        ]));
+    }
+
+    /**
+     * Temporadas de una serie (episodios con nombre, sinopsis, imagen y fecha),
+     * en paralelo. Devuelve número de temporada => datos. Caché de un día:
+     * los episodios ya emitidos no cambian y la lista se pide en cada ficha.
+     */
+    public function seasons(int $tvId, array $numbers, string $language = 'es-MX'): array
+    {
+        $out = [];
+        $missing = [];
+        foreach (array_unique(array_map('intval', $numbers)) as $n) {
+            $cached = Cache::get("tmdb:season:{$tvId}:{$n}:{$language}");
+            if (is_array($cached)) {
+                $out[$n] = $cached;
+            } else {
+                $missing[] = $n;
+            }
+        }
+
+        if ($missing !== []) {
+            $responses = Http::pool(fn ($pool) => array_map(
+                fn ($n) => $pool->as((string) $n)
+                    ->timeout(10)
+                    ->get(self::BASE . "/tv/{$tvId}/season/{$n}", [
+                        'api_key' => config('services.tmdb.key'),
+                        'language' => $language,
+                    ]),
+                $missing
+            ), 8);
+
+            foreach ($missing as $n) {
+                $res = $responses[(string) $n] ?? null;
+                if (! $res instanceof \Illuminate\Http\Client\Response) {
+                    continue;
+                }
+                // Solo lo que usa la lista de episodios (la respuesta entera pesa
+                // 50-130 KB por temporada), y un 404 (temporada que TMDB no tiene,
+                // p. ej. la 0 de algunos repos) también se guarda: si no, se
+                // volvería a pedir en cada ficha.
+                if ($res->successful()) {
+                    $data = ['episodes' => array_map(fn ($ep) => array_intersect_key($ep, array_flip([
+                        'season_number', 'episode_number', 'name', 'overview', 'still_path', 'air_date',
+                    ])), $res->json('episodes') ?? [])];
+                } elseif ($res->status() === 404) {
+                    $data = ['episodes' => []];
+                } else {
+                    continue;
+                }
+                Cache::put("tmdb:season:{$tvId}:{$n}:{$language}", $data, 86400);
+                $out[$n] = $data;
+            }
+        }
+
+        return $out;
+    }
+
+    /** Lo que vieron quienes vieron este título: más afinado que /similar (géneros y palabras clave). */
+    public function recommendations(string $type, int $tmdbId, int $page = 1): ?array
     {
         $media = $type === 'series' ? 'tv' : 'movie';
 
-        return $this->cached("tmdb:similar:{$media}:{$tmdbId}", fn () => $this->get("/{$media}/{$tmdbId}/similar", [
-            'page' => 1,
+        return $this->cached("tmdb:reco:{$media}:{$tmdbId}:{$page}", fn () => $this->get("/{$media}/{$tmdbId}/recommendations", [
+            'page' => $page,
             'language' => 'es-MX',
         ]));
     }

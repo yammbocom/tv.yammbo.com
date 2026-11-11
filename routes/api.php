@@ -44,6 +44,19 @@ Route::prefix('app-tv')->group(function () {
     Route::get('mi-plan', \App\Http\Controllers\AppTv\MyPlanController::class)->middleware('throttle:60,1');
     Route::get('acceso-check', \App\Http\Controllers\AppTv\AccessCheckController::class)->middleware('throttle:60,1');
         Route::get('avatars', [\App\Http\Controllers\AppTv\AvatarsController::class, 'index'])->middleware('throttle:30,1');
+    Route::get('trailer', \App\Http\Controllers\AppTv\TrailerController::class)->middleware('throttle:60,1');
+    Route::get('ficha', \App\Http\Controllers\AppTv\FichaController::class)->middleware('throttle:60,1');
+    Route::get('podcasts/home', [\App\Http\Controllers\AppTv\PodcastController::class, 'home'])->middleware('throttle:60,1');
+    Route::get('podcasts/search', [\App\Http\Controllers\AppTv\PodcastController::class, 'search'])->middleware('throttle:30,1');
+    Route::get('podcasts/show/{browseId}', [\App\Http\Controllers\AppTv\PodcastController::class, 'show'])
+        ->where('browseId', 'MPSP[\w\-]{8,80}')->middleware('throttle:60,1');
+    // TV-EXTRAS-API: novedades, perfiles y anuncios de la app de TV
+    Route::get('news', \App\Http\Controllers\AppTv\TvNewsController::class)->middleware('throttle:60,1');
+    Route::get('profiles', [\App\Http\Controllers\AppTv\TvProfilesController::class, 'index'])->middleware('throttle:60,1');
+    Route::post('profiles/save', [\App\Http\Controllers\AppTv\TvProfilesController::class, 'save'])->middleware('throttle:30,1');
+    Route::post('profiles/delete', [\App\Http\Controllers\AppTv\TvProfilesController::class, 'delete'])->middleware('throttle:30,1');
+    Route::get('ads/next', [\App\Http\Controllers\AppTv\TvAdsController::class, 'next'])->middleware('throttle:60,1');
+    Route::post('ads/event', [\App\Http\Controllers\AppTv\TvAdsController::class, 'event'])->middleware('throttle:60,1');
 });
 
 // Privadas: el dueño sale de la sesión web o del JWT, nunca del request.

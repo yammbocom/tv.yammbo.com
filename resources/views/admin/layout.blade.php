@@ -24,6 +24,10 @@
          'icon' => 'M4 7h16M4 12h16M4 17h9'],
         ['route' => 'panel.push.index', 'pattern' => 'panel.push.*', 'label' => 'Push',
          'icon' => 'M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7M13.7 20a1.9 1.9 0 0 1-3.4 0'],
+        ['route' => 'panel.tv-news.index', 'pattern' => 'panel.tv-news.*', 'label' => 'Novedades',
+         'icon' => 'M4 5h16v11H8l-4 4V5ZM8 9h8M8 12h5'],
+        ['route' => 'panel.tv-ads.index', 'pattern' => 'panel.tv-ads.*', 'label' => 'Anuncios',
+         'icon' => 'M3 6h18v12H3V6ZM10 9.5v5l4.5-2.5L10 9.5Z'],
     ];
 @endphp
 
@@ -61,8 +65,8 @@
     </aside>
 
     {{-- Barra inferior: solo en móvil --}}
-    <nav class="md:hidden fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[#1f1f1f] bg-[#0f0f0f] pb-[env(safe-area-inset-bottom)]"
-         aria-label="Secciones del panel">
+    <nav class="md:hidden fixed inset-x-0 bottom-0 z-50 grid border-t border-[#1f1f1f] bg-[#0f0f0f] pb-[env(safe-area-inset-bottom)]"
+         aria-label="Secciones del panel" style="grid-template-columns:repeat({{ count($navLinks) }},minmax(0,1fr))">
         @foreach($navLinks as $navLink)
             @php($activo = request()->routeIs($navLink['pattern']))
             <a href="{{ route($navLink['route']) }}"

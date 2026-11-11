@@ -25,6 +25,14 @@ Route::get('/catalog/{type}/{id}/{extra}.json', [StremioAddonController::class, 
 Route::get('/meta/{type}/{id}.json', [StremioAddonController::class, 'meta']);
 Route::get('/stream/{type}/{id}.json', [StremioAddonController::class, 'stream']);
 
+// La URL del antiguo addon CO-MX (com.yammbo.comx) apunta ahora al addon
+// unificado: así un enlace o instalación vieja no se queda en un 404.
+Route::redirect('/comx/manifest.json', '/manifest.json');
+Route::redirect('/comx/catalog/{type}/{id}.json', '/catalog/{type}/{id}.json');
+Route::redirect('/comx/catalog/{type}/{id}/{extra}.json', '/catalog/{type}/{id}/{extra}.json');
+Route::redirect('/comx/meta/{type}/{id}.json', '/meta/{type}/{id}.json');
+Route::redirect('/comx/stream/{type}/{id}.json', '/stream/{type}/{id}.json');
+
 /*
  * Auto-actualizacion del Yammbo TV Service (el .exe de PC). El servicio pide
  * /updater/check al arrancar y, si hay version mayor, descarga el instalador
@@ -252,6 +260,9 @@ Route::post('/auth/reset-password', [\App\Http\Controllers\AppTv\ResetPasswordCo
 
 // TV-LINK-QR-ROUTES-V54: QR login para APK Android TV (NativeAuthAty redirige al WebView aqui)
 use App\Http\Controllers\AppTv\TvLinkController;
+Route::get('/trailer-tv', fn () => response()->view('trailer-tv')->header('Cache-Control', 'public, max-age=3600'))->name('app-tv.trailer');
+Route::get('/ver/{id}', \App\Http\Controllers\AppTv\ShareLinkController::class)->where('id', '[A-Za-z0-9_.-]{1,64}')->middleware('throttle:60,1')->name('app-tv.ver');
+
 Route::get('/tv-link-app', function () {
     return view('tv-link-app');
 })->name('app-tv.tv-link-app');
@@ -381,6 +392,21 @@ Route::prefix('panel')->middleware(['auth', EnsurePanelAdmin::class])->name('pan
 
     Route::get('/push', [PushController::class, 'index'])->name('push.index');
     Route::post('/push', [PushController::class, 'store'])->name('push.store');
+
+    // TV-EXTRAS-PANEL: novedades y anuncios de la app de TV
+    Route::get('/tv-news', [\App\Http\Controllers\Admin\TvNewsController::class, 'index'])->name('tv-news.index');
+    Route::post('/tv-news', [\App\Http\Controllers\Admin\TvNewsController::class, 'store'])->name('tv-news.store');
+    Route::get('/tv-news/{news}/edit', [\App\Http\Controllers\Admin\TvNewsController::class, 'edit'])->name('tv-news.edit');
+    Route::put('/tv-news/{news}', [\App\Http\Controllers\Admin\TvNewsController::class, 'update'])->name('tv-news.update');
+    Route::post('/tv-news/{news}/toggle', [\App\Http\Controllers\Admin\TvNewsController::class, 'toggle'])->name('tv-news.toggle');
+    Route::delete('/tv-news/{news}', [\App\Http\Controllers\Admin\TvNewsController::class, 'destroy'])->name('tv-news.destroy');
+    Route::get('/tv-ads', [\App\Http\Controllers\Admin\TvAdsController::class, 'index'])->name('tv-ads.index');
+    Route::post('/tv-ads', [\App\Http\Controllers\Admin\TvAdsController::class, 'store'])->name('tv-ads.store');
+    Route::post('/tv-ads/settings', [\App\Http\Controllers\Admin\TvAdsController::class, 'settings'])->name('tv-ads.settings');
+    Route::get('/tv-ads/{ad}/edit', [\App\Http\Controllers\Admin\TvAdsController::class, 'edit'])->name('tv-ads.edit');
+    Route::put('/tv-ads/{ad}', [\App\Http\Controllers\Admin\TvAdsController::class, 'update'])->name('tv-ads.update');
+    Route::post('/tv-ads/{ad}/toggle', [\App\Http\Controllers\Admin\TvAdsController::class, 'toggle'])->name('tv-ads.toggle');
+    Route::delete('/tv-ads/{ad}', [\App\Http\Controllers\Admin\TvAdsController::class, 'destroy'])->name('tv-ads.destroy');
 });
 
 // /admin era el panel de Filament. Se mantiene la URL viva porque es la que

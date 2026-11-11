@@ -11,8 +11,12 @@
     // los muestra sola; mientras esten vacios se ensena solo la direccion corta.
     $codeTv     = '4874406';   // go.aftvnews.com -> https://tv.yammbo.com/tv
     $codeMobile = null;
-    $codeVpn    = '5916443';   // go.aftvnews.com -> https://edge-v5k8r3.pages.dev/v
-    $vpn       = '/download/VPN-Yammbo.apk';
+    $codeVpn    = '6302254';   // go.aftvnews.com -> https://tv.yammbo.com/vpn-tv (5916443 era la VPN vieja)
+    // VPN solo para TV: /vpn-tv redirige al APK vigente (/root/redir-vpn.sh tv <archivo>); /vpn es alias.
+    // /download/VPN-Yammbo.apk sigue existiendo para app-tv/vpn-info.
+    $vpn       = '/vpn-tv';
+    // VPN del movil (otra app): /root/redir-vpn.sh movil <archivo>.
+    $vpnMobile = '/vpn-movil';
     // Yammbo Tv Instalador: /instalador redirige al APK vigente.
     $codeSetup = '2915414';   // go.aftvnews.com -> https://tv.yammbo.com/instalador
 @endphp
@@ -395,10 +399,16 @@
         ? 'Algunos operadores bloquean el servidor de video. Cambia el DNS de tu red a <b>1.1.1.1</b> y <b>8.8.8.8</b>, o usa esta VPN una vez.'
         : 'Some carriers block the video server. Set your network DNS to <b>1.1.1.1</b> and <b>8.8.8.8</b>, or use this VPN once.' !!}</p>
       <div class="vpncode">
+        @if ($codeVpn)
         <div class="code-label">{{ $isEs ? 'En tu TV, codigo para Downloader' : 'On your TV, Downloader code' }}</div>
         <div class="code-num">{{ $codeVpn }}</div>
+        @else
+        <div class="code-label">{{ $isEs ? 'En tu TV, escribe en Downloader' : 'On your TV, type in Downloader' }}</div>
+        <div class="code-num" style="font-size:20px">tv.yammbo.com/vpn-tv</div>
+        @endif
       </div>
-      <a class="btn ghost" href="{{ $vpn }}">{{ $isEs ? 'Descargar VPN' : 'Download VPN' }}</a>
+      <a class="btn ghost" href="{{ $vpn }}">{{ $isEs ? 'Descargar VPN para TV' : 'Download VPN for TV' }}</a>
+      <a class="btn ghost" href="{{ $vpnMobile }}" style="margin-top:8px">{{ $isEs ? 'Descargar VPN para movil' : 'Download VPN for mobile' }}</a>
     </section>
   </div>
 

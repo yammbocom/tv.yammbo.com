@@ -22,9 +22,7 @@ use Illuminate\Support\Facades\Mail;
  */
 class YamboMail
 {
-    private const RED    = '#e50914';
-    private const AMBER  = '#f59e0b';
-    private const GREEN  = '#22c55e';
+    private const RED    = '#E50914';
 
     /** Envia usando la plantilla base. Devuelve true si no lanzo excepcion. */
     public static function send(string $to, string $subject, array $data): bool
@@ -127,7 +125,7 @@ class YamboMail
     public static function paymentFailed(User $user, array $rows = []): bool
     {
         return self::send($user->email, 'No pudimos cobrar tu suscripcion - Yambo TV', [
-            'accent'     => self::AMBER,
+            'accent'     => self::RED,
             'title'      => 'Hubo un problema con tu pago',
             'body'       => '<p style="margin:0 0 10px 0;">' . self::hello($user) . '</p>'
                           . '<p style="margin:0;">No pudimos cobrar la renovacion de tu suscripcion. '
@@ -172,7 +170,7 @@ class YamboMail
     public static function receipt(User $user, array $rows = []): bool
     {
         return self::send($user->email, 'Pago recibido - Yambo TV', [
-            'accent'     => self::GREEN,
+            'accent'     => self::RED,
             'title'      => 'Pago recibido',
             'body'       => '<p style="margin:0 0 10px 0;">' . self::hello($user) . '</p>'
                           . '<p style="margin:0;">Gracias. Confirmamos tu pago y tu suscripcion sigue activa.</p>',

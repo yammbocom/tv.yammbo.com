@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vincular Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { min-height: 100%; }
         body {
-            background: #0a0a0a;
+            background: var(--bg);
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family:var(--font);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -28,10 +30,10 @@
         }
         .left { flex: 1; min-width: 0; }
         .logo {
-            color: #e50914;
+            color: var(--accent-text);
             font-size: clamp(28px, 4vw, 44px);
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: -.02em;
             margin-bottom: 14px;
         }
         h1 {
@@ -41,7 +43,7 @@
             line-height: 1.2;
         }
         .subtitle {
-            color: #bfbfbf;
+            color: var(--muted);
             font-size: clamp(13px, 1.5vw, 17px);
             line-height: 1.45;
             margin-bottom: 20px;
@@ -55,13 +57,13 @@
             margin-bottom: 16px;
             font-size: clamp(13px, 1.4vw, 16px);
             line-height: 1.35;
-            color: #ddd;
+            color: var(--fg);
         }
         .steps li::before {
             content: counter(step);
             flex-shrink: 0;
             width: 34px; height: 34px;
-            background: #e50914;
+            background: var(--accent);
             color: #fff;
             border-radius: 50%;
             display: flex;
@@ -74,45 +76,42 @@
         .qr-card {
             background: #fff;
             padding: 14px;
-            border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(229, 9, 20, 0.25);
+            border-radius:var(--radius);
             line-height: 0;
         }
         .qr-card img { display: block; width: clamp(180px, 24vw, 260px); height: clamp(180px, 24vw, 260px); }
         .code-display { text-align: center; }
         .code-label {
-            color: #888;
+            color: var(--muted);
             font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
             margin-bottom: 8px;
         }
         .code-value {
-            background: #181818;
-            border: 2px solid #e50914;
+            background: var(--soft-2);
+            border: 1px solid var(--accent);
             border-radius: 12px;
             padding: 14px 22px;
             font-size: clamp(26px, 3vw, 34px);
             font-weight: 800;
             letter-spacing: 8px;
-            color: #e50914;
-            font-family: "Courier New", monospace;
+            color: var(--accent-text);
+            font-family:var(--mono);
         }
-        .url-line { color: #888; font-size: 13px; margin-top: 8px; }
+        .url-line { color: var(--muted); font-size: 13px; margin-top: 8px; }
         .url-line strong { color: #fff; }
         .status {
             margin-top: 10px;
-            color: #888;
+            color: var(--muted);
             font-size: 13px;
             text-align: center;
             min-height: 18px;
         }
-        .status.linked { color: #38a169; font-weight: 600; }
-        .status.error { color: #e50914; }
+        .status.linked { color: var(--fg); font-weight: 600; }
+        .status.error { color: var(--accent-text); }
         .spinner {
             display: inline-block;
             width: 12px; height: 12px;
-            border: 2px solid #888;
+            border: 1px solid var(--muted);
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -120,8 +119,8 @@
             vertical-align: middle;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-state { text-align: center; color: #bfbfbf; padding: 30px 20px; }
-        .btn-retry { background:#e50914;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer;margin-top:16px; }
+        .loading-state { text-align: center; color: var(--muted); padding: 30px 20px; }
+        .btn-retry { background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer;margin-top:16px; }
         @media (max-width: 760px) {
             .container { flex-direction: column; gap: 20px; }
         }
@@ -188,7 +187,7 @@
 
             function renderError(message) {
                 document.getElementById('content').innerHTML =
-                    '<div class="loading-state" style="color:#e50914;">' +
+                    '<div class="loading-state" style="color:var(--accent-text);">' +
                         '<strong>Error:</strong> ' + message +
                         '<br><button class="btn-retry" onclick="location.reload()">Reintentar</button>' +
                     '</div>';

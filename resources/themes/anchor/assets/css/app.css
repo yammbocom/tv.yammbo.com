@@ -126,8 +126,8 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-    --yammbo-red: #E50914;
-    --yammbo-red-dark: #B0070F;
+    --yammbo-red: var(--color-accent);
+    --yammbo-red-dark: var(--color-accent-2);
 }
 
 body {
@@ -139,44 +139,44 @@ body {
 }
 
 /* --- Backgrounds WHITE → BLACK (pero NO bg-black nativo, ese es Yambo ya) --- */
-.bg-white:not(body):not(.yambo-keep-bg) { background-color: #000 !important; }
-.bg-zinc-50:not(body), .bg-gray-50:not(body) { background-color: #0a0a0a !important; }
-.bg-zinc-100:not(body), .bg-gray-100:not(body), .bg-neutral-100:not(body) { background-color: #111 !important; }
-.bg-slate-50:not(body), .bg-slate-100:not(body) { background-color: #0a0a0a !important; }
+.bg-white:not(body):not(.yambo-keep-bg) { background-color: var(--color-paper) !important; }
+.bg-zinc-50:not(body), .bg-gray-50:not(body) { background-color: var(--color-paper-2) !important; }
+.bg-zinc-100:not(body), .bg-gray-100:not(body), .bg-neutral-100:not(body) { background-color: var(--color-paper-2) !important; }
+.bg-slate-50:not(body), .bg-slate-100:not(body) { background-color: var(--color-paper-2) !important; }
 .bg-white\/50 { background-color: rgba(0,0,0,0.5) !important; }
 .bg-white\/90 { background-color: rgba(0,0,0,0.9) !important; }
-.dark\:bg-zinc-800, .dark\:bg-zinc-900 { background-color: #0a0a0a !important; }
+.dark\:bg-zinc-800, .dark\:bg-zinc-900 { background-color: var(--color-paper-2) !important; }
 
 /* --- Dark surfaces (zinc-900/800) should stay DARK — do NOT turn into red --- */
 /* Only specific PRIMARY BUTTONS (non-text) turn red via explicit selectors. */
 
 /* --- Text contrast: dark → light --- */
-.text-black:not(.yambo-keep-color) { color: #fafafa !important; }
-.text-gray-900, .text-zinc-900, .text-slate-900, .text-neutral-900 { color: #fafafa !important; }
-.text-gray-800, .text-zinc-800, .text-slate-800, .text-neutral-800 { color: #ededed !important; }
-.text-gray-700, .text-zinc-700, .text-slate-700, .text-neutral-700 { color: #d4d4d8 !important; }
-.text-gray-600, .text-zinc-600, .text-slate-600, .text-neutral-600 { color: #bdbdbd !important; }
-.text-gray-500, .text-zinc-500, .text-slate-500, .text-neutral-500 { color: #a1a1aa !important; }
-.text-gray-400, .text-zinc-400, .text-slate-400, .text-neutral-400 { color: #8a8a92 !important; }
-.text-white { color: #fff !important; }
+.text-black:not(.yambo-keep-color) { color: var(--color-ink) !important; }
+.text-gray-900, .text-zinc-900, .text-slate-900, .text-neutral-900 { color: var(--color-ink) !important; }
+.text-gray-800, .text-zinc-800, .text-slate-800, .text-neutral-800 { color: var(--color-ink) !important; }
+.text-gray-700, .text-zinc-700, .text-slate-700, .text-neutral-700 { color: var(--color-ink) !important; }
+.text-gray-600, .text-zinc-600, .text-slate-600, .text-neutral-600 { color: var(--color-ink-mute) !important; }
+.text-gray-500, .text-zinc-500, .text-slate-500, .text-neutral-500 { color: var(--color-ink-mute) !important; }
+.text-gray-400, .text-zinc-400, .text-slate-400, .text-neutral-400 { color: var(--color-ink-mute) !important; }
+.text-white { color: var(--color-ink) !important; }
 
 .hover\:text-zinc-900:hover, .hover\:text-gray-900:hover,
-.hover\:text-black:hover, .hover\:text-slate-900:hover { color: #fff !important; }
+.hover\:text-black:hover, .hover\:text-slate-900:hover { color: var(--color-ink) !important; }
 
 /* --- Borders oscuros --- */
 .border-zinc-100:not([class*="border-red"]),
 .border-zinc-200:not([class*="border-red"]),
 .border-gray-100:not([class*="border-red"]),
 .border-gray-200:not([class*="border-red"]),
-.border-slate-100, .border-slate-200 { border-color: #27272a !important; }
-.border-zinc-200\/60, .border-zinc-200\/70, .border-gray-200\/60, .border-gray-200\/70 { border-color: rgba(42,42,42,0.7) !important; }
+.border-slate-100, .border-slate-200 { border-color: var(--color-rule) !important; }
+.border-zinc-200\/60, .border-zinc-200\/70, .border-gray-200\/60, .border-gray-200\/70 { border-color: var(--color-rule) !important; }
 
 /* --- Primary/accent elements (EXPLICITLY primary) turn red --- */
 a[data-primary], [data-primary="indigo-700"],
 .fi-color-primary, .fi-btn-color-primary,
 button.fi-btn[data-variant="primary"] {
     background-color: var(--yammbo-red) !important;
-    color: #fff !important;
+    color: var(--color-ink) !important;
 }
 .fi-color-primary:hover, .fi-btn-color-primary:hover { background-color: var(--yammbo-red-dark) !important; }
 
@@ -191,9 +191,9 @@ html[data-theme] { color-scheme: dark; }
 /* Container parent (the main white card) */
 #auth-body,
 body[id="auth-body"],
-#auth-body[id] { background-color: #000 !important; }
+#auth-body[id] { background-color: var(--color-paper) !important; }
 
-#auth-background-image-overlay { background-color: #000 !important; opacity: 1 !important; }
+#auth-background-image-overlay { background-color: var(--color-paper) !important; opacity: 1 !important; }
 #auth-background-image { display: none !important; }
 
 /* The actual form card (white on default devdojo) */
@@ -202,10 +202,9 @@ body[id="auth-body"],
 #auth-container.bg-white,
 [data-auth] #auth-container,
 [data-auth] .bg-white {
-    background-color: #111 !important;
-    border: 1px solid #2A2A2A !important;
-    color: #fff !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+    background-color: var(--color-paper-2) !important;
+    border: 1px solid var(--color-rule) !important;
+    color: var(--color-ink) !important;
 }
 
 /* Primary button */
@@ -213,7 +212,7 @@ body[id="auth-body"],
 .auth-component-button[class],
 [data-auth] button[type="submit"] {
     background-color: var(--yammbo-red) !important;
-    color: #fff !important;
+    color: var(--color-ink) !important;
     border: none !important;
 }
 .auth-component-button:hover { background-color: var(--yammbo-red-dark) !important; }
@@ -223,26 +222,26 @@ body[id="auth-body"],
 [data-auth] input[type="text"],
 [data-auth] input[type="email"],
 [data-auth] input[type="password"] {
-    background-color: #1A1A1A !important;
-    border-color: #333 !important;
-    color: #fff !important;
+    background-color: var(--color-paper-2) !important;
+    border-color: var(--color-rule-strong) !important;
+    color: var(--color-ink) !important;
 }
 .auth-component-input::placeholder,
-[data-auth] input::placeholder { color: #666 !important; }
+[data-auth] input::placeholder { color: var(--color-ink-mute) !important; }
 .auth-component-input:focus,
 [data-auth] input:focus { border-color: var(--yammbo-red) !important; outline: none !important; }
 
 .auth-component-input-label,
-.auth-component-input-label-focused { color: #d4d4d8 !important; }
+.auth-component-input-label-focused { color: var(--color-ink) !important; }
 
 /* Social auth buttons */
 .auth-component-social-button,
 [data-auth] .bg-zinc-50 {
-    background-color: #1A1A1A !important;
-    border-color: #333 !important;
-    color: #fff !important;
+    background-color: var(--color-paper-2) !important;
+    border-color: var(--color-rule-strong) !important;
+    color: var(--color-ink) !important;
 }
-.auth-component-social-button:hover { background-color: #2A2A2A !important; }
+.auth-component-social-button:hover { background-color: var(--color-paper-3) !important; }
 
 /* Links inside auth */
 [data-auth] a { color: var(--yammbo-red) !important; }
@@ -259,12 +258,12 @@ input[type="password"]:not([data-auth] *):not(.auth-component-input),
 input[type="search"]:not([data-auth] *):not(.auth-component-input),
 input[type="number"]:not([data-auth] *):not(.auth-component-input),
 textarea, select {
-    background-color: #1A1A1A !important;
-    color: #fff !important;
-    border-color: #333 !important;
+    background-color: var(--color-paper-2) !important;
+    color: var(--color-ink) !important;
+    border-color: var(--color-rule-strong) !important;
 }
 input:not([data-auth] *)::placeholder,
-textarea::placeholder { color: #666 !important; }
+textarea::placeholder { color: var(--color-ink-mute) !important; }
 input:focus:not([data-auth] *),
 textarea:focus, select:focus {
     border-color: var(--yammbo-red) !important;

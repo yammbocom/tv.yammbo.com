@@ -3,21 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <title>{{ __('app-tv.payment_success.page_title') }} — Yammbo Tv</title>
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
-  .card{max-width:420px;margin:20px;background:#111;border:1px solid #2A2A2A;border-radius:12px;padding:32px 26px;text-align:center;color:#fff}
+  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:var(--font);min-height:100vh;display:flex;align-items:center;justify-content:center}
+  .card{max-width:420px;margin:20px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:32px 26px;text-align:center;color:#fff}
   .logo{display:block;width:96px;height:96px;margin:0 auto 20px}
-  .check{width:72px;height:72px;border-radius:50%;background:#E50914;display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .check{width:72px;height:72px;border-radius:50%;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px}
   .check svg{width:38px;height:38px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
   h1{margin:0 0 10px;font-size:24px;font-weight:800;color:#fff}
-  p{color:#bdbdbd;font-size:15px;line-height:1.55;margin:0 0 20px}
-  .btn{display:inline-block;background:#E50914;color:#fff;border:0;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer}
-  .btn:hover{background:#B0070F}
-  .small{color:#777;font-size:12px;margin-top:14px}
+  p{color:var(--muted);font-size:15px;line-height:1.55;margin:0 0 20px}
+  .btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer}
+  .btn:hover{background:var(--accent-hover)}
+  .small{color:var(--muted);font-size:12px;margin-top:14px}
 </style>
 </head>
 <body>

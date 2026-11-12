@@ -3,43 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ __('app-tv.subscription.page_title') }} — Yammbo Tv</title>
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
   .wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px}
   .logo{display:block;width:96px;height:96px;margin:8px auto 20px}
-  h1{font-size:26px;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.02em;color:#fff}
-  .subtitle{text-align:center;color:#bdbdbd;margin:0 0 28px;font-size:15px}
-  .toggle{display:flex;background:#111;border:1px solid #2A2A2A;border-radius:999px;padding:4px;margin:0 auto 24px;width:fit-content}
+  h1{font-size:26px;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.03em;color:#fff}
+  .subtitle{text-align:center;color:var(--muted);margin:0 0 28px;font-size:15px}
+  .toggle{display:flex;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px;margin:0 auto 24px;width:fit-content}
   .toggle button{flex:1;background:transparent;color:#fff;border:0;padding:10px 22px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
-  .toggle button.active{background:#E50914}
+  .toggle button.active{background:var(--accent)}
   .plans{display:grid;gap:16px;grid-template-columns:1fr}
   @media (min-width:640px){.plans{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}}
-  .plan{background:#111;border:1px solid #2A2A2A;border-radius:12px;padding:22px 20px;display:flex;flex-direction:column;position:relative;transition:transform .15s,border-color .15s;color:#fff}
-  .plan:hover{transform:translateY(-2px);border-color:#E50914}
-  .plan.recommended{border-color:#E50914;box-shadow:0 0 0 1px #E50914}
-  .badge-recommended{position:absolute;top:-12px;right:16px;background:#E50914;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
+  .plan{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:22px 20px;display:flex;flex-direction:column;position:relative;transition:transform .15s,border-color .15s;color:#fff}
+  .plan:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .plan.recommended{border-color:var(--accent);}
+  .badge-recommended{position:absolute;top:-12px;right:16px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;}
   .plan h3{margin:0 0 8px;font-size:20px;font-weight:700;color:#fff}
   .price{font-size:32px;font-weight:800;margin:8px 0 4px;line-height:1;color:#fff}
-  .price small{font-size:13px;color:#bdbdbd;font-weight:500}
-  .features{list-style:none;padding:0;margin:14px 0 20px;color:#ddd;font-size:14px;line-height:1.55;flex:1}
+  .price small{font-size:13px;color:var(--muted);font-weight:500}
+  .features{list-style:none;padding:0;margin:14px 0 20px;color:var(--fg);font-size:14px;line-height:1.55;flex:1}
   .features li{padding-left:18px;position:relative;margin-bottom:6px}
-  .features li::before{content:"✓";color:#E50914;position:absolute;left:0;font-weight:700}
-  .features li.no{color:#777}
-  .features li.no::before{content:"×";color:#777}
-  .btn{display:block;width:100%;background:#E50914;color:#fff;border:0;border-radius:8px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px;transition:background .15s}
-  .btn:hover{background:#B0070F}
-  .btn.paypal{background:#1A1A1A;border:1px solid #333;margin-top:8px;color:#fff}
-  .btn.paypal:hover{background:#2A2A2A}
-  .err{background:#2A0E10;border:1px solid #5A1D22;color:#FFB3B8;padding:12px 14px;border-radius:8px;margin:16px 0;font-size:14px;display:none}
+  .features li::before{content:"✓";color:var(--accent-text);position:absolute;left:0;font-weight:700}
+  .features li.no{color:var(--muted)}
+  .features li.no::before{content:"×";color:var(--muted)}
+  .btn{display:block;width:100%;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px;transition:background .15s}
+  .btn:hover{background:var(--accent-hover)}
+  .btn.paypal{background:var(--soft-2);border:1px solid var(--line-strong);margin-top:8px;color:#fff}
+  .btn.paypal:hover{background:var(--line)}
+  .err{background:var(--soft);border:1px solid var(--accent);color:var(--accent-text);padding:12px 14px;border-radius:8px;margin:16px 0;font-size:14px;display:none}
   .err.show{display:block}
-  .back{display:block;text-align:center;color:#888;text-decoration:none;font-size:13px;margin-top:22px}
+  .back{display:block;text-align:center;color:var(--muted);text-decoration:none;font-size:13px;margin-top:22px}
   .back:hover{color:#fff}
-  .loading{display:none;text-align:center;color:#bdbdbd;font-size:14px;margin-top:16px}
+  .loading{display:none;text-align:center;color:var(--muted);font-size:14px;margin-top:16px}
   .loading.show{display:block}
 </style>
 </head>
@@ -86,7 +88,7 @@
     @empty
       <div class="plan">
         <h3>{{ __('app-tv.subscription.no_plans_title') }}</h3>
-        <p style="color:#bdbdbd;margin:8px 0 0;font-size:14px">{{ __('app-tv.subscription.no_plans_body') }}</p>
+        <p style="color:var(--muted);margin:8px 0 0;font-size:14px">{{ __('app-tv.subscription.no_plans_body') }}</p>
       </div>
     @endforelse
   </div>

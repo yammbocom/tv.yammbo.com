@@ -7,6 +7,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Trailer</title>
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
   #p { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }

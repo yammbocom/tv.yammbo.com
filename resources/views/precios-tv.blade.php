@@ -18,55 +18,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suscribete - Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #0a0a0a; color: #fff; min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: #fff; min-height: 100vh;
+            font-family:var(--font);
             padding: 28px 18px 40px;
         }
         .wrap { max-width: 520px; margin: 0 auto; }
-        .logo { color: #e50914; font-size: 28px; font-weight: 800; letter-spacing: 3px; text-align: center; margin-bottom: 6px; }
+        .logo { color: var(--accent-text); font-size: 28px; font-weight: 800; letter-spacing: -.02em; text-align: center; margin-bottom: 6px; }
         h1 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-        .sub { color: #9b9b9f; font-size: 14px; text-align: center; margin-bottom: 8px; }
-        .who { color: #cfcfd3; font-size: 13px; text-align: center; margin-bottom: 22px; }
+        .sub { color: var(--muted); font-size: 14px; text-align: center; margin-bottom: 8px; }
+        .who { color: var(--fg); font-size: 13px; text-align: center; margin-bottom: 22px; }
         .who strong { color: #fff; }
 
         .feats { list-style: none; margin: 12px 0 4px; padding: 0; text-align: left; }
         .feats li { font-size: 13px; line-height: 1.5; margin-bottom: 5px; }
-        .feats li.si { color: #cfcfd3; }
-        .feats li.no { color: #6d6d73; }
-        .toggle { display: flex; background: #1a1a1c; border-radius: 999px; padding: 5px; margin: 0 auto 24px; max-width: 320px; }
+        .feats li.si { color: var(--fg); }
+        .feats li.no { color: var(--muted); }
+        .toggle { display: flex; background: var(--soft-2); border-radius: 999px; padding: 5px; margin: 0 auto 24px; max-width: 320px; }
         .toggle button {
             flex: 1; padding: 11px; border: 0; border-radius: 999px; background: transparent;
-            color: #9b9b9f; font-size: 14px; font-weight: 600; cursor: pointer;
+            color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer;
         }
-        .toggle button.on { background: #e50914; color: #fff; }
+        .toggle button.on { background: var(--accent); color: #fff; }
         .save { font-size: 11px; opacity: .85; }
 
         .plan {
-            background: #141416; border: 2px solid #232327; border-radius: 16px;
+            background: var(--soft); border: 1px solid var(--line); border-radius:var(--radius);
             padding: 20px; margin-bottom: 14px; position: relative;
         }
-        .plan.best { border-color: #e50914; }
+        .plan.best { border-color: var(--accent); }
         .tag {
             position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
-            background: #e50914; color: #fff; font-size: 11px; font-weight: 700;
-            padding: 4px 14px; border-radius: 999px; letter-spacing: .5px;
+            background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+            padding: 4px 14px; border-radius: 999px;
         }
         .plan h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .plan .desc { color: #9b9b9f; font-size: 13px; margin-bottom: 14px; }
+        .plan .desc { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
         .price { font-size: 34px; font-weight: 800; margin-bottom: 2px; line-height: 1.1; }
         .price .amt { font-size: inherit; font-weight: inherit; color: inherit; }
-        .price .per { font-size: 14px; font-weight: 500; color: #9b9b9f; }
-        .cycle-note { color: #6b6b70; font-size: 12px; margin-bottom: 16px; }
+        .price .per { font-size: 14px; font-weight: 500; color: var(--muted); }
+        .cycle-note { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
         .plan button.buy {
             width: 100%; padding: 14px; border: 0; border-radius: 12px;
-            background: #e50914; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+            background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
         }
-        .plan.alt button.buy { background: #232327; }
-        .foot { color: #6b6b70; font-size: 12px; text-align: center; margin-top: 18px; line-height: 1.5; }
-        .err { background: rgba(229,9,20,.12); color: #f87171; padding: 14px; border-radius: 12px; text-align: center; font-size: 14px; }
+        .plan.alt button.buy { background: var(--line); }
+        .foot { color: var(--muted); font-size: 12px; text-align: center; margin-top: 18px; line-height: 1.5; }
+        .err { background: var(--soft); border: 1px solid var(--accent); color: var(--accent-text); padding: 14px; border-radius: 12px; text-align: center; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -82,7 +84,7 @@
         </div>
     @elseif(! empty($current))
         <div class="who">Cuenta: <strong>{{ $user->email }}</strong></div>
-        <div class="err" style="border-color:#1f5a35;background:#0a2818;color:#9be4af">
+        <div class="err" style="border-color:var(--line-strong);background:var(--soft);color:var(--fg)">
             Ya tienes el plan <strong>{{ $current['plan'] }}</strong> activo{{ $current['ends'] ? ' hasta el '.$current['ends'] : '' }}.<br>
             No necesitas pagar de nuevo: vuelve a la app de tu TV o del movil y entrara sola.
             @if($current['stripe'])<br>Para cambiar de plan o cancelarlo, entra en tv.yammbo.com/mi-suscripcion.@endif

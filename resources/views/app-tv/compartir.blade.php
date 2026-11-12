@@ -3,32 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <title>{{ __('app-tv.compartir.page_title') }}</title>
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
   .wrap{max-width:560px;margin:0 auto;padding:32px 20px 80px;text-align:center}
   .logo{display:block;width:96px;height:96px;margin:8px auto 20px}
-  h1{font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em}
-  .subtitle{color:#bdbdbd;margin:0 0 28px;font-size:15px;line-height:1.55}
-  .link-box{background:#111;border:1px solid #2A2A2A;border-radius:12px;padding:16px;margin:0 0 24px;display:flex;gap:8px;align-items:center}
-  .link-box input{flex:1;background:transparent;border:0;color:#fff;font-size:14px;outline:none;text-overflow:ellipsis;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-  .copy-btn{background:#E50914;color:#fff;border:0;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap}
-  .copy-btn:hover{background:#B0070F}
-  .copy-btn.ok{background:#1a7c33}
-  .share-main{display:block;width:100%;background:#E50914;color:#fff;border:0;border-radius:12px;padding:16px 24px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .15s;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px}
-  .share-main:hover{background:#B0070F}
+  h1{font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-.03em}
+  .subtitle{color:var(--muted);margin:0 0 28px;font-size:15px;line-height:1.55}
+  .link-box{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 24px;display:flex;gap:8px;align-items:center}
+  .link-box input{flex:1;background:transparent;border:0;color:#fff;font-size:14px;outline:none;text-overflow:ellipsis;font-family:var(--mono)}
+  .copy-btn{background:var(--accent);color:#fff;border:0;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap}
+  .copy-btn:hover{background:var(--accent-hover)}
+  .copy-btn.ok{background:var(--fg);color:#000}
+  .share-main{display:block;width:100%;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:16px 24px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .15s;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px}
+  .share-main:hover{background:var(--accent-hover)}
   .share-main svg{width:20px;height:20px}
   .actions{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-bottom:24px}
-  .btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#1A1A1A;border:1px solid #333;color:#fff;border-radius:10px;padding:14px 18px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
-  .btn:hover{background:#222;border-color:#E50914}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--soft-2);border:1px solid var(--line-strong);color:#fff;border-radius:10px;padding:14px 18px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
+  .btn:hover{background:var(--line);border-color:var(--accent)}
   .btn svg{width:18px;height:18px}
   .qr-card{background:#fff;border-radius:12px;padding:20px;margin:24px auto;display:inline-block}
   .qr-card img{display:block}
-  .qr-caption{color:#bdbdbd;font-size:13px;margin-top:8px}
-  .back{display:block;text-align:center;color:#888;text-decoration:none;font-size:13px;margin-top:28px}
+  .qr-caption{color:var(--muted);font-size:13px;margin-top:8px}
+  .back{display:block;text-align:center;color:var(--muted);text-decoration:none;font-size:13px;margin-top:28px}
   .back:hover{color:#fff}
 </style>
 </head>

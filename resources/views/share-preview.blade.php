@@ -19,7 +19,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>{{ $fullTitle }} — Yammbo Tv</title>
 <meta name="description" content="{{ $ogDesc }}">
@@ -41,33 +41,33 @@
 <meta name="twitter:description" content="{{ $ogDesc }}">
 <meta name="twitter:image" content="{{ $backdrop ?: $ogImage }}">
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html,body{margin:0;background:#000;color:#fff;min-height:100vh;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  .bg{position:fixed;inset:0;z-index:0;background:#000 center/cover no-repeat;opacity:.35;filter:blur(2px)}
-  .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35) 0%,#000 85%)}
+    font-family:var(--font);-webkit-font-smoothing:antialiased}
+  .bg{position:fixed;inset:0;z-index:0;background:#000 center/cover no-repeat}
+  .bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.8)}
   .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:clamp(20px,4vw,48px) clamp(16px,4vw,32px) 64px}
   .brand{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:20px;letter-spacing:-.02em;margin-bottom:clamp(24px,5vw,56px)}
   .brand img{width:36px;height:36px}
   .card{display:grid;grid-template-columns:1fr;gap:24px;align-items:start}
-  .poster{width:min(240px,62vw);aspect-ratio:2/3;border-radius:14px;object-fit:cover;background:#141416;
-    box-shadow:0 20px 60px -20px rgba(0,0,0,.9);justify-self:center}
-  .kind{display:inline-block;background:#E50914;color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;
-    text-transform:uppercase;padding:5px 10px;border-radius:999px;margin-bottom:12px}
+  .poster{width:min(240px,62vw);aspect-ratio:2/3;border-radius:var(--radius);object-fit:cover;background:var(--soft);justify-self:center}
+  .kind{display:inline-block;background:var(--accent);color:#fff;font-size:11px;font-weight:800;letter-spacing:.09em;padding:5px 10px;border-radius:999px;margin-bottom:12px}
   h1{margin:0 0 6px;font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:-.03em;font-weight:800}
-  .year{color:#b8b8bd;font-size:15px;margin:0 0 16px}
-  .desc{color:#d0d0d6;font-size:clamp(15px,2vw,17px);line-height:1.6;margin:0 0 26px;max-width:62ch}
+  .year{color:var(--muted);font-size:15px;margin:0 0 16px}
+  .desc{color:var(--fg);font-size:clamp(15px,2vw,17px);line-height:1.6;margin:0 0 26px;max-width:62ch}
   .ctas{display:flex;flex-wrap:wrap;gap:10px}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 22px;border-radius:12px;
-    font-weight:700;font-size:15px;text-decoration:none;color:#fff;background:#E50914}
-  .btn:hover{background:#c8070f}
+    font-weight:700;font-size:15px;text-decoration:none;color:#fff;background:var(--accent)}
+  .btn:hover{background:var(--accent-hover)}
   .btn.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);font-weight:600}
   .btn.ghost:hover{background:rgba(255,255,255,.14)}
   .btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
   .btn svg{width:18px;height:18px;fill:currentColor}
-  .note{color:#8b8b93;font-size:13px;margin-top:16px}
-  .note a{color:#d4d4d9}
+  .note{color:var(--muted);font-size:13px;margin-top:16px}
+  .note a{color:var(--fg)}
   @media (min-width:720px){
     .card{grid-template-columns:240px 1fr;gap:40px;align-items:center}
     .poster{width:240px;justify-self:start}

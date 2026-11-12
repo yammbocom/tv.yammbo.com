@@ -9,7 +9,7 @@
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
 @vite(['resources/themes/anchor/assets/css/app.css', 'resources/themes/anchor/assets/js/app.js'])
 </head>
-<body class="bg-black text-white min-h-screen antialiased">
+<body class="font-body bg-black text-white min-h-screen antialiased">
 @php
     // Una sola definición para las dos navegaciones: barra lateral en escritorio
     // y barra inferior en móvil. Los iconos son trazos simples, sin librería.
@@ -37,13 +37,13 @@
      las últimas secciones. --}}
 <div class="flex flex-col md:flex-row min-h-screen">
 
-    <aside class="w-full md:w-60 md:shrink-0 border-b md:border-b-0 md:border-r border-[#1f1f1f] bg-[#0f0f0f] px-4 py-3 md:p-5 flex flex-col">
+    <aside class="w-full md:w-60 md:shrink-0 border-b md:border-b-0 md:border-r border-[#262626] bg-[#0a0a0a] px-4 py-3 md:p-5 flex flex-col">
         <div class="flex items-center justify-between md:block">
             <a href="{{ route('panel.dashboard') }}" class="flex items-center gap-2 md:mb-8">
                 <img src="/images/yambo-icon.png" alt="Yammbo Tv" class="w-7 h-7 md:w-8 md:h-8 rounded">
                 <span class="font-bold tracking-tight text-white">Panel</span>
             </a>
-            <a href="/auth/logout" class="md:hidden text-xs text-[#888] hover:text-white">Salir</a>
+            <a href="/auth/logout" class="md:hidden text-xs text-[#a3a3a3] hover:text-white">Salir</a>
         </div>
 
         {{-- Barra lateral: solo de md hacia arriba --}}
@@ -51,27 +51,27 @@
             @foreach($navLinks as $navLink)
                 <a href="{{ route($navLink['route']) }}"
                    @if(request()->routeIs($navLink['pattern'])) aria-current="page" @endif
-                   class="rounded-md px-3 py-2 transition-colors {{ request()->routeIs($navLink['pattern']) ? 'bg-[#E50914] text-white' : 'text-[#888] hover:bg-[#1a1a1a] hover:text-white' }}">
+                   class="rounded-r-md border-l-2 px-3 py-2 transition-colors {{ request()->routeIs($navLink['pattern']) ? 'border-[#E50914] bg-[#141414] text-white' : 'border-transparent text-[#a3a3a3] hover:bg-[#141414] hover:text-white' }}">
                     {{ $navLink['label'] === 'Subs' ? 'Suscripciones' : $navLink['label'] }}
                 </a>
             @endforeach
         </nav>
 
-        <div class="hidden md:block mt-6 pt-4 border-t border-[#1f1f1f] text-xs">
-            <p class="text-[#666] mb-2 truncate">{{ auth()->user()->email }}</p>
+        <div class="hidden md:block mt-6 pt-4 border-t border-[#262626] text-xs">
+            <p class="text-[#a3a3a3] mb-2 truncate">{{ auth()->user()->email }}</p>
             {{-- El logout lo sigue sirviendo devdojo/auth, que es lo que se mantiene --}}
-            <a href="/auth/logout" class="text-[#888] hover:text-white">Cerrar sesión</a>
+            <a href="/auth/logout" class="text-[#a3a3a3] hover:text-white">Cerrar sesión</a>
         </div>
     </aside>
 
     {{-- Barra inferior: solo en móvil --}}
-    <nav class="md:hidden fixed inset-x-0 bottom-0 z-50 grid border-t border-[#1f1f1f] bg-[#0f0f0f] pb-[env(safe-area-inset-bottom)]"
+    <nav class="md:hidden fixed inset-x-0 bottom-0 z-50 grid border-t border-[#262626] bg-[#0a0a0a] pb-[env(safe-area-inset-bottom)]"
          aria-label="Secciones del panel" style="grid-template-columns:repeat({{ count($navLinks) }},minmax(0,1fr))">
         @foreach($navLinks as $navLink)
             @php($activo = request()->routeIs($navLink['pattern']))
             <a href="{{ route($navLink['route']) }}"
                @if($activo) aria-current="page" @endif
-               class="flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] leading-none transition-colors {{ $activo ? 'text-[#E50914]' : 'text-[#888]' }}">
+               class="flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] leading-none transition-colors {{ $activo ? 'text-[#FF4D55]' : 'text-[#a3a3a3]' }}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="{{ $navLink['icon'] }}"/>
                 </svg>
@@ -82,13 +82,13 @@
 
     <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-6xl pb-28 md:pb-8">
         @if(session('success'))
-            <div class="mb-6 rounded-md border border-[#1f5a35] bg-[#0a2818] px-4 py-3 text-sm text-[#9be4af]">{{ session('success') }}</div>
+            <div class="mb-6 rounded-md border border-[#404040] bg-[#0a0a0a] px-4 py-3 text-sm text-white">{{ session('success') }}</div>
         @endif
         @if(session('error'))
-            <div class="mb-6 rounded-md border border-[#5a1d22] bg-[#2a0e10] px-4 py-3 text-sm text-[#ffb3b8]">{{ session('error') }}</div>
+            <div class="mb-6 rounded-md border border-[#E50914] bg-[#0a0a0a] px-4 py-3 text-sm text-white">{{ session('error') }}</div>
         @endif
         @if($errors->any())
-            <div class="mb-6 rounded-md border border-[#5a1d22] bg-[#2a0e10] px-4 py-3 text-sm text-[#ffb3b8]">
+            <div class="mb-6 rounded-md border border-[#E50914] bg-[#0a0a0a] px-4 py-3 text-sm text-white">
                 <ul class="list-disc list-inside space-y-1">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>

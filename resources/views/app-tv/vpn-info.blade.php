@@ -3,37 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <title>{{ __('app-tv.vpn.page_title') }} — Yammbo Tv</title>
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
   .wrap{max-width:680px;margin:0 auto;padding:32px 20px 80px}
   .icon-wrap{display:flex;justify-content:center;margin-bottom:18px}
-  .icon-wrap svg{width:64px;height:64px;color:#E50914}
-  h1{font-size:26px;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.02em}
-  .subtitle{text-align:center;color:#bdbdbd;margin:0 0 28px;font-size:15px;line-height:1.55}
-  .card{background:#111;border:1px solid #2A2A2A;border-radius:12px;padding:22px 24px;margin-bottom:16px}
+  .icon-wrap svg{width:64px;height:64px;color:var(--accent-text)}
+  h1{font-size:26px;font-weight:800;text-align:center;margin:0 0 8px;letter-spacing:-.03em}
+  .subtitle{text-align:center;color:var(--muted);margin:0 0 28px;font-size:15px;line-height:1.55}
+  .card{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin-bottom:16px}
   .card h2{margin:0 0 12px;font-size:18px;font-weight:700}
-  .card p{margin:0 0 10px;color:#ddd;font-size:14px;line-height:1.6}
-  .card ol{margin:0;padding-left:22px;color:#ddd;font-size:14px;line-height:1.7}
+  .card p{margin:0 0 10px;color:var(--fg);font-size:14px;line-height:1.6}
+  .card ol{margin:0;padding-left:22px;color:var(--fg);font-size:14px;line-height:1.7}
   .card ol li{margin-bottom:6px}
   .vpn-list{display:grid;gap:10px;grid-template-columns:1fr;margin-top:14px}
   @media (min-width:520px){.vpn-list{grid-template-columns:1fr 1fr}}
-  .vpn{background:#1A1A1A;border:1px solid #333;border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+  .vpn{background:var(--soft-2);border:1px solid var(--line-strong);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
   .vpn-name{font-weight:600;font-size:14px}
-  .vpn-tag{background:#E50914;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
-  .vpn-tag.free{background:#2a2a2a;color:#bdbdbd}
-  .note{background:#1A0608;border:1px solid #5A1D22;border-radius:10px;padding:14px 16px;margin-top:16px;color:#FFB3B8;font-size:13px;line-height:1.55}
-  .cta-card{background:linear-gradient(135deg,#1a0608 0%,#2a0a0e 100%);border:1px solid #E50914;border-radius:14px;padding:22px 24px;margin-bottom:18px;text-align:center;box-shadow:0 4px 24px rgba(229,9,20,.15)}
+  .vpn-tag{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;}
+  .vpn-tag.free{background:var(--line);color:var(--muted)}
+  .note{background:var(--soft);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;margin-top:16px;color:var(--accent-text);font-size:13px;line-height:1.55}
+  .cta-card{background:var(--soft);border:1px solid var(--accent);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;text-align:center;}
   .cta-card h2{margin:0 0 8px;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em}
-  .cta-card p{margin:0 0 16px;color:#ddd;font-size:14px;line-height:1.55}
-  .cta-btn{display:inline-block;background:#E50914;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 28px;border-radius:10px;letter-spacing:.02em;transition:transform .15s ease,background .15s ease}
-  .cta-btn:hover,.cta-btn:active{background:#c8070f;transform:translateY(-1px)}
+  .cta-card p{margin:0 0 16px;color:var(--fg);font-size:14px;line-height:1.55}
+  .cta-btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 28px;border-radius:10px;transition:transform .15s ease,background .15s ease}
+  .cta-btn:hover,.cta-btn:active{background:var(--accent-hover);transform:translateY(-1px)}
   .cta-btn svg{vertical-align:-3px;margin-right:8px}
-  .cta-hint{margin:14px 0 0;color:#bdbdbd;font-size:12.5px;line-height:1.5}
-  .back{display:block;text-align:center;color:#888;text-decoration:none;font-size:13px;margin-top:28px}
+  .cta-hint{margin:14px 0 0;color:var(--muted);font-size:12.5px;line-height:1.5}
+  .back{display:block;text-align:center;color:var(--muted);text-decoration:none;font-size:13px;margin-top:28px}
   .back:hover{color:#fff}
 </style>
 </head>

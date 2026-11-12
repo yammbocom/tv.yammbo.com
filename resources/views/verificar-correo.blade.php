@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificar correo - Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #0a0a0a; color: #fff; min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: #fff; min-height: 100vh;
+            font-family:var(--font);
             display: flex; align-items: center; justify-content: center;
             padding: 28px 20px; text-align: center;
         }
@@ -17,11 +19,11 @@
             width: 82px; height: 82px; border-radius: 50%;
             font-size: 40px; line-height: 82px; margin: 0 auto 22px;
         }
-        .ok  { background: rgba(56,161,105,.15); color: #4ade80; }
-        .bad { background: rgba(229,9,20,.15); color: #f87171; }
+        .ok  { background: var(--soft); border: 1px solid var(--line-strong); color: var(--fg); }
+        .bad { background: var(--soft); border: 1px solid var(--accent); color: var(--accent-text); }
         h1 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
-        p { color: #bfbfbf; font-size: 15px; line-height: 1.5; }
-        .brand { color: #e50914; font-weight: 800; letter-spacing: 3px; margin-top: 28px; font-size: 15px; }
+        p { color: var(--muted); font-size: 15px; line-height: 1.5; }
+        .brand { color: var(--accent-text); font-weight: 800; letter-spacing: -.02em; margin-top: 28px; font-size: 15px; }
     </style>
 </head>
 <body>

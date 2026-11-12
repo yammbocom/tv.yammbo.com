@@ -28,7 +28,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E50914">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>{{ $isEs ? 'Descargar Yammbo Tv' : 'Download Yammbo Tv' }} — Yammbo Tv</title>
 <meta name="description" content="{{ $isEs ? 'Descarga Yammbo Tv para tu televisor o tu telefono Android.' : 'Download Yammbo Tv for your TV or Android phone.' }}">
@@ -57,16 +57,15 @@
 <meta name="twitter:description" content="{{ $ogDesc }}">
 <meta name="twitter:image" content="{{ url($ogImg) }}">
 <link rel="icon" href="/images/yambo-icon.png" type="image/png">
+<link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html,body{margin:0;padding:0;background:#000;color:#fff;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:var(--font);
     -webkit-font-smoothing:antialiased;min-height:100vh}
   a{color:inherit}
 
-  /* Halo rojo de fondo, igual que la landing */
-  .glow{position:fixed;inset:0;pointer-events:none;z-index:0;
-    background:radial-gradient(900px 480px at 50% -8%,rgba(229,9,20,.20),transparent 60%)}
 
   .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;
     padding:clamp(28px,5vw,56px) clamp(16px,4vw,32px) 80px}
@@ -76,121 +75,120 @@
     font-size:22px;font-weight:800;letter-spacing:-.02em}
   .brand img{width:40px;height:40px}
   h1{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;line-height:1.1}
-  .sub{color:#b8b8bd;font-size:clamp(15px,2.2vw,17px);line-height:1.6;margin:0 auto;max-width:560px}
+  .sub{color:var(--muted);font-size:clamp(15px,2.2vw,17px);line-height:1.6;margin:0 auto;max-width:560px}
   .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px;padding:0;list-style:none}
   .chips a{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;
-    background:#141416;border:1px solid #2a2a30;color:#d4d4d9;font-size:13px;font-weight:600;
+    background:var(--soft);border:1px solid var(--line);color:var(--fg);font-size:13px;font-weight:600;
     text-decoration:none;transition:border-color .15s ease,color .15s ease}
-  .chips a:hover{border-color:#E50914;color:#fff}
-  .chips svg{width:15px;height:15px;stroke:#E50914;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .chips a:hover{border-color:var(--accent);color:#fff}
+  .chips svg{width:15px;height:15px;stroke:var(--accent-text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
   /* Tarjetas base */
-  .card{position:relative;background:linear-gradient(160deg,#141416 0%,#0d0d0f 100%);
-    border:1px solid #26262b;border-radius:20px;padding:clamp(22px,3vw,32px)}
-  .ico{width:52px;height:52px;border-radius:14px;background:#1c1c20;display:flex;align-items:center;
+  .card{position:relative;background:var(--soft);
+    border:1px solid var(--line);border-radius:var(--radius);padding:clamp(22px,3vw,32px)}
+  .ico{width:52px;height:52px;border-radius:var(--radius);background:var(--soft-2);display:flex;align-items:center;
     justify-content:center;margin-bottom:18px;flex:0 0 auto}
-  .ico svg{width:27px;height:27px;stroke:#E50914;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  .ico.solid svg{fill:#E50914;stroke:none}
+  .ico svg{width:27px;height:27px;stroke:var(--accent-text);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ico.solid svg{fill:var(--accent);stroke:none}
   .card h2{margin:0 0 6px;font-size:clamp(20px,2.4vw,24px);font-weight:750;letter-spacing:-.01em}
-  .for{color:#8b8b93;font-size:13.5px;line-height:1.55;margin:0 0 18px}
-  .badge{position:absolute;top:18px;right:18px;background:#E50914;color:#fff;font-size:10.5px;font-weight:800;
-    letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+  .for{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0 0 18px}
+  .badge{position:absolute;top:18px;right:18px;background:var(--accent);color:#fff;font-size:10.5px;font-weight:800;
+    padding:5px 10px;border-radius:999px}
 
   /* Tarjeta de TV: destacada, a todo el ancho */
-  .tv{border-color:rgba(229,9,20,.45);margin-bottom:18px;scroll-margin-top:16px;
-    box-shadow:0 0 0 1px rgba(229,9,20,.12),0 18px 60px -24px rgba(229,9,20,.55)}
+  .tv{border-color:var(--accent);margin-bottom:18px;scroll-margin-top:16px;}
   .tv-grid{display:grid;grid-template-columns:1fr;gap:26px}
-  .tvlead{margin:0 0 18px;color:#c9c9cf;font-size:14.5px;line-height:1.6;max-width:46ch}
+  .tvlead{margin:0 0 18px;color:var(--fg);font-size:14.5px;line-height:1.6;max-width:46ch}
   .tvlead b{color:#fff}
-  .codebox{background:#0b0b0d;border:1px solid rgba(229,9,20,.4);border-radius:14px;
+  .codebox{background:var(--soft);border:1px solid var(--accent);border-radius:var(--radius);
     padding:18px;text-align:center}
-  .code-label{color:#8b8b93;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-  .code-num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(30px,5vw,42px);
-    font-weight:800;color:#E50914;letter-spacing:.14em;line-height:1}
-  .code-alt{color:#8b8b93;font-size:12.5px;margin-top:10px}
-  .code-alt b{color:#d4d4d9;font-weight:600}
-  .other{margin:14px 0 0;color:#8b8b93;font-size:13px;line-height:1.5}
-  .other a{color:#d4d4d9;font-weight:600}
+  .code-label{color:var(--muted);font-size:11px;margin-bottom:8px}
+  .code-num{font-family:var(--mono);font-size:clamp(30px,5vw,42px);
+    font-weight:800;color:var(--accent-text);letter-spacing:.14em;line-height:1}
+  .code-alt{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .code-alt b{color:var(--fg);font-weight:600}
+  .other{margin:14px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+  .other a{color:var(--fg);font-weight:600}
   /* Tele completa: en blanco, para que no se confunda con la tarjeta roja de la app sola */
-  .tv.full{border-color:rgba(255,255,255,.4);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 60px -24px rgba(255,255,255,.25)}
+  .tv.full{border-color:var(--line-strong)}
   .tv.full .badge{background:#fff;color:#000}
   .tv.full .ico svg{stroke:#fff}
-  .tv.full .codebox{border-color:rgba(255,255,255,.35)}
+  .tv.full .codebox{border-color:var(--line-strong)}
   .tv.full .code-num{color:#fff}
   .tv.full .feat li::before{background:#fff}
   .tv.full .feat b{color:#fff}
   .tv.full .steps li::before{background:#fff;color:#000}
   .shot{margin:0 0 18px}
-  .shot img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid #26262b;background:#000}
-  .shot figcaption{color:#8b8b93;font-size:12.5px;margin-top:8px}
-  .tv-steps{background:#0b0b0d;border:1px solid #1f1f24;border-radius:16px;padding:22px 22px 10px}
-  .tv-steps h3{margin:0 0 16px;font-size:13px;font-weight:700;color:#8b8b93;text-transform:uppercase;letter-spacing:.09em}
+  .shot img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#000}
+  .shot figcaption{color:var(--muted);font-size:12.5px;margin-top:8px}
+  .tv-steps{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 10px}
+  .tv-steps h3{margin:0 0 16px;font-size:13px;font-weight:700;color:var(--muted);}
   .steps{margin:0;padding:0;list-style:none;counter-reset:st}
   .steps li{counter-increment:st;position:relative;padding-left:40px;margin-bottom:16px;
-    color:#b0b0b8;font-size:14px;line-height:1.55;min-height:26px}
+    color:var(--muted);font-size:14px;line-height:1.55;min-height:26px}
   .steps li::before{content:counter(st);position:absolute;left:0;top:-1px;width:26px;height:26px;
-    border-radius:50%;background:#E50914;color:#fff;font-size:12.5px;font-weight:800;
+    border-radius:50%;background:var(--accent);color:#fff;font-size:12.5px;font-weight:800;
     display:flex;align-items:center;justify-content:center}
   .steps b{color:#fff;font-weight:650}
-  .meta{color:#6e6e77;font-size:12px;margin:12px 0 0}
+  .meta{color:var(--muted);font-size:12px;margin:12px 0 0}
 
   /* Tele completa: las dos formas (Downloader / movil) */
-  .ways-title{margin:30px 0 14px;font-size:13px;font-weight:700;color:#8b8b93;text-transform:uppercase;letter-spacing:.09em}
+  .ways-title{margin:30px 0 14px;font-size:13px;font-weight:700;color:var(--muted);}
   .ways{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
-  .way{background:#0b0b0d;border:1px solid #1f1f24;border-radius:16px;padding:22px;scroll-margin-top:16px;display:flex;flex-direction:column}
-  .way-tag{align-self:flex-start;background:#1c1c20;border:1px solid #303038;color:#d4d4d9;font-size:10.5px;font-weight:800;
-    letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:12px}
+  .way{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:22px;scroll-margin-top:16px;display:flex;flex-direction:column}
+  .way-tag{align-self:flex-start;background:var(--soft-2);border:1px solid var(--line-strong);color:var(--fg);font-size:10.5px;font-weight:800;
+    padding:4px 10px;border-radius:999px;margin-bottom:12px}
   .way h3{margin:0 0 6px;font-size:18px;font-weight:750;letter-spacing:-.01em}
-  .way-for{color:#8b8b93;font-size:13.5px;line-height:1.55;margin:0 0 18px}
+  .way-for{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0 0 18px}
   .way .codebox,.way .btn{margin-bottom:6px}
   .way .meta{margin:6px 0 20px;text-align:center}
   .way .codebox{margin-bottom:22px}
   .phones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}
-  .phones img{display:block;width:100%;height:auto;border-radius:18px;border:1px solid #2a2a30;background:#000}
-  .way-note{margin:4px 0 0;padding:12px 14px;border-radius:12px;background:#141416;border:1px solid #26262b;
-    color:#9a9aa3;font-size:13px;line-height:1.55}
+  .phones img{display:block;width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--line);background:#000}
+  .way-note{margin:4px 0 0;padding:12px 14px;border-radius:12px;background:var(--soft);border:1px solid var(--line);
+    color:var(--muted);font-size:13px;line-height:1.55}
   .way-note a,.app-note a{color:#fff;font-weight:600}
   .tv.full .btn{background:#fff;color:#000}
-  .tv.full .btn:hover{background:#e2e2e6}
-  .app-note{margin:-8px 0 22px;color:#8b8b93;font-size:13px;line-height:1.5}
+  .tv.full .btn:hover{background:#d4d4d4}
+  .app-note{margin:-8px 0 22px;color:var(--muted);font-size:13px;line-height:1.5}
 
   /* Movil + Windows */
   .apps{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
-  .app{display:flex;flex-direction:column;transition:border-color .2s ease,transform .2s ease;scroll-margin-top:16px}
-  .app:hover{border-color:#3a3a42;transform:translateY(-2px)}
+  .app{display:flex;flex-direction:column;transition:border-color .2s ease;scroll-margin-top:16px}
+  .app:hover{border-color:var(--line-strong)}
   .app-head{display:flex;gap:16px;align-items:center;margin-bottom:18px}
   .app-head .ico{margin:0}
   .app-head .for{margin:0}
   .feat{list-style:none;margin:0 0 22px;padding:0}
-  .feat li{color:#c9c9cf;font-size:14px;line-height:1.5;padding-left:20px;position:relative;margin-bottom:8px}
-  .feat li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:#E50914}
+  .feat li{color:var(--fg);font-size:14px;line-height:1.5;padding-left:20px;position:relative;margin-bottom:8px}
+  .feat li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
   .app .cta{margin-top:auto}
   .app .meta{text-align:center}
 
-  .btn{display:flex;align-items:center;justify-content:center;gap:9px;background:#E50914;color:#fff;
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;background:var(--accent);color:#fff;
     text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;min-height:48px;
     transition:background .15s ease}
-  .btn:hover{background:#c8070f}
-  .btn:focus-visible,.chips a:focus-visible{outline:2px solid #fff;outline-offset:2px}
-  .btn.ghost{background:#1c1c20;border:1px solid #303038;font-weight:600;font-size:14px}
-  .btn.ghost:hover{background:#26262c}
+  .btn:hover{background:var(--accent-hover)}
+  .btn:focus-visible,.chips a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn.ghost{background:var(--soft-2);border:1px solid var(--line-strong);font-weight:600;font-size:14px}
+  .btn.ghost:hover{background:var(--hover)}
   .btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
   /* Ayuda: guia de APK/EXE + problemas de carga */
   .help{display:grid;grid-template-columns:1fr;gap:18px}
-  .help .card{background:#0e0e10;border-color:#212126}
+  .help .card{background:var(--soft);border-color:var(--line)}
   .help h3{margin:0 0 18px;font-size:18px;font-weight:750}
-  .help p{margin:0 0 16px;color:#8b8b93;font-size:14px;line-height:1.6}
-  .help p b{color:#d4d4d9}
+  .help p{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.6}
+  .help p b{color:var(--fg)}
   .extra{display:flex;flex-direction:column}
   .extra .btn{margin-top:auto}
-  .vpncode{background:#0b0b0d;border:1px solid #26262b;border-radius:12px;padding:12px 14px;
+  .vpncode{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
     text-align:center;margin:0 0 14px}
   .vpncode .code-num{font-size:26px;color:#fff}
 
-  footer{text-align:center;margin-top:44px;color:#5c5c66;font-size:12.5px;line-height:1.7}
-  footer a{color:#9a9aa3;text-decoration:none}
-  footer a:hover{color:#E50914}
+  footer{text-align:center;margin-top:44px;color:var(--muted);font-size:12.5px;line-height:1.7}
+  footer a{color:var(--muted);text-decoration:none}
+  footer a:hover{color:var(--accent-text)}
 
   /* Tablet: movil y Windows lado a lado */
   @media (min-width:680px){
@@ -208,12 +206,10 @@
   }
   @media (prefers-reduced-motion:reduce){
     .app,.btn,.chips a{transition:none}
-    .app:hover{transform:none}
   }
 </style>
 </head>
 <body>
-<div class="glow"></div>
 <div class="wrap">
 
   <header>

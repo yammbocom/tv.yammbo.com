@@ -4,31 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listo - Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #0a0a0a; color: #fff; min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: #fff; min-height: 100vh;
+            font-family:var(--font);
             display: flex; align-items: center; justify-content: center; padding: 28px 20px;
             text-align: center;
         }
         .box { max-width: 420px; }
         .check {
-            width: 82px; height: 82px; border-radius: 50%; background: rgba(56,161,105,.15);
-            color: #4ade80; font-size: 42px; line-height: 82px; margin: 0 auto 22px;
+            width: 82px; height: 82px; border-radius: 50%; background: var(--soft); border: 1px solid var(--line-strong);
+            color: var(--fg); font-size: 42px; line-height: 82px; margin: 0 auto 22px;
         }
         h1 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
-        p { color: #bfbfbf; font-size: 15px; line-height: 1.5; margin-bottom: 22px; }
+        p { color: var(--muted); font-size: 15px; line-height: 1.5; margin-bottom: 22px; }
         .tv-note {
-            background: #141416; border: 1px solid #232327; border-radius: 14px;
-            padding: 18px; color: #cfcfd3; font-size: 14px; line-height: 1.55;
+            background: var(--soft); border: 1px solid var(--line); border-radius:var(--radius);
+            padding: 18px; color: var(--fg); font-size: 14px; line-height: 1.55;
         }
         .tv-note strong { color: #fff; }
         .cta {
             display: inline-block; margin-top: 18px; padding: 14px 26px; border-radius: 10px;
-            background: #e50914; color: #fff; text-decoration: none; font-weight: 700; font-size: 15px;
+            background: var(--accent); color: #fff; text-decoration: none; font-weight: 700; font-size: 15px;
         }
-        .brand { color: #e50914; font-weight: 800; letter-spacing: 3px; margin-top: 26px; font-size: 15px; }
+        .brand { color: var(--accent-text); font-weight: 800; letter-spacing: -.02em; margin-top: 26px; font-size: 15px; }
     </style>
 </head>
 <body>

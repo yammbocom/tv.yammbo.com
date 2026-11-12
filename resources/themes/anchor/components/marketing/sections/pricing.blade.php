@@ -64,9 +64,9 @@
                     $isCurrent = $activePlanId === $plan->id;
                     $features = $plan->featureList();
                 @endphp
-                <div class="relative p-8 rounded-2xl bg-surface border {{ $isDefault ? 'border-accent' : 'border-rule' }} flex flex-col">
+                <div class="relative p-8 rounded-xl bg-surface border {{ $isDefault ? 'border-accent' : 'border-rule' }} flex flex-col">
                     @if($isDefault)
-                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-accent text-ink text-xs font-bold uppercase tracking-wide">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-accent text-ink text-xs font-bold">
                             {{ __('landing.pricing.recommended') }}
                         </div>
                     @endif

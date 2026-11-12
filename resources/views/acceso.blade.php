@@ -44,20 +44,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { height: 100%; }
         body {
-            background: #0a0a0a; color: #fff;
+            background: var(--bg); color: #fff;
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family:var(--font);
             display: flex; align-items: center; justify-content: center;
             padding: 3vh 4vw; overflow-y: auto;
         }
-        .verify { text-align: center; color: #6b6b70; }
+        .verify { text-align: center; color: var(--muted); }
         .spinner {
             display: inline-block; width: 26px; height: 26px;
-            border: 3px solid #232327; border-top-color: #e50914;
+            border: 1px solid var(--line); border-top-color: var(--accent);
             border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -67,19 +69,19 @@
             justify-content: center; max-width: 1100px; width: 100%;
         }
         .left { flex: 1; min-width: 0; }
-        .logo { color: #e50914; font-size: clamp(26px, 3.6vw, 40px); font-weight: 800; letter-spacing: 3px; margin-bottom: 16px; }
+        .logo { color: var(--accent-text); font-size: clamp(26px, 3.6vw, 40px); font-weight: 800; letter-spacing: -.02em; margin-bottom: 16px; }
         h1 { font-size: clamp(22px, 3vw, 34px); font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
-        .sub { color: #cfcfd3; font-size: clamp(14px, 1.7vw, 18px); line-height: 1.5; margin-bottom: 22px; }
+        .sub { color: var(--fg); font-size: clamp(14px, 1.7vw, 18px); line-height: 1.5; margin-bottom: 22px; }
         .feats { list-style: none; }
         .feats li {
             display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
-            font-size: clamp(13px, 1.5vw, 16px); color: #ddd;
+            font-size: clamp(13px, 1.5vw, 16px); color: var(--fg);
         }
-        .feats li::before { content: "\2713"; color: #e50914; font-weight: 800; }
+        .feats li::before { content: "\2713"; color: var(--accent-text); font-weight: 800; }
         .right { display: flex; flex-direction: column; align-items: center; gap: 16px; flex-shrink: 0; }
-        .qr-box { background: #fff; border-radius: 16px; padding: 14px; line-height: 0; }
+        .qr-box { background: #fff; border-radius:var(--radius); padding: 14px; line-height: 0; }
         .qr-box img { width: clamp(180px, 24vw, 240px); height: clamp(180px, 24vw, 240px); display: block; }
-        .qr-cap { color: #9b9b9f; font-size: clamp(12px, 1.5vw, 15px); text-align: center; max-width: 260px; }
+        .qr-cap { color: var(--muted); font-size: clamp(12px, 1.5vw, 15px); text-align: center; max-width: 260px; }
         .qr-cap strong { color: #fff; }
     </style>
 </head>

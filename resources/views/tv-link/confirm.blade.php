@@ -17,12 +17,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Vincular Yammbo Tv</title>
+    <link rel="preload" href="/fonts/geist/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/noir.css?v={{ filemtime(public_path('css/noir.css')) }}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #0a0a0a;
+            background: var(--bg);
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family:var(--font);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -30,12 +32,12 @@
             padding: 20px;
         }
         .card {
-            background: #181818;
-            border-radius: 16px;
+            background: var(--soft);
+            border: 1px solid var(--line);
+            border-radius:var(--radius);
             padding: 32px 28px;
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 8px 32px rgba(229, 9, 20, 0.15);
         }
         .logo {
             text-align: center;
@@ -51,14 +53,14 @@
             text-align: center;
         }
         .subtitle {
-            color: #bfbfbf;
+            color: var(--muted);
             font-size: 14px;
             text-align: center;
             margin-bottom: 24px;
         }
         .code-box {
-            background: #0a0a0a;
-            border: 2px solid #e50914;
+            background: var(--soft);
+            border: 1px solid var(--accent);
             border-radius: 8px;
             padding: 14px;
             text-align: center;
@@ -66,18 +68,18 @@
             font-weight: 700;
             letter-spacing: 4px;
             margin-bottom: 24px;
-            color: #e50914;
+            color: var(--accent-text);
         }
         label {
             display: block;
             font-size: 13px;
-            color: #bfbfbf;
+            color: var(--muted);
             margin-bottom: 6px;
         }
         input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
-            background: #0a0a0a;
-            border: 1px solid #333;
+            background: var(--soft);
+            border: 1px solid var(--line-strong);
             color: #fff;
             padding: 12px 14px;
             border-radius: 8px;
@@ -86,11 +88,11 @@
         }
         input:focus {
             outline: none;
-            border-color: #e50914;
+            border-color: var(--accent);
         }
         button {
             width: 100%;
-            background: #e50914;
+            background: var(--accent);
             color: #fff;
             border: none;
             padding: 14px;
@@ -100,32 +102,32 @@
             cursor: pointer;
             margin-top: 8px;
         }
-        button:hover { background: #c40811; }
-        button:disabled { background: #555; cursor: not-allowed; }
+        button:hover { background: var(--accent-hover); }
+        button:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
         .error {
-            background: rgba(229, 9, 20, 0.15);
-            border-left: 3px solid #e50914;
+            background: var(--soft);
+            border: 1px solid var(--accent);
             padding: 10px 14px;
             border-radius: 4px;
             font-size: 14px;
             margin-bottom: 16px;
-            color: #ffaaaa;
+            color: var(--accent-text);
         }
         .success {
-            background: rgba(56, 161, 105, 0.15);
-            border-left: 3px solid #38a169;
+            background: var(--soft);
+            border: 1px solid var(--line-strong);
             padding: 14px;
             border-radius: 4px;
             font-size: 14px;
             text-align: center;
-            color: #9ae6b4;
+            color: var(--fg);
         }
         .info {
             background: rgba(255, 255, 255, 0.05);
             padding: 10px 14px;
             border-radius: 4px;
             font-size: 13px;
-            color: #bfbfbf;
+            color: var(--muted);
             text-align: center;
             margin-bottom: 16px;
         }
@@ -138,26 +140,26 @@
             flex: 1;
             width: auto;
             margin: 0;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            color: #bfbfbf;
+            background: var(--soft);
+            border: 1px solid var(--line-strong);
+            color: var(--muted);
             font-size: 14px;
             font-weight: 600;
             padding: 11px;
         }
         .tabs .tab.active {
-            background: #e50914;
-            border-color: #e50914;
+            background: var(--accent);
+            border-color: var(--accent);
             color: #fff;
         }
-        .tabs .tab:hover { background: #1a1a1a; }
-        .tabs .tab.active:hover { background: #c40811; }
+        .tabs .tab:hover { background: var(--soft-2); }
+        .tabs .tab.active:hover { background: var(--accent-hover); }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="logo">
-            <strong style="color:#e50914; font-size:28px; letter-spacing:2px;">YAMBO TV</strong>
+            <strong style="color:var(--accent-text); font-size:28px; letter-spacing:-.02em;">YAMBO TV</strong>
         </div>
 
         @if ($status === 'success')

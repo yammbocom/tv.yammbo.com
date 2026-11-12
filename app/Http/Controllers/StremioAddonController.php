@@ -115,7 +115,7 @@ class StremioAddonController extends Controller
             }
         }
 
-        $metas = $this->catalogMetas($type, $id, $skip, $query);
+        $metas = array_map(fn ($m) => is_array($m) ? $this->withGenreLinks($m) : $m, $this->catalogMetas($type, $id, $skip, $query));
 
         return $this->cors(response()->json(
             ['metas' => $metas],
@@ -128,6 +128,9 @@ class StremioAddonController extends Controller
     public function meta(string $type, string $id): JsonResponse
     {
         $meta = $this->resolveMeta($type, $id);
+        if (is_array($meta)) {
+            $meta = $this->withGenreLinks($meta);
+        }
 
         return $this->cors(response()->json(
             ['meta' => $meta],
@@ -386,6 +389,61 @@ class StremioAddonController extends Controller
         if ($type === 'series') {
             $meta['videos'] = $this->comx->seriesVideos($tmdbId);
         }
+
+        return $meta;
+    }
+
+    /** Nombres en inglés que TMDB devuelve para algunos géneros de series aunque se pida es-MX. */
+    private const GENRE_ALIASES = [
+        'action & adventure' => 10759,
+        'sci-fi & fantasy' => 10765,
+        'war & politics' => 10768,
+        'kids' => 10762,
+        'news' => 10763,
+        'talk' => 10767,
+    ];
+
+    /**
+     * Enlaces de género hacia nuestros catálogos. Sin `links`, stremio-core
+     * convierte `genres` en enlaces a Cinemeta (addon retirado), y la app ofrece
+     * instalarlo al pulsar un género. Un género sin catálogo propio va a la búsqueda.
+     */
+    private function withGenreLinks(array $meta): array
+    {
+        $type = $meta['type'] ?? null;
+        $genres = $meta['genres'] ?? null;
+        if (! in_array($type, ['movie', 'series'], true) || ! is_array($genres) || $genres === []) {
+            return $meta;
+        }
+
+        $catalogGenres = $this->comx->genres()[$type] ?? [];
+        $byName = [];
+        foreach ($catalogGenres as $genreId => $name) {
+            $byName[mb_strtolower($name)] = $genreId;
+        }
+        $transport = rawurlencode(rtrim((string) config('app.url'), '/') . '/manifest.json');
+
+        $links = [];
+        foreach ($genres as $name) {
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+            $key = mb_strtolower($name);
+            $alias = self::GENRE_ALIASES[$key] ?? null;
+            $genreId = $byName[$key] ?? ($alias !== null && isset($catalogGenres[$alias]) ? $alias : null);
+            $links[] = [
+                'name' => $name,
+                'category' => 'Genres',
+                'url' => $genreId !== null
+                    ? "stremio:///discover/{$transport}/{$type}/comx-{$type}-{$genreId}"
+                    : 'stremio:///search?search=' . rawurlencode($name),
+            ];
+        }
+
+        $meta['links'] = array_merge(
+            array_values(array_filter($meta['links'] ?? [], fn ($l) => ($l['category'] ?? null) !== 'Genres')),
+            $links
+        );
 
         return $meta;
     }

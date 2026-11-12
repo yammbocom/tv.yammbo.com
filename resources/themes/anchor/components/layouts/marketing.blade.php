@@ -17,6 +17,11 @@
     {{ $javascript ?? '' }}
 
     {{-- Yammbo chat widget (chat.yammbo.com) — marketing pages only, not /app SPA nor /admin --}}
+    {{-- The widget ships the Yammbo blue; tv's brand is red, so its accent tokens are overridden here. --}}
+    <style>
+        #yammbo-chat-root, #yammbo-chat-root[data-yc-theme] { --yc-accent: #E50914 !important; --yc-accent-hover: #B0070F !important; --yc-accent-text: #FF4D55 !important; --yc-accent-fg: #ffffff !important; }
+        #yammbo-chat-root[data-yc-theme="light"] { --yc-accent-text: #B0070F !important; }
+    </style>
     <script src="https://chat.yammbo.com/widget.js" defer></script>
 
 </body>

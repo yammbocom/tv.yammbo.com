@@ -515,9 +515,6 @@
   </div>
 
   <footer>
-    {{ $isEs ? 'Ya tienes cuenta?' : 'Already have an account?' }}
-    <a href="/mi-suscripcion">{{ $isEs ? 'Gestiona tu suscripcion' : 'Manage your subscription' }}</a>
-    <br>
     &copy; {{ date('Y') }} Yammbo Tv
   </footer>
 

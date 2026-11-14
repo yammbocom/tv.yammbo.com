@@ -123,7 +123,7 @@
     </section>
 
     {{-- 3. CTA pegajoso: aparece cuando ya se ha visto el recorrido y se
-         retira al llegar a los precios, donde estorbaría.
+         retira al llegar a la FAQ, donde estorbaría.
 
          Antes colgaba de un IntersectionObserver sobre un <span hidden>: con
          display:none la caja mide 0×0 y no intersecta nunca, así que la barra
@@ -132,11 +132,11 @@
     <div
         x-data="{ show: false, closed: false }"
         x-init="
-            const pricingEl = document.getElementById('pricing');
+            const faqEl = document.getElementById('faq');
             const update = () => {
-                if (closed || !pricingEl) return;
-                const pricingTop = pricingEl.getBoundingClientRect().top;
-                show = window.scrollY > window.innerHeight && pricingTop > window.innerHeight * 0.9;
+                if (closed || !faqEl) return;
+                const faqTop = faqEl.getBoundingClientRect().top;
+                show = window.scrollY > window.innerHeight && faqTop > window.innerHeight * 0.9;
             };
             update();
             window.addEventListener('scroll', update, { passive: true });
@@ -152,10 +152,9 @@
         {{-- En móvil el texto de apoyo se oculta y el botón quedaba pegado a la
              izquierda con la X al otro extremo, descentrado. Ahora el botón se
              centra y la X se ancla al borde sin desplazarlo. --}}
-        <x-container class="relative flex items-center justify-center gap-4 py-3 sm:justify-between">
-            <p class="hidden sm:block text-[length:var(--text-sm)] text-[color:var(--color-ink-mute)] whitespace-nowrap">{{ __('landing.hero.hint') }}</p>
+        <x-container class="relative flex items-center justify-center gap-4 py-3">
             <div class="flex items-center gap-3">
-                <a href="/pricing" class="btn btn-accent">{{ __('landing.pricing.cta') }}</a>
+                <a href="/auth/register" class="btn btn-accent">{{ __('landing.nav.register') }}</a>
                 <button @click="closed = true; show = false" type="button"
                         aria-label="{{ __('landing.ui.close') }}"
                         class="absolute right-6 sm:static text-[color:var(--color-ink-dim)] hover:text-[color:var(--color-ink)]">
@@ -165,13 +164,8 @@
         </x-container>
     </div>
 
-    {{-- 4. Precios --}}
-    <x-container class="py-16 sm:py-24 border-t border-rule">
-        <x-marketing.sections.pricing />
-    </x-container>
-
     {{-- 5. FAQ --}}
-    <x-container class="py-16 sm:py-24 border-t border-rule">
+    <x-container id="faq" class="py-16 sm:py-24 border-t border-rule">
         <x-marketing.sections.faq />
     </x-container>
 </x-layouts.marketing>

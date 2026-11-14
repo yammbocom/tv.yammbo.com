@@ -6,7 +6,7 @@
 <x-layouts.marketing
     :seo="[
         'title' => 'Centro de ayuda — Yammbo Tv',
-        'description' => 'Cómo instalar Yammbo Tv, gestionar tu suscripción y resolver los problemas más comunes.',
+        'description' => 'Cómo instalar Yammbo Tv, usar tu cuenta y resolver los problemas más comunes.',
         'type' => 'website',
     ]"
 >
@@ -31,25 +31,10 @@
 
         <h3>¿Necesito cuenta?</h3>
         <p>
-            Sí. Crea una cuenta con tu correo desde la propia aplicación o en la web. Las cuentas nuevas incluyen
-            <strong>7 días de prueba</strong>; después hace falta una suscripción activa.
+            Sí. Crea una cuenta con tu correo desde la propia aplicación o en la web.
         </p>
 
-        <h3>¿En qué se diferencian los planes?</h3>
-        <ul>
-            <li><strong>Basic</strong> — 1 dispositivo a la vez. Películas y series, sin TV en vivo.</li>
-            <li><strong>Standard</strong> — 2 dispositivos a la vez, con TV en vivo.</li>
-            <li><strong>Premium</strong> — 3 dispositivos a la vez, con TV en vivo.</li>
-        </ul>
-        <p>Puedes verlos y cambiar de plan en <a href="/pricing">la página de planes</a>.</p>
-
-        <h2>Cuenta y suscripción</h2>
-
-        <h3>¿Cómo cancelo?</h3>
-        <p>
-            Desde tu cuenta, en la sección de suscripción. La cancelación es inmediata y conservas el acceso
-            hasta el final del periodo que ya has pagado. No hay permanencia.
-        </p>
+        <h2>Cuenta y uso</h2>
 
         <h3>He olvidado mi contraseña</h3>
         <p>
@@ -59,7 +44,7 @@
 
         <h3>¿Cuántos dispositivos puedo usar?</h3>
         <p>
-            Depende del plan (1, 2 o 3 a la vez). El límite es de uso <em>simultáneo</em>: puedes tener la
+            Hasta 3 a la vez. El límite es de uso <em>simultáneo</em>: puedes tener la
             aplicación instalada en más aparatos, pero solo ese número puede estar activo al mismo tiempo. Si
             superas el límite, la sesión más antigua se cierra.
         </p>
@@ -81,8 +66,7 @@
         <h3>Un título concreto no tiene fuentes disponibles</h3>
         <p>
             Las fuentes las sirven proveedores de terceros y cambian con el tiempo: a veces un título deja de
-            estar disponible temporalmente. Prueba más tarde o con otro título. Que un título no aparezca no
-            afecta a tu suscripción, que cubre el uso del software.
+            estar disponible temporalmente. Prueba más tarde o con otro título.
         </p>
 
         <h3>Se ve entrecortado o tarda en empezar</h3>
@@ -112,7 +96,7 @@
         <p>
             No. Yammbo Tv es software: un reproductor y organizador que muestra lo que sirven proveedores de
             terceros. <strong>No alojamos, almacenamos ni distribuimos ningún vídeo, película, serie, canal o
-            portada.</strong> Tu suscripción paga el uso de las aplicaciones y del sistema de cuentas, no el
+            portada.</strong> Tu cuenta da acceso a las aplicaciones y al sistema de cuentas, no al
             contenido. Puedes leerlo en detalle en los <a href="/terms">Términos de Servicio</a>.
         </p>
 
@@ -126,7 +110,7 @@
         <h2>¿Sigues con dudas?</h2>
         <p>
             Escríbenos a <a href="mailto:support@yammbo.com">support@yammbo.com</a>. Cuéntanos qué dispositivo
-            usas, qué plan tienes y qué ves en pantalla; con eso te ayudamos mucho más rápido.
+            usas y qué ves en pantalla; con eso te ayudamos mucho más rápido.
         </p>
     </div>
     </x-container>

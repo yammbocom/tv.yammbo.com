@@ -49,19 +49,19 @@ return [
         'f3_body' => 'Automatic subtitles in dozens of languages so you never miss a line, no matter where the content comes from.',
 
         'f4_title' => 'High quality',
-        'f4_body' => 'High quality playback sources come with every plan. The final quality depends on the source of each title.',
+        'f4_body' => 'Playback sources come in high quality. Final quality depends on each title\'s source.',
 
         'f5_title' => 'Chromecast',
         'f5_body' => 'Send what you watch in the web player to your TV with Chromecast.',
 
         'f6_title' => 'Ad-free',
-        'f6_body' => 'Your time matters. No plan interrupts playback with ads.',
+        'f6_body' => 'Your time matters. Nothing interrupts playback with ads.',
 
         'f7_title' => 'Early access',
-        'f7_body' => 'Premium members get early access to new app features and improvements.',
+        'f7_body' => 'Get new features and app improvements before anyone else.',
 
         'f8_title' => '24/7 Support',
-        'f8_body' => 'Our team is ready to help by email and chat, with VIP priority on Premium plans.',
+        'f8_body' => 'Our team is ready to help you by email and chat.',
     ],
 
     'pricing' => [
@@ -104,7 +104,7 @@ return [
     'faq' => [
         'heading' => 'Frequently asked questions',
         'q1_q' => 'How do I get started?',
-        'q1_a' => 'Create your account, pick the plan that fits you and start watching right away. You can switch plans or cancel anytime.',
+        'q1_a' => 'Create your account and start watching right away.',
         'q2_q' => 'Which devices can I use Yammbo Tv on?',
         'q2_a' => 'Android phones, Android TV, Google TV and Fire TV, Windows, and the web browser on any computer. There is no app for iPhone or Apple TV. The web player works with Chromecast.',
         'q3_q' => 'Can I cancel anytime?',
@@ -112,7 +112,7 @@ return [
         'q4_q' => 'How many devices can I use at once?',
         'q4_a' => 'Basic: 1 device at a time. Standard: 2 at a time. Premium: 3 at a time.',
         'q5_q' => 'What image quality do you offer?',
-        'q5_a' => 'Quality is not limited by plan: every plan gets the same high quality sources, and the final quality depends on the source of each title.',
+        'q5_a' => 'Every source comes in high quality; final quality depends on each title\'s source.',
     ],
 
     'cta' => [

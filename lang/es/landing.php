@@ -49,19 +49,19 @@ return [
         'f3_body' => 'Subtítulos automáticos en decenas de idiomas para que nunca te pierdas un diálogo, sin importar el país de la producción.',
 
         'f4_title' => 'Alta calidad',
-        'f4_body' => 'Las fuentes de reproducción en alta calidad vienen en todos los planes. La calidad final depende de la fuente de cada título.',
+        'f4_body' => 'Las fuentes de reproducción vienen en alta calidad. La calidad final depende de la fuente de cada título.',
 
         'f5_title' => 'Chromecast',
         'f5_body' => 'Envía a tu televisor lo que ves en el reproductor web, con Chromecast.',
 
         'f6_title' => 'Sin anuncios',
-        'f6_body' => 'Tu tiempo vale. Ningún plan te interrumpe con publicidad durante la reproducción.',
+        'f6_body' => 'Tu tiempo vale. Nada te interrumpe con publicidad durante la reproducción.',
 
         'f7_title' => 'Estrena antes',
-        'f7_body' => 'Miembros Premium reciben acceso anticipado a nuevas funciones y mejoras de la app.',
+        'f7_body' => 'Recibe antes que nadie las nuevas funciones y mejoras de la app.',
 
         'f8_title' => 'Soporte 24/7',
-        'f8_body' => 'Nuestro equipo está listo para ayudarte por correo y chat, con prioridad VIP para planes Premium.',
+        'f8_body' => 'Nuestro equipo está listo para ayudarte por correo y chat.',
     ],
 
     'pricing' => [
@@ -91,7 +91,7 @@ return [
     'faq' => [
         'heading' => 'Preguntas frecuentes',
         'q1_q' => '¿Cómo empiezo?',
-        'q1_a' => 'Crea tu cuenta, elige el plan que mejor te encaje y empieza a ver al instante. Puedes cambiar de plan o cancelar cuando quieras.',
+        'q1_a' => 'Crea tu cuenta y empieza a ver al instante.',
         'q2_q' => '¿En qué dispositivos puedo usar Yammbo Tv?',
         'q2_a' => 'Móviles Android, Android TV, Google TV y Fire TV, Windows, y el navegador de cualquier computadora. No hay app para iPhone ni Apple TV. El reproductor web funciona con Chromecast.',
         'q3_q' => '¿Puedo cancelar en cualquier momento?',
@@ -99,7 +99,7 @@ return [
         'q4_q' => '¿Cuántos dispositivos puedo usar a la vez?',
         'q4_a' => 'Basic: 1 dispositivo a la vez. Standard: 2 a la vez. Premium: 3 a la vez.',
         'q5_q' => '¿Qué calidad de imagen ofrecen?',
-        'q5_a' => 'La calidad no depende del plan: todos los planes tienen las mismas fuentes en alta calidad, y la calidad final depende de la fuente de cada título.',
+        'q5_a' => 'Todas las fuentes vienen en alta calidad; la calidad final depende de la fuente de cada título.',
     ],
 
     'cta' => [

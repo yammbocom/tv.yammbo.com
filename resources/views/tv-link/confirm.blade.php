@@ -188,7 +188,6 @@
                 Te enviamos un correo para <b>verificar tu cuenta</b>.
                 Abrelo desde tu telefono y, en cuanto lo confirmes, tu TV entrara sola.
             </div>
-            <div class="subtitle">Tienes 7 dias de prueba gratis al confirmar.</div>
         @else
             @php($mode = $mode ?? 'login')
             <h1 id="ttl">{{ $mode === 'register' ? 'Crear cuenta' : 'Iniciar sesion' }}</h1>

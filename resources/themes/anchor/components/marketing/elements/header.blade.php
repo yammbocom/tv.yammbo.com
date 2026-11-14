@@ -15,7 +15,6 @@
 
         {{-- Desktop nav --}}
         <nav class="hidden md:flex items-center gap-6 text-[length:var(--text-sm)] font-body">
-            <a href="/pricing" class="link-quiet whitespace-nowrap">{{ __('landing.nav.pricing') }}</a>
             <a href="/help" class="link-quiet whitespace-nowrap">{{ __('landing.nav.help') }}</a>
             @guest
                 <a href="/auth/login" class="link-quiet whitespace-nowrap">{{ __('landing.nav.login') }}</a>
@@ -27,7 +26,7 @@
             @auth
                 <a href="/app" class="btn btn-accent">{{ __('landing.nav.app') }}</a>
             @else
-                <a href="/pricing" class="btn btn-accent">{{ __('landing.pricing.cta') }}</a>
+                <a href="/auth/register" class="btn btn-accent">{{ __('landing.nav.register') }}</a>
             @endauth
         </div>
 
@@ -58,13 +57,12 @@
          style="transition-duration: var(--dur-mid)"
          id="nav-mobile" class="nav-sheet fixed inset-0 z-40 flex flex-col md:hidden">
         <nav class="flex flex-col gap-1 px-6 pt-28 pb-8">
-            <a href="/pricing" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.pricing') }}</a>
             <a href="/help" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.help') }}</a>
             @auth
                 <a href="/app" @click="mobileOpen = false" class="btn btn-accent mt-4 justify-center">{{ __('landing.nav.app') }}</a>
             @else
                 <a href="/auth/login" @click="mobileOpen = false" class="nav-sheet-link">{{ __('landing.nav.login') }}</a>
-                <a href="/pricing" @click="mobileOpen = false" class="btn btn-accent mt-4 justify-center">{{ __('landing.pricing.cta') }}</a>
+                <a href="/auth/register" @click="mobileOpen = false" class="btn btn-accent mt-4 justify-center">{{ __('landing.nav.register') }}</a>
             @endauth
         </nav>
     </div>

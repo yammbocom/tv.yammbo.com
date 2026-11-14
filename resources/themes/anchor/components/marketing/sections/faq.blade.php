@@ -6,7 +6,7 @@
     </div>
 
     <div class="max-w-3xl mx-auto space-y-3">
-        @foreach(['q1','q2','q3','q4','q5'] as $i => $key)
+        @foreach(['q1','q2','q5'] as $i => $key)
             <details class="group p-5 rounded-xl bg-surface border border-rule transition-colors" {{ $i === 0 ? 'open' : '' }}>
                 <summary class="flex justify-between items-center cursor-pointer list-none">
                     <h3 class="font-display text-base font-semibold text-[color:var(--color-ink)] pr-4">{{ __('landing.faq.'.$key.'_q') }}</h3>

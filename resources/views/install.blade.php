@@ -31,7 +31,7 @@
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>{{ $isEs ? 'Descargar Yammbo Tv' : 'Download Yammbo Tv' }} — Yammbo Tv</title>
-<meta name="description" content="{{ $isEs ? 'Descarga Yammbo Tv para tu televisor o tu telefono Android.' : 'Download Yammbo Tv for your TV or Android phone.' }}">
+<meta name="description" content="{{ $isEs ? 'Descarga Yammbo Tv para tu televisor, tu telefono Android o tu iPhone.' : 'Download Yammbo Tv for your TV, Android phone or iPhone.' }}">
 @php
     $ogImg = file_exists(public_path('images/og-install.jpg'))
         ? '/images/og-install.jpg'
@@ -164,6 +164,8 @@
   .feat li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
   .app .cta{margin-top:auto}
   .app .meta{text-align:center}
+  .ios{margin-bottom:18px}
+  .ios .cta{max-width:420px}
 
   .btn{display:flex;align-items:center;justify-content:center;gap:9px;background:var(--accent);color:#fff;
     text-decoration:none;font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;min-height:48px;
@@ -227,6 +229,7 @@
       <li><a href="#tv"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ $isEs ? 'Televisor: solo la app' : 'TV: app only' }}</a></li>
       <li><a href="#instalador"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 10.5l3 3 5-5M8 21h8"/></svg>{{ $isEs ? 'Televisor: tele completa' : 'TV: full setup' }}</a></li>
       <li><a href="#movil"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>{{ $isEs ? 'Movil' : 'Mobile' }}</a></li>
+      <li><a href="#ios"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10.5 5h3"/></svg>iPhone / iPad</a></li>
       <li><a href="#windows"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/></svg>Windows</a></li>
     </ul>
   </header>
@@ -448,6 +451,31 @@
     </section>
 
   </div>
+
+  {{-- iPhone / iPad: sin app nativa; se instala la web (PWA). Guia completa en /install/ios --}}
+  <section class="card app ios" id="ios">
+    <div class="app-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10.5 5h3"/></svg>
+      </div>
+      <div>
+        <h2>{{ $isEs ? 'Yammbo Tv para iPhone y iPad' : 'Yammbo Tv for iPhone and iPad' }}</h2>
+        <p class="for">{{ $isEs ? 'También funciona en iOS: se instala desde el navegador, sin App Store' : 'Works on iOS too: install it from your browser, no App Store' }}</p>
+      </div>
+    </div>
+    <ul class="feat">
+      <li>{{ $isEs ? 'Icono en tu pantalla de inicio y pantalla completa, como una app' : 'Home Screen icon and full screen, like an app' }}</li>
+      <li>{{ $isEs ? 'Funciona con Safari, Chrome y Edge' : 'Works with Safari, Chrome and Edge' }}</li>
+      <li>{{ $isEs ? 'Misma cuenta y mismo progreso que en tus otros dispositivos' : 'Same account and progress as your other devices' }}</li>
+    </ul>
+    <div class="cta">
+      <a class="btn" href="/install/ios">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        {{ $isEs ? 'Ver cómo instalarla en iPhone' : 'See how to install it on iPhone' }}
+      </a>
+      <p class="meta">{{ $isEs ? 'Guía paso a paso · menos de un minuto' : 'Step-by-step guide · under a minute' }}</p>
+    </div>
+  </section>
 
   <div class="help">
     {{-- Como instalar (movil y Windows; la TV ya tiene sus pasos) --}}

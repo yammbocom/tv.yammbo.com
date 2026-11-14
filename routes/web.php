@@ -360,6 +360,8 @@ Route::post('webhook/stripe', [\App\Http\Controllers\Billing\StripeWebhook::clas
 
 // Yambo: /install override (debe ir tras Wave::routes para ganar a wave.install)
 Route::view("/install", "install");
+// iPhone/iPad: no hay app nativa; guia para añadir la PWA (/app) a la pantalla de inicio
+Route::view("/install/ios", "install-ios");
 
 /*
 |--------------------------------------------------------------------------

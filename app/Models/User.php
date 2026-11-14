@@ -199,14 +199,14 @@ class User extends AuthUser implements JWTSubject
                 \Log::error('alta usuario, promo: '.$e->getMessage());
             }
 
-            // Cuenta nueva (cualquier plataforma): pedir confirmacion de correo
+            // Cuenta nueva (cualquier plataforma): pedir confirmacion de correo.
+            // Solo ese correo: la bienvenida ("Tu cuenta ya esta lista", con boton
+            // a /mi-suscripcion) llegaba a la vez, la gente pulsaba ese y nunca
+            // confirmaba (31 de 60 altas sin verificar en 30 dias). La bienvenida
+            // sale ahora al confirmar (EmailVerificationController::verify).
             try {
                 if (empty($user->email_verified_at) && ! empty($user->email)) {
                     \App\Http\Controllers\AppTv\EmailVerificationController::sendLink($user);
-                    \App\Support\YamboMail::welcome($user,
-                        $promoUntil ? $promoUntil->format('d/m/Y')
-                            : ($user->trial_ends_at ? \Carbon\Carbon::parse($user->trial_ends_at)->format('d/m/Y') : null),
-                        (bool) $promoUntil);
                 }
             } catch (\Throwable $e) {
                 \Log::error('alta usuario, correos: '.$e->getMessage());

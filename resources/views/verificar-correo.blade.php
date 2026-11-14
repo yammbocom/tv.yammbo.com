@@ -31,6 +31,9 @@
         <div class="icon {{ $ok ? 'ok' : 'bad' }}">{!! $ok ? '&#10003;' : '&#33;' !!}</div>
         <h1>{{ $ok ? 'Correo confirmado' : 'No pudimos confirmarlo' }}</h1>
         <p>{{ $msg }}</p>
+        @if (!empty($cta))
+            <p style="margin-top:22px;"><a href="{{ $cta['url'] }}" style="display:inline-block;background:var(--accent,#E50914);color:#fff;padding:12px 26px;border-radius:999px;font-weight:700;text-decoration:none;">{{ $cta['text'] }}</a></p>
+        @endif
         <div class="brand">YAMBO TV</div>
     </div>
 </body>

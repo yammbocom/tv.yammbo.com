@@ -250,7 +250,7 @@ class TvLinkController extends Controller
             ]);
         }
 
-        // Crear la cuenta (User::created envia verificacion + bienvenida) con prueba de 7 dias
+        // Crear la cuenta (User::created envia la verificacion; la bienvenida sale al confirmar) con prueba de 7 dias
         try {
             $user = User::create([
                 'name' => $name,

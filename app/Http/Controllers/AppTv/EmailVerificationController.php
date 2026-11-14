@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\URL;
  */
 class EmailVerificationController extends Controller
 {
+    /** Desde aqui la bienvenida sale al confirmar el correo, no al registrarse (UTC). */
+    private const WELCOME_ON_VERIFY_SINCE = '2026-11-14 23:50:00';
+
     /**
      * Genera y envia el enlace de verificacion. Devuelve true si salio el correo
      * o si ya se mando uno hace menos de $minGapSeconds.
@@ -75,15 +78,42 @@ class EmailVerificationController extends Controller
             ], 404);
         }
 
-        if (! $user->email_verified_at) {
-            $user->email_verified_at = now();
-            $user->save();
+        // Condicional: con doble clic (o el escaner de enlaces del correo + el
+        // clic) solo una peticion marca la cuenta y manda la bienvenida.
+        $marked = User::whereKey($user->id)->whereNull('email_verified_at')
+            ->update(['email_verified_at' => now()]);
+        // Las altas anteriores a este cambio ya recibieron la bienvenida al registrarse.
+        if ($marked === 1 && $user->created_at?->gte(self::WELCOME_ON_VERIFY_SINCE)) {
+            self::sendWelcome($user->fresh());
         }
 
         return response()->view('verificar-correo', [
             'ok' => true,
-            'msg' => 'Ya puedes iniciar sesion en tu TV.',
+            'msg' => 'Ya puedes entrar en Yammbo Tv desde este navegador o desde tu TV.',
+            'cta' => ['text' => 'Entrar a Yammbo Tv', 'url' => url('/app/')],
         ]);
+    }
+
+    /** Bienvenida tras confirmar, con la fecha de su Premium de regalo o de su prueba. */
+    private static function sendWelcome(User $user): void
+    {
+        try {
+            $promo = \App\Models\Subscription::where('billable_type', 'user')
+                ->where('billable_id', $user->id)
+                ->where('vendor_slug', 'promo')
+                ->whereIn('status', ['active', 'trialing'])
+                ->where('ends_at', '>', now())
+                ->orderByDesc('ends_at')
+                ->value('ends_at');
+            $trial = $user->trial_ends_at && \Carbon\Carbon::parse($user->trial_ends_at)->isFuture()
+                ? $user->trial_ends_at : null;
+            $until = $promo ?: $trial;
+            \App\Support\YamboMail::welcome($user,
+                $until ? \Carbon\Carbon::parse($until)->format('d/m/Y') : null,
+                (bool) $promo);
+        } catch (\Throwable $e) {
+            \Log::error('verificacion, bienvenida: '.$e->getMessage());
+        }
     }
 
     /** Reenvia el enlace (desde la web del movil o la app). */

@@ -30,7 +30,8 @@
     <div class="icon">&#9993;</div>
     <h1>Verifica tu correo electronico</h1>
     <p>Te enviamos un enlace de confirmacion a <strong>{{ auth()->user()->email ?? 'tu correo' }}</strong>.<br>
-       Abrelo para poder ingresar.</p>
+       Busca el correo <strong>«Confirma tu correo»</strong> y pulsa su boton para poder ingresar.
+       Si no lo ves, revisa Correo no deseado o Promociones.</p>
     <form method="POST" action="{{ route('app-tv.reenviar-verificacion') }}">
         @csrf
         <input type="hidden" name="email" value="{{ auth()->user()->email ?? '' }}">

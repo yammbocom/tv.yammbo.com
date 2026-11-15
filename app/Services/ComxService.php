@@ -291,13 +291,14 @@ class ComxService
 
         // El endpoint es público y cada búsqueda recorre las tres bases con un
         // callback PHP por fila (~110 ms): la misma consulta se sirve de caché.
-        return Cache::remember('comx:search:v1:' . $type . ':' . md5($normQuery), 3600, fn (): array => $this->scoreSearchIds($type, $normQuery));
+        // v2: palabras en plural ("juegos de tronos") ya cuadran con el singular.
+        return Cache::remember('comx:search:v3:' . $type . ':' . md5($normQuery), 3600, fn (): array => $this->scoreSearchIds($type, $normQuery));
     }
 
     /** @return array<string,string> id TMDB => título */
     private function scoreSearchIds(string $type, string $normQuery): array
     {
-        $tokens = array_values(array_unique(explode(' ', $normQuery)));
+        $tokens = array_map(self::tokenForms(...), array_values(array_unique(explode(' ', $normQuery))));
         $compactQuery = str_replace(' ', '', $normQuery);
         $score = static fn ($title): int => self::titleScore((string) $title, $normQuery, $compactQuery, $tokens);
 
@@ -378,18 +379,51 @@ class ComxService
     }
 
     /**
+     * Formas con las que una palabra de la consulta cuadra: ella misma y, si
+     * acaba en plural, su singular. "juegos de tronos" no encontraba "Juego de
+     * Tronos" porque "juegos" no está dentro de "juego". Con "-es" se prueba
+     * también sin las dos letras: "canciones" → "cancion", "flores" → "flor".
+     *
+     * @return list<string>
+     */
+    private static function tokenForms(string $token): array
+    {
+        $forms = [$token];
+        if (strlen($token) >= 4 && str_ends_with($token, 's')) {
+            $forms[] = substr($token, 0, -1);
+            if (strlen($token) >= 5 && str_ends_with($token, 'es')) {
+                $forms[] = substr($token, 0, -2);
+            }
+        }
+
+        return $forms;
+    }
+
+    /**
      * 0 si el título no cuadra. Cuadra si contiene todas las palabras de la
-     * consulta (también pegadas: "spiderman" cuadra con "Spider-Man").
+     * consulta (también pegadas: "spiderman" cuadra con "Spider-Man"), cada
+     * una en alguna de sus formas (tokenForms).
+     *
+     * @param  list<list<string>>  $tokens
      */
     private static function titleScore(string $title, string $query, string $compactQuery, array $tokens): int
     {
         $norm = self::normalizeTitle($title);
         $compact = str_replace(' ', '', $norm);
+        $literal = true;
         if ($norm === $query || $compact === $compactQuery) {
             $rank = 4;
         } else {
-            foreach ($tokens as $token) {
-                if (! str_contains($norm, $token) && ! str_contains($compact, $token)) {
+            foreach ($tokens as $forms) {
+                $hit = false;
+                foreach ($forms as $i => $form) {
+                    if (str_contains($norm, $form) || str_contains($compact, $form)) {
+                        $hit = true;
+                        $literal = $literal && $i === 0;
+                        break;
+                    }
+                }
+                if (! $hit) {
                     return 0;
                 }
             }
@@ -402,7 +436,10 @@ class ComxService
             }
         }
 
-        return $rank * 1000 - min(strlen($norm), 999);
+        // A igual rango, el que tiene todas las palabras tal cual va antes que el
+        // que solo cuadra por el singular: buscando "mars", "U.S. Marshals" no
+        // puede quedar fuera de los 40 por "Mark" o "Mara", que son más cortos.
+        return $rank * 2000 + ($literal ? 1000 : 0) - min(strlen($norm), 999);
     }
 
     /** Título guardado en el repo, para fichas cuyo id de TMDB ya no existe. */

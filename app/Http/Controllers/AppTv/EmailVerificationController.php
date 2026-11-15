@@ -94,23 +94,11 @@ class EmailVerificationController extends Controller
         ]);
     }
 
-    /** Bienvenida tras confirmar, con la fecha de su Premium de regalo o de su prueba. */
+    /** Bienvenida tras confirmar. Sin fechas: el acceso inicial no se anuncia. */
     private static function sendWelcome(User $user): void
     {
         try {
-            $promo = \App\Models\Subscription::where('billable_type', 'user')
-                ->where('billable_id', $user->id)
-                ->where('vendor_slug', 'promo')
-                ->whereIn('status', ['active', 'trialing'])
-                ->where('ends_at', '>', now())
-                ->orderByDesc('ends_at')
-                ->value('ends_at');
-            $trial = $user->trial_ends_at && \Carbon\Carbon::parse($user->trial_ends_at)->isFuture()
-                ? $user->trial_ends_at : null;
-            $until = $promo ?: $trial;
-            \App\Support\YamboMail::welcome($user,
-                $until ? \Carbon\Carbon::parse($until)->format('d/m/Y') : null,
-                (bool) $promo);
+            \App\Support\YamboMail::welcome($user);
         } catch (\Throwable $e) {
             \Log::error('verificacion, bienvenida: '.$e->getMessage());
         }

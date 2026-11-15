@@ -146,6 +146,7 @@ return [
         'cycle_month' => 'Mensual',
         'trial_ends' => 'Fin de prueba',
         'next_renewal' => 'Próxima renovación',
+        'active_until' => 'Activo hasta',
         'access_until' => 'Acceso hasta',
         'payment_method' => 'Método de pago',
         'manage_subscription' => 'Gestionar suscripción',

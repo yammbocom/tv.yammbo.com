@@ -39,12 +39,14 @@
         <h1>Suscripción activada</h1>
         <p>Gracias. Tu pago se completó correctamente.</p>
         @if(($src ?? '') === 'web')
-            {{-- Pago hecho desde la web: ahi el contenido no reproduce, asi que lo
-                 util es que instale las apps, no devolverlo al navegador. --}}
+            {{-- Pago hecho desde la web: puede volver a la app web ya como Premium,
+                 o instalar las apps. --}}
             <div class="tv-note">
                 <strong>Ya puedes instalar Yammbo Tv.</strong><br>
                 Entra con esta misma cuenta y tendrás tu suscripción activa.
             </div>
+            <a class="cta" href="{{ url('/app/') }}">Volver a ver</a>
+            <br>
             <a class="cta" href="/install">Instalar en móvil o TV</a>
         @else
             {{-- Pago desde el movil o desde el QR de la TV: la app consulta el

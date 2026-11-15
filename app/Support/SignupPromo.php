@@ -130,7 +130,9 @@ class SignupPromo
         $data = [
             'plan_id' => $plan->id,
             'status' => 'active',
-            'cycle' => 'year',
+            // Una promo corta (prueba) no es un plan anual: la vista de la cuenta
+            // no debe presentarla como tal.
+            'cycle' => (int) config('yammbo.signup_promo.days', 0) < 60 ? 'month' : 'year',
             'seats' => 1,
             'ends_at' => $until->format('Y-m-d H:i:s'),
             'trial_ends_at' => null,

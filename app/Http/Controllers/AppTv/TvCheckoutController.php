@@ -54,7 +54,8 @@ class TvCheckoutController extends Controller
         $sub = \App\Models\Subscription::where('billable_type', 'user')
             ->where('billable_id', $user->id)
             ->where('status', 'active')
-            ->where(fn ($q) => $q->whereNull('vendor_slug')->orWhere('vendor_slug', '!=', 'trial'))
+            // The signup promo is not a paid plan: whoever has it can pay.
+            ->where(fn ($q) => $q->whereNull('vendor_slug')->orWhereNotIn('vendor_slug', ['trial', 'promo']))
             ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
             ->orderByRaw("vendor_slug = 'stripe' desc")
             ->orderByDesc('id')

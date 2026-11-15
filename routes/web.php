@@ -64,6 +64,13 @@ Route::get('/addon-logo/{slug}', [\App\Http\Controllers\AppTv\AddonCatalogContro
 Route::match(['get', 'options'], '/aio/{token}/{path}', [\App\Http\Controllers\AppTv\AddonProxyController::class, 'handle'])
     ->where(['token' => '[a-z0-9]{32,64}', 'path' => '.*']);
 
+/*
+ * Addon de streams Premium propio (sustituye al proxy /aio, cuyo proveedor
+ * dejo de responder). Mismo token por cuenta y 403 sin suscripcion activa.
+ */
+Route::match(['get', 'options'], '/yp/{token}/{path}', [\App\Http\Controllers\AppTv\PremiumStreamAddonController::class, 'handle'])
+    ->where(['token' => '[a-z0-9]{32,64}', 'path' => '.*']);
+
 /**
  * Stremio SPA (/app) — sirve index.html con el user Wave/Laravel inyectado
  * como window.YAMBO_USER para que el NavMenu y User.tsx muestren el email
@@ -162,8 +169,8 @@ Route::get('/api/app-tv/whoami', function () use ($yamboSubscriptionFor) {
 });
 
 /*
- * URL del addon premium para el SPA. Se devuelve ya tokenizada para esta
- * cuenta; el cliente nunca ve la del proveedor.
+ * URL del addon premium para el SPA (/yp/{token}/manifest.json). Se devuelve
+ * ya tokenizada para esta cuenta.
  */
 Route::get('/api/app-tv/addon-url', function () use ($yamboSubscriptionFor) {
     $user = auth()->user();
@@ -179,7 +186,7 @@ Route::get('/api/app-tv/addon-url', function () use ($yamboSubscriptionFor) {
 
     return response()->json([
         'active' => true,
-        'url' => url('/aio/'.$row->token.'/manifest.json'),
+        'url' => url('/yp/'.$row->token.'/manifest.json'),
     ]);
 });
 

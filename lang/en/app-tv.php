@@ -142,6 +142,7 @@ return [
         'cycle_month' => 'Monthly',
         'trial_ends' => 'Trial ends',
         'next_renewal' => 'Next renewal',
+        'active_until' => 'Active until',
         'access_until' => 'Access until',
         'payment_method' => 'Payment method',
         'manage_subscription' => 'Manage subscription',

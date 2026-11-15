@@ -17,6 +17,9 @@
         $activeSub = Subscription::where('billable_type', 'user')
             ->where('billable_id', $authUser->id)
             ->whereIn('status', ['active', 'trialing'])
+            // El acceso inicial (promo) no es un plan contratado: quien llega aqui
+            // tiene que ver el boton de pagar, no "Plan actual".
+            ->where('vendor_slug', '!=', 'promo')
             ->where(function ($q) use ($now) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
             })

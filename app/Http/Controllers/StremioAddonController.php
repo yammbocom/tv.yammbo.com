@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\AppTv\TrailerController;
 use App\Services\ComxService;
 use App\Services\TmdbService;
 use Illuminate\Http\JsonResponse;
@@ -78,13 +79,13 @@ class StremioAddonController extends Controller
 
         return $this->cors(response()->json([
             'id' => 'com.yammbo.tv',
-            'version' => '0.5.0',
+            'version' => '0.6.0',
             'name' => 'Yammbo Tv',
             'description' => $spanish
                 ? 'Películas y series con póster y reproducción, servidas por Yammbo Tv.'
                 : 'Movies and series with posters and playback, served by Yammbo Tv.',
             'logo' => url('/images/yambo-icon.png'),
-            'resources' => ['catalog', 'meta', 'stream', 'addon_catalog'],
+            'resources' => ['catalog', 'meta', 'addon_catalog'],
             'types' => ['movie', 'series'],
             'idPrefixes' => ['tt', 'yammbo', 'comx'],
             'catalogs' => $catalogs,
@@ -142,15 +143,14 @@ class StremioAddonController extends Controller
 
     public function stream(string $type, string $id): JsonResponse
     {
-        // Solo CO-MX trae fuentes propias; el resto las pone el addon premium.
-        $streams = str_starts_with($id, 'comx:') ? $this->comx->streams($type, $id) : [];
-
+        // Las fuentes las sirve el addon Premium por usuario (/yp/{token}/...),
+        // solo con suscripcion activa. Este addon publico nunca las da.
         return $this->cors(response()->json(
-            ['streams' => $streams],
+            ['streams' => []],
             200,
             [],
             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-        ));
+        ))->header('Cache-Control', 'private, no-store');
     }
 
     /** Recomendaciones ("parecidos") del repo, para el cajón lateral del reproductor. */
@@ -341,6 +341,7 @@ class StremioAddonController extends Controller
             }
 
             $meta = $this->comx->metaFromTmdb($data, $type, $tmdbId);
+            $meta = $this->withTrailer($meta, $type, (string) ($data['original_title'] ?? $data['original_name'] ?? ''), (int) $tmdbId);
             if ($type === 'series') {
                 // Sin `videos` la ficha no muestra temporadas ni se puede reproducir.
                 $meta['videos'] = $this->withEpisodeDetails($tmdbId, $this->comx->seriesVideos($tmdbId));
@@ -386,8 +387,43 @@ class StremioAddonController extends Controller
             'type' => $type,
             'name' => $title,
         ];
+        $meta = $this->withTrailer($meta, $type, '', 0);
         if ($type === 'series') {
             $meta['videos'] = $this->comx->seriesVideos($tmdbId);
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Añade el tráiler a la ficha (`trailers` para stremio-core, `trailerStreams`
+     * para el SPA), con la lógica y la caché de /api/app-tv/trailer. Nunca rompe la
+     * ficha: si no hay tráiler, falla o tarda demasiado, la ficha sale sin él. En el
+     * último caso se termina de buscar tras enviar la respuesta, para que la
+     * próxima vez esté en caché.
+     */
+    private function withTrailer(array $meta, string $type, string $orig, int $tmdbId): array
+    {
+        try {
+            $title = (string) ($meta['name'] ?? '');
+            $year = (int) ($meta['releaseInfo'] ?? 0);
+            $kind = $type === 'series' ? 'tv' : 'movie';
+            $found = app(TrailerController::class)->trailerFor($title, $orig, $year, $kind, 'es', $tmdbId, 4.0);
+
+            if (! empty($found['ok']) && ! empty($found['key'])) {
+                $meta['trailers'] = [['source' => $found['key'], 'type' => 'Trailer']];
+                $meta['trailerStreams'] = [['ytId' => $found['key'], 'title' => 'Tráiler']];
+            } else {
+                app()->terminating(function () use ($title, $orig, $year, $kind, $tmdbId) {
+                    try {
+                        app(TrailerController::class)->trailerFor($title, $orig, $year, $kind, 'es', $tmdbId);
+                    } catch (\Throwable $e) {
+                        // solo calienta la caché
+                    }
+                });
+            }
+        } catch (\Throwable $e) {
+            // la ficha sale sin tráiler
         }
 
         return $meta;

@@ -34,12 +34,15 @@ return [
     ],
 
     /*
-     * Promo de alta: toda cuenta nueva recibe este plan gratis durante N dias
-     * (fila en subscriptions con vendor_slug 'promo'). 0 = desactivada: vuelve
-     * la prueba normal de 7 dias. Puesta 2026-10-01 a peticion del dueño.
+     * Promo de alta: toda cuenta nueva recibe este plan durante N dias, sin
+     * avisarle (fila en subscriptions con vendor_slug 'promo'). Pasado ese
+     * plazo tiene que pagar: solo Premium (incluida esta promo) reproduce.
+     * 0 = desactivada. Los usuarios anteriores conservan lo que ya tienen.
+     * Nombre de env nuevo a proposito (TV_SIGNUP_TRIAL_DAYS): el antiguo
+     * TV_SIGNUP_PROMO_DAYS valia 365 y ya no se lee.
      */
     'signup_promo' => [
-        'days' => (int) env('TV_SIGNUP_PROMO_DAYS', 365),
+        'days' => (int) env('TV_SIGNUP_TRIAL_DAYS', 7),
         'plan_id' => (int) env('TV_SIGNUP_PROMO_PLAN_ID', 3),
     ],
 

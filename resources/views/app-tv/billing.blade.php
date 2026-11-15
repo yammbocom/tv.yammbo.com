@@ -81,7 +81,7 @@
         @endif
       </span>
     </div>
-    @if($subscription->cycle)
+    @if($subscription->cycle && $subscription->vendor_slug !== 'promo')
       <div class="row">
         <span class="label">{{ __('app-tv.billing.cycle') }}</span>
         <span class="value">{{ $subscription->cycle === 'year' ? __('app-tv.billing.cycle_year') : ($subscription->cycle === 'month' ? __('app-tv.billing.cycle_month') : ucfirst($subscription->cycle)) }}</span>
@@ -93,13 +93,14 @@
         <span class="value">{{ \Carbon\Carbon::parse($subscription->trial_ends_at)->format('d/m/Y') }}</span>
       </div>
     @endif
-    @if($subscription->ends_at)
+    {{-- The promo end date is not shown: the first days are silent. --}}
+    @if($subscription->ends_at && $subscription->vendor_slug !== 'promo')
       <div class="row">
         <span class="label">{{ $subscription->status === 'cancelled' ? __('app-tv.billing.access_until') : __('app-tv.billing.next_renewal') }}</span>
         <span class="value">{{ \Carbon\Carbon::parse($subscription->ends_at)->format('d/m/Y') }}</span>
       </div>
     @endif
-    @if($subscription->vendor_slug)
+    @if($subscription->vendor_slug && $subscription->vendor_slug !== 'promo')
       <div class="row">
         <span class="label">{{ __('app-tv.billing.payment_method') }}</span>
         <span class="value">{{ ucfirst($subscription->vendor_slug) }}</span>

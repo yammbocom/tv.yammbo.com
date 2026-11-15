@@ -88,21 +88,16 @@ class YamboMail
         ]);
     }
 
-    public static function welcome(User $user, ?string $trialEnds = null, bool $premium = false): bool
+    public static function welcome(User $user): bool
     {
-        $rows = [];
-        if ($trialEnds) {
-            $rows[$premium ? 'Premium gratis hasta' : 'Prueba gratis hasta'] = $trialEnds;
-        }
         return self::send($user->email, 'Bienvenido a Yambo TV', [
             'accent'     => self::RED,
             'title'      => 'Bienvenido a Yambo TV',
             'body'       => '<p style="margin:0 0 10px 0;">' . self::hello($user) . '</p>'
                           . '<p style="margin:0;">Tu cuenta ya esta lista. Abre la app en tu televisor y '
                           . 'vincula la sesion escaneando el codigo QR: no hace falta escribir contrasenas con el mando.</p>',
-            'actionText' => 'Ver mi cuenta',
-            'actionUrl'  => self::accountUrl($user),
-            'rows'       => $rows,
+            'actionText' => 'Entrar a Yammbo Tv',
+            'actionUrl'  => url('/app/'),
         ]);
     }
 

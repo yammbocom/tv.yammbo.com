@@ -44,13 +44,46 @@ class TrailerController extends Controller
             return response()->json(['ok' => false, 'reason' => 'no_title']);
         }
 
+        return response()->json($this->trailerFor($title, $orig, $year, $type, $lang, $tmdbId));
+    }
+
+    /** Instante (microtime) tras el cual se deja de llamar a TMDB/YouTube; null = sin limite. */
+    protected ?float $deadline = null;
+
+    /**
+     * Trailer de un titulo, con la misma cache de 7 dias (aciertos) / 1 dia (fallos)
+     * que el endpoint. Con $budget (segundos) deja de consultar a terceros pasado ese
+     * tiempo y no cachea un resultado incompleto, para que quien lo use dentro de otra
+     * respuesta (la ficha del addon) no se quede esperando.
+     */
+    public function trailerFor(string $title, string $orig, int $year, string $type, string $lang, int $tmdbId = 0, float $budget = 0): array
+    {
+        $title = mb_substr(trim($title), 0, 120);
+        $orig = mb_substr(trim($orig), 0, 120);
+        if ($title === '' && $orig === '') {
+            return ['ok' => false, 'reason' => 'no_title'];
+        }
+
         $ck = 'tv_trailer_v19_' . md5(implode('|', [$title, $orig, $year, $type, $lang, $tmdbId]));
         if (($hit = Cache::get($ck)) !== null) {
-            return response()->json($hit);
+            return $hit;
         }
-        $data = $this->resolve($title, $orig, $year, $type, $lang, $tmdbId);
-        Cache::put($ck, $data, $data['ok'] ? self::TTL_OK : self::TTL_MISS);
-        return response()->json($data);
+        $this->deadline = $budget > 0 ? microtime(true) + $budget : null;
+        try {
+            $data = $this->resolve($title, $orig, $year, $type, $lang, $tmdbId);
+            $incomplete = $this->deadline !== null && microtime(true) > $this->deadline;
+        } finally {
+            $this->deadline = null;
+        }
+        if (! $incomplete) {
+            Cache::put($ck, $data, $data['ok'] ? self::TTL_OK : self::TTL_MISS);
+        }
+        return $data;
+    }
+
+    private function overBudget(): bool
+    {
+        return $this->deadline !== null && microtime(true) > $this->deadline;
     }
 
     private function resolve(string $title, string $orig, int $year, string $type, string $lang, int $tmdbId = 0): array
@@ -318,7 +351,7 @@ class TrailerController extends Controller
      */
     private function youtubeSearch(string $title, string $orig, int $year, string $lang, bool $latino = false): array
     {
-        if ($title === '') {
+        if ($title === '' || $this->overBudget()) {
             return [];
         }
         $word = $lang === 'es' ? 'tráiler' : 'trailer';
@@ -493,6 +526,9 @@ class TrailerController extends Controller
         if (($hit = Cache::get($ck)) !== null) {
             return (bool) $hit;
         }
+        if ($this->overBudget()) {
+            return false;   // sin tiempo para comprobarlo: no se da por bueno ni se cachea
+        }
         try {
             $status = Http::timeout(5)->withHeaders(['User-Agent' => self::UA])
                 ->get('https://www.youtube.com/oembed', [
@@ -516,6 +552,9 @@ class TrailerController extends Controller
 
     protected function get(string $path, array $params): ?array
     {
+        if ($this->overBudget()) {
+            return null;
+        }
         try {
             $res = Http::timeout(8)->get(self::BASE . $path, $params);
             return $res->successful() ? $res->json() : null;

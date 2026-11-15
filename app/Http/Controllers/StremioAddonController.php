@@ -20,6 +20,9 @@ use Illuminate\Http\JsonResponse;
  */
 class StremioAddonController extends Controller
 {
+    /** Segundos máximos que la ficha espera al tráiler; el resto se completa tras enviar la respuesta. */
+    public const TRAILER_BUDGET = 1.5;
+
     public function __construct(
         private TmdbService $tmdb,
         private ComxService $comx,
@@ -408,12 +411,16 @@ class StremioAddonController extends Controller
             $title = (string) ($meta['name'] ?? '');
             $year = (int) ($meta['releaseInfo'] ?? 0);
             $kind = $type === 'series' ? 'tv' : 'movie';
-            $found = app(TrailerController::class)->trailerFor($title, $orig, $year, $kind, 'es', $tmdbId, 4.0);
+            $trailers = app(TrailerController::class);
+            $found = $trailers->trailerFor($title, $orig, $year, $kind, 'es', $tmdbId, self::TRAILER_BUDGET);
 
             if (! empty($found['ok']) && ! empty($found['key'])) {
                 $meta['trailers'] = [['source' => $found['key'], 'type' => 'Trailer']];
                 $meta['trailerStreams'] = [['ytId' => $found['key'], 'title' => 'Tráiler']];
-            } else {
+            }
+            // A result found within the budget can be partial (the latin search did
+            // not fit) and is then not cached: finish it after the response.
+            if (! \Illuminate\Support\Facades\Cache::has($trailers->cacheKey($title, $orig, $year, $kind, 'es', $tmdbId))) {
                 app()->terminating(function () use ($title, $orig, $year, $kind, $tmdbId) {
                     try {
                         app(TrailerController::class)->trailerFor($title, $orig, $year, $kind, 'es', $tmdbId);

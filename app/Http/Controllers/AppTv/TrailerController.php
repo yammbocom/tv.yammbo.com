@@ -64,7 +64,7 @@ class TrailerController extends Controller
             return ['ok' => false, 'reason' => 'no_title'];
         }
 
-        $ck = 'tv_trailer_v19_' . md5(implode('|', [$title, $orig, $year, $type, $lang, $tmdbId]));
+        $ck = $this->cacheKey($title, $orig, $year, $type, $lang, $tmdbId);
         if (($hit = Cache::get($ck)) !== null) {
             return $hit;
         }
@@ -79,6 +79,15 @@ class TrailerController extends Controller
             Cache::put($ck, $data, $data['ok'] ? self::TTL_OK : self::TTL_MISS);
         }
         return $data;
+    }
+
+    /** Clave de cache del tráiler (la misma para el endpoint, la ficha del addon y el calentado). */
+    public function cacheKey(string $title, string $orig, int $year, string $type, string $lang, int $tmdbId = 0): string
+    {
+        $title = mb_substr(trim($title), 0, 120);
+        $orig = mb_substr(trim($orig), 0, 120);
+
+        return 'tv_trailer_v19_' . md5(implode('|', [$title, $orig, $year, $type, $lang, $tmdbId]));
     }
 
     private function overBudget(): bool

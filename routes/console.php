@@ -15,3 +15,6 @@ Schedule::command('activity:clean')->daily();
 
 // Aviso de proxima renovacion: una vez al dia, 5 dias antes del cobro.
 Illuminate\Support\Facades\Schedule::command('yambo:avisos-renovacion')->dailyAt('09:00');
+
+// Calienta la caché de tráilers de los catálogos CO-MX para que la ficha no espere a TMDB/YouTube.
+Schedule::command('yambo:warm-trailers')->dailyAt('04:20')->withoutOverlapping();
